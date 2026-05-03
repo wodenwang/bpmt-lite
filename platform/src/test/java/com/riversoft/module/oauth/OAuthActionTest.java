@@ -106,7 +106,28 @@ public class OAuthActionTest {
 
         filter.doFilter(request, response, chain);
 
-        assertEquals("/oauth/OAuthAction/authorize.shtml", response.getForwardedUrl());
+        assertEquals("/oauth/OAuthAction/authorize.shtml?_full_url=http%3A%2F%2Flocalhost%2Foauth%2Fauthorize",
+                response.getForwardedUrl());
+    }
+
+    @Test
+    public void directFilterPassesPublicFullUrlToForwardedAction() throws Exception {
+        OAuthDirectFilter filter = new OAuthDirectFilter();
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/oauth/authorize");
+        request.setServerName("127.0.0.1");
+        request.setServerPort(18080);
+        request.setParameter("response_type", "code");
+        request.setParameter("client_id", "client-a");
+        request.setParameter("redirect_uri", "http://client.example/callback");
+        request.setQueryString("response_type=code&client_id=client-a&redirect_uri=http%3A%2F%2Fclient.example%2Fcallback");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        MockFilterChain chain = new MockFilterChain();
+
+        filter.doFilter(request, response, chain);
+
+        assertEquals(
+                "/oauth/OAuthAction/authorize.shtml?_full_url=http%3A%2F%2F127.0.0.1%3A18080%2Foauth%2Fauthorize%3Fresponse_type%3Dcode%26client_id%3Dclient-a%26redirect_uri%3Dhttp%253A%252F%252Fclient.example%252Fcallback",
+                response.getForwardedUrl());
     }
 
     private MockHttpServletRequest authorizeRequest() {

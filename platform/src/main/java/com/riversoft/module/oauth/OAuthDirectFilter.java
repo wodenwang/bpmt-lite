@@ -1,6 +1,8 @@
 package com.riversoft.module.oauth;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -12,6 +14,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.riversoft.core.web.Actions;
 
 @WebFilter("/oauth/*")
 public class OAuthDirectFilter implements Filter {
@@ -26,7 +30,7 @@ public class OAuthDirectFilter implements Filter {
         String path = httpRequest.getRequestURI().substring(httpRequest.getContextPath().length());
         String target = target(path);
         if (target != null) {
-            RequestDispatcher dispatcher = request.getRequestDispatcher(target);
+            RequestDispatcher dispatcher = request.getRequestDispatcher(withPublicFullUrl(httpRequest, target));
             dispatcher.forward(request, response);
             return;
         }
@@ -47,5 +51,21 @@ public class OAuthDirectFilter implements Filter {
             return "/oauth/OAuthAction/userinfo.shtml";
         }
         return null;
+    }
+
+    private String withPublicFullUrl(HttpServletRequest request, String target) {
+        StringBuilder publicUrl = new StringBuilder(request.getRequestURL());
+        if (request.getQueryString() != null) {
+            publicUrl.append('?').append(request.getQueryString());
+        }
+        return target + "?" + Actions.Keys.FULL_URL.toString() + "=" + urlEncode(publicUrl.toString());
+    }
+
+    private String urlEncode(String value) {
+        try {
+            return URLEncoder.encode(value, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalStateException("UTF-8 is unavailable.", e);
+        }
     }
 }
