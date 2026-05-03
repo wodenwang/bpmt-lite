@@ -114,8 +114,11 @@ public class MenuActionThirdpartTest {
                 StandardCharsets.UTF_8);
 
         assertTrue(jsp.indexOf("toggleMenuActionFields") >= 0);
-        assertTrue(jsp.indexOf("data-menu-action-row=\"view\"") >= 0);
-        assertTrue(jsp.indexOf("data-menu-action-row=\"thirdpart\"") >= 0);
+        assertTrue(jsp.indexOf("data-menu-open-type=\"1\"") >= 0);
+        assertTrue(jsp.indexOf("data-menu-open-type=\"2\"") >= 0);
+        assertTrue(jsp.indexOf("<th>打开网址</th>") >= 0);
+        assertTrue(jsp.indexOf("<th>打开第三方网址</th>") >= 0);
+        assertTrue(jsp.indexOf(":input", jsp.indexOf("toggleMenuActionFields")) >= 0);
         assertTrue(jsp.indexOf("<textarea name=\"thirdpartUrl\"") >= 0);
     }
 
