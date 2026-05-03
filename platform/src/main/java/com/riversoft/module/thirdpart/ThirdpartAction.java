@@ -53,13 +53,13 @@ public class ThirdpartAction {
         Map<String, Object> input = readInput(request);
         CmPri pri = readPri(request);
 
-        boolean editFlag = findByPk(thirdpartKey) != null;
-        if (editFlag) {
-            service().updateThirdpart(thirdpartKey, input, pri);
-            redirectInfoPage(request, response, "保存成功.");
-        } else {
+        boolean isCreate = "1".equals(RequestUtils.getStringValue(request, "isCreate"));
+        if (isCreate) {
             String clientSecret = service().createThirdpart(input, pri);
             redirectInfoPage(request, response, "新增成功. clientSecret只展示一次: " + clientSecret);
+        } else {
+            service().updateThirdpart(thirdpartKey, input, pri);
+            redirectInfoPage(request, response, "保存成功.");
         }
     }
 
@@ -72,12 +72,13 @@ public class ThirdpartAction {
         }
 
         String requestedFlag = RequestUtils.getStringValue(request, "activeFlag");
-        Integer activeFlag = StringUtils.isBlank(requestedFlag) ? Integer.valueOf(currentActiveFlag(entity) == 1 ? 0 : 1)
-                : Integer.valueOf(requestedFlag);
+        Object activeFlag = StringUtils.isBlank(requestedFlag) ? Integer.valueOf(currentActiveFlag(entity) == 1 ? 0 : 1)
+                : requestedFlag;
         Map<String, Object> input = new HashMap<String, Object>();
         input.put("activeFlag", activeFlag);
         service().updateThirdpart(thirdpartKey, input, null);
-        redirectInfoPage(request, response, activeFlag.intValue() == 1 ? "启用成功." : "停用成功.");
+        redirectInfoPage(request, response,
+                Integer.valueOf(1).equals(activeFlag) || "1".equals(activeFlag) ? "启用成功." : "停用成功.");
     }
 
     protected ThirdpartService service() {

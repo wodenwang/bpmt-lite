@@ -84,6 +84,7 @@ public class ThirdpartActionTest {
         TestThirdpartAction action = new TestThirdpartAction();
         action.createdSecret = "plain-secret";
         MockHttpServletRequest request = filledRequest();
+        request.setParameter("isCreate", "1");
 
         action.submitForm(request, new MockHttpServletResponse());
 
@@ -98,10 +99,26 @@ public class ThirdpartActionTest {
     }
 
     @Test
+    public void submitFormCreateIntentDoesNotUpdateExistingThirdpart() {
+        TestThirdpartAction action = new TestThirdpartAction();
+        action.createdSecret = "plain-secret";
+        action.entities.put("app-a", thirdpart("app-a", 1));
+        MockHttpServletRequest request = filledRequest();
+        request.setParameter("isCreate", "1");
+
+        action.submitForm(request, new MockHttpServletResponse());
+
+        assertEquals("create", action.writeMode);
+        assertEquals(null, action.updatedKey);
+        assertTrue(action.redirectMessage.indexOf("plain-secret") >= 0);
+    }
+
+    @Test
     public void submitFormUpdatesThirdpartAndAcceptsOptionalSecret() {
         TestThirdpartAction action = new TestThirdpartAction();
         action.entities.put("app-a", thirdpart("app-a", 1));
         MockHttpServletRequest request = filledRequest();
+        request.setParameter("isCreate", "0");
         request.setParameter("clientSecret", "new-secret");
 
         action.submitForm(request, new MockHttpServletResponse());
@@ -123,9 +140,23 @@ public class ThirdpartActionTest {
 
         action.toggleActive(request, new MockHttpServletResponse());
 
-        assertEquals(Integer.valueOf(0), action.input.get("activeFlag"));
+        assertEquals("0", action.input.get("activeFlag"));
         assertEquals("update", action.writeMode);
         assertTrue(action.redirectMessage.indexOf("停用") >= 0);
+    }
+
+    @Test
+    public void toggleActivePassesInvalidRequestedFlagToService() {
+        TestThirdpartAction action = new TestThirdpartAction();
+        action.entities.put("app-a", thirdpart("app-a", 1));
+        MockHttpServletRequest request = request();
+        request.setParameter("thirdpartKey", "app-a");
+        request.setParameter("activeFlag", "abc");
+
+        action.toggleActive(request, new MockHttpServletResponse());
+
+        assertEquals("abc", action.input.get("activeFlag"));
+        assertEquals("update", action.writeMode);
     }
 
     @Test

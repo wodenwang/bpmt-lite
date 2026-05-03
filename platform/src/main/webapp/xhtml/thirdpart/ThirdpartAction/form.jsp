@@ -21,6 +21,7 @@
 <c:set var="editFlag" value="${vo!=null}" />
 <div name="msgZone" id="${_zone}_err_zone"></div>
 <form aync="true" action="${_acp}/submitForm.shtml" method="post">
+	<input type="hidden" name="isCreate" value="${editFlag?0:1}" />
 	<table class="ws-table">
 		<tr>
 			<th>系统标识</th>
