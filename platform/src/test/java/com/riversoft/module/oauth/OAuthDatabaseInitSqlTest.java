@@ -25,6 +25,15 @@ public class OAuthDatabaseInitSqlTest {
             "UNIQUE KEY `UK_CM_THIRDPART_AUTH_CODE_HASH`",
             "UNIQUE KEY `UK_CM_THIRDPART_ACCESS_TOKEN_HASH`" };
 
+    private static final String[] REQUIRED_MENU_TOKENS = {
+            "('sys_thirdpart', '1', 'sys', '/thirdpart/ThirdpartAction/index.shtml', 'manage', 'link_edit.png', '外部第三方系统管理', '1', '13'",
+            "('sys_thirdpart', '1', 'sys_thirdpart', '外部第三方系统管理', NULL, '1', '2', '${true}')" };
+
+    private static final String[] REQUIRED_FULL_MENU_TOKENS = {
+            "('sys_menu',1,'sys','/manager/MenuAction/index.shtml','manage','application_side_list.png','用户菜单',1,195",
+            "('sys_thirdpart',1,'sys','/thirdpart/ThirdpartAction/index.shtml','manage','link_edit.png','外部第三方系统管理',1,196",
+            "('sys_thirdpart',1,'sys_thirdpart','外部第三方系统管理',NULL,1,2,'${true}')" };
+
     @Test
     public void defaultInitializationSqlContainsOAuthTables() throws Exception {
         assertOAuthTables(gzipReader("../database/bpmt-min.sql.gz"));
@@ -32,6 +41,16 @@ public class OAuthDatabaseInitSqlTest {
         assertOAuthTables(Files.newBufferedReader(Paths.get("../database/bpmt-db.sql"), StandardCharsets.UTF_8));
         assertOAuthTables(
                 Files.newBufferedReader(Paths.get("../database/v1.5.0-oauth-tables.sql"), StandardCharsets.UTF_8));
+    }
+
+    @Test
+    public void defaultInitializationSqlContainsThirdpartManagementMenu() throws Exception {
+        assertSqlContains(gzipReader("../database/bpmt-min.sql.gz"), REQUIRED_MENU_TOKENS,
+                "thirdpart management menu");
+        assertSqlContains(gzipReader("../database/bpmt.sql.gz"), REQUIRED_FULL_MENU_TOKENS,
+                "thirdpart management menu");
+        assertSqlContains(Files.newBufferedReader(Paths.get("../database/bpmt-db.sql"), StandardCharsets.UTF_8),
+                REQUIRED_MENU_TOKENS, "thirdpart management menu");
     }
 
     private void assertOAuthTables(BufferedReader reader) throws IOException {
@@ -49,6 +68,23 @@ public class OAuthDatabaseInitSqlTest {
             reader.close();
         }
         assertTrue("Missing OAuth SQL tokens: " + missing, missing.isEmpty());
+    }
+
+    private void assertSqlContains(BufferedReader reader, String[] requiredTokens, String label) throws IOException {
+        Set<String> missing = new LinkedHashSet<String>(Arrays.asList(requiredTokens));
+        try {
+            String line;
+            while ((line = reader.readLine()) != null && !missing.isEmpty()) {
+                for (String token : requiredTokens) {
+                    if (line.indexOf(token) >= 0) {
+                        missing.remove(token);
+                    }
+                }
+            }
+        } finally {
+            reader.close();
+        }
+        assertTrue("Missing " + label + " SQL tokens: " + missing, missing.isEmpty());
     }
 
     private BufferedReader gzipReader(String path) throws IOException {
