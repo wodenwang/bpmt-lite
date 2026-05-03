@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+  <class entity-name="CmThirdpart" table="CM_THIRDPART">
+    <cache usage="read-write" />
+    <comment>外部系统主数据</comment>
+    <id name="thirdpartKey" type="java.lang.String">
+      <column name="THIRDPART_KEY" length="100" not-null="true"><comment>外部系统业务主键</comment></column>
+    </id>
+    <property name="thirdpartName" type="java.lang.String"><column name="THIRDPART_NAME" length="200" not-null="true"><comment>外部系统名称</comment></column></property>
+    <property name="clientId" type="java.lang.String"><column name="CLIENT_ID" length="100" not-null="true"><comment>OAuth Client ID</comment></column></property>
+    <property name="clientSecretHash" type="java.lang.String"><column name="CLIENT_SECRET_HASH" length="128" not-null="true"><comment>OAuth Client Secret Hash</comment></column></property>
+    <property name="redirectUris" type="text"><column name="REDIRECT_URIS" not-null="true"><comment>OAuth 回调地址白名单</comment></column></property>
+    <property name="homeUrl" type="java.lang.String"><column name="HOME_URL" length="500"><comment>第三方系统入口地址</comment></column></property>
+    <many-to-one name="pri" class="com.riversoft.platform.po.CmPri" cascade="all" lazy="false">
+      <column name="PRI_KEY" length="100" not-null="true"><comment>外部系统权限点</comment></column>
+    </many-to-one>
+    <property name="activeFlag" type="java.lang.Integer"><column name="ACTIVE_FLAG" length="8" not-null="true" default="1"><comment>启用状态</comment></column></property>
+    <property name="description" type="java.lang.String"><column name="DESCRIPTION" length="500"><comment>说明</comment></column></property>
+    <property name="createTime" type="java.util.Date"><column name="CREATE_TIME" length="23" not-null="true"><comment>创建时间</comment></column></property>
+    <property name="updateTime" type="java.util.Date"><column name="UPDATE_TIME" length="23" not-null="true"><comment>更新时间</comment></column></property>
+  </class>
+</hibernate-mapping>

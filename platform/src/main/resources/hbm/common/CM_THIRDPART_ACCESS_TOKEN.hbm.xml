@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+  <class entity-name="CmThirdpartAccessToken" table="CM_THIRDPART_ACCESS_TOKEN">
+    <comment>外部系统 OAuth Access Token 运行数据</comment>
+    <id name="id" type="java.lang.String">
+      <column name="ID" length="100" not-null="true"><comment>ID</comment></column>
+    </id>
+    <property name="tokenHash" type="java.lang.String"><column name="TOKEN_HASH" length="128" not-null="true"><comment>Access Token Hash</comment></column></property>
+    <property name="clientId" type="java.lang.String"><column name="CLIENT_ID" length="100" not-null="true"><comment>OAuth Client ID</comment></column></property>
+    <property name="thirdpartKey" type="java.lang.String"><column name="THIRDPART_KEY" length="100" not-null="true"><comment>外部系统业务主键</comment></column></property>
+    <property name="userId" type="java.lang.String"><column name="USER_ID" length="100" not-null="true"><comment>用户 ID</comment></column></property>
+    <property name="expiresAt" type="java.util.Date"><column name="EXPIRES_AT" length="23" not-null="true"><comment>过期时间</comment></column></property>
+    <property name="revokedAt" type="java.util.Date"><column name="REVOKED_AT" length="23"><comment>吊销时间</comment></column></property>
+    <property name="lastUsedAt" type="java.util.Date"><column name="LAST_USED_AT" length="23"><comment>最后使用时间</comment></column></property>
+    <property name="createTime" type="java.util.Date"><column name="CREATE_TIME" length="23" not-null="true"><comment>创建时间</comment></column></property>
+  </class>
+</hibernate-mapping>
