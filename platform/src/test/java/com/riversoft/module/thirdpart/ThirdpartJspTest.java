@@ -39,6 +39,14 @@ public class ThirdpartJspTest {
         assertTrue(jsp.contains("thirdpartPri.shtml?groupId=${vo.groupId}"));
     }
 
+    @Test
+    public void priMenuUsesDomLookupForPermissionIdsWithDots() throws Exception {
+        String jsp = readWebapp("xhtml/manager/pri/PriGroupAction/menu_pri.jsp");
+
+        assertTrue(jsp.contains("document.getElementById('${_zone}_pri_' + treeNode.pri.priKey)"));
+        assertFalse(jsp.contains("$('#${_zone}_pri_' + treeNode.pri.priKey)"));
+    }
+
     private String readWebapp(String relativePath) throws Exception {
         return new String(Files.readAllBytes(Paths.get("src/main/webapp", relativePath)), StandardCharsets.UTF_8);
     }

@@ -47,6 +47,22 @@ public class OAuthActionTest {
     }
 
     @Test
+    public void authorizeWithoutThirdpartPermissionRedirectsAccessDeniedDescription() {
+        TestOAuthAction action = new TestOAuthAction();
+        action.loggedIn = true;
+        action.currentUserId = "oauth_no_pri";
+        action.canAccess = false;
+        MockHttpServletRequest request = authorizeRequest();
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        action.authorize(request, response);
+
+        assertEquals(
+                "http://client.example/callback?error=access_denied&error_description=%E6%97%A0%E6%9D%83%E9%99%90%E8%AE%BF%E9%97%AE%5B%E6%BC%94%E7%A4%BA%E7%B3%BB%E7%BB%9F%5D%E7%AC%AC%E4%B8%89%E6%96%B9%E7%B3%BB%E7%BB%9F%E3%80%82&state=s-1",
+                response.getRedirectedUrl());
+    }
+
+    @Test
     public void tokenReturnsOAuthJson() throws Exception {
         TestOAuthAction action = new TestOAuthAction();
         action.tokenResult.put("access_token", "token-a");
@@ -207,6 +223,7 @@ public class OAuthActionTest {
             Map<String, Object> thirdpart = new HashMap<String, Object>();
             thirdpart.put("clientId", clientId);
             thirdpart.put("thirdpartKey", "app-a");
+            thirdpart.put("thirdpartName", "演示系统");
             result.put("thirdpart", thirdpart);
             result.put("requestId", "request-a");
             return result;

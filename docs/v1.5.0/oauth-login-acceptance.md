@@ -18,7 +18,7 @@
 | 7 | authorize 未登录回登录页 | 未登录访问 `/oauth/authorize` 时进入现有 BPMT 登录页 |
 | 8 | 登录后回 authorize | 用户完成 BPMT 登录后回到原始 authorize 请求，并继续生成授权码 |
 | 9 | `redirect_uri` 白名单 | 不在 `CM_THIRDPART.REDIRECT_URIS` 白名单内的回调地址被拒绝，不回跳不可信地址 |
-| 10 | 权限不足 `access_denied` | 当前用户没有 `CM_THIRDPART.PRI_KEY` 权限时，返回或回跳 OAuth 错误 `access_denied` |
+| 10 | 权限不足 `access_denied` | 非超管用户没有 `CM_THIRDPART.PRI_KEY` 权限时，返回或回跳 OAuth 错误 `access_denied`，并明确提示无权限访问目标第三方系统；`admin` 作为系统级超管可绕过该权限校验 |
 | 11 | code 只能用一次 | 同一个授权码第一次换 token 成功后，再次使用返回 `invalid_grant` |
 | 12 | code 过期失败 | 超过授权码有效期后换 token 返回 `invalid_grant` |
 | 13 | token 正常 | 合法 code 可通过 `/oauth/token` 换取响应，包含 `access_token`、`token_type`、`expires_in`、`userid` |
@@ -49,11 +49,11 @@ OAuth 主流程可按以下顺序人工或自动化验收：
 ```text
 1. 创建启用状态的外部系统，记录 client_id、clientSecret、redirect_uri、PRI_KEY。
 2. 使用无 BPMT 登录态浏览器访问 /oauth/authorize。
-3. 登录 admin/admin，确认回到 authorize 并回跳第三方 redirect_uri。
+3. 登录 admin/admin，确认系统级超管可回到 authorize 并回跳第三方 redirect_uri。
 4. 使用 code 调 /oauth/token。
 5. 使用 access_token 调 /oauth/userinfo。
 6. 重复使用同一个 code，确认 invalid_grant。
-7. 使用无权限用户访问同一 client，确认 access_denied。
+7. 使用两个非超管测试账号访问同一 client：一个账号所属角色绑定目标第三方系统权限组，应成功获得 code；另一个账号不绑定该权限组，应返回 access_denied。
 8. 检查 runtime/platform-logs/ 下 OAuth INFO 日志和敏感值脱敏情况。
 ```
 

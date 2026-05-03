@@ -34,7 +34,7 @@
 					if (treeNode.pri == undefined) {
 						return;
 					}
-					var $priZone = $('#${_zone}_pri_' + treeNode.pri.priKey);
+					var $priZone = $(document.getElementById('${_zone}_pri_' + treeNode.pri.priKey));
 					$('button', $priZone).click();
 				}
 			}
@@ -45,6 +45,9 @@
 		var zTree = $.fn.zTree.init($tree, treeSetting, datas);
 		$tree.addClass("ztree");
 		zTree.expandAll(true);
+		function priZone(treeNode) {
+			return $(document.getElementById('${_zone}_pri_' + treeNode.pri.priKey));
+		}
 
 		//处理表单
 		$('form', $zone).submit(function(event) {
@@ -54,7 +57,7 @@
 			//提交之前把树勾选的项都勾上
 			var array = zTree.getCheckedNodes(true);
 			$.each(array, function(i, treeNode) {
-				var $priZone = $('#${_zone}_pri_' + treeNode.pri.priKey);
+				var $priZone = priZone(treeNode);
 				$(':checkbox', $priZone).prop("checked", true);
 			});
 

@@ -57,7 +57,8 @@ public class OAuthAction {
         if (!service.currentUserCanAccess(thirdpart)) {
             logger.info("OAuth authorize access denied. requestId={} clientId={} userId={} result={} reason={}",
                     requestId, clientId, userId, "deny", "access_denied");
-            redirectExternal(response, appendQuery(redirectUri, "error", "access_denied", state));
+            redirectExternal(response,
+                    appendErrorQuery(redirectUri, "access_denied", accessDeniedDescription(thirdpart), state));
             return;
         }
 
@@ -215,6 +216,33 @@ public class OAuthAction {
             url.append('&').append("state=").append(urlEncode(state));
         }
         return url.toString();
+    }
+
+    private String appendErrorQuery(String redirectUri, String error, String description, String state) {
+        StringBuilder url = new StringBuilder(redirectUri);
+        url.append(redirectUri.indexOf('?') >= 0 ? '&' : '?');
+        url.append("error=").append(urlEncode(error));
+        if (StringUtils.isNotEmpty(description)) {
+            url.append('&').append("error_description=").append(urlEncode(description));
+        }
+        if (StringUtils.isNotEmpty(state)) {
+            url.append('&').append("state=").append(urlEncode(state));
+        }
+        return url.toString();
+    }
+
+    private String accessDeniedDescription(Map<String, Object> thirdpart) {
+        if (thirdpart == null) {
+            return "无权限访问第三方系统。";
+        }
+        String name = stringValue(thirdpart.get("thirdpartName"));
+        if (StringUtils.isBlank(name)) {
+            name = stringValue(thirdpart.get("thirdpartKey"));
+        }
+        if (StringUtils.isBlank(name)) {
+            return "无权限访问第三方系统。";
+        }
+        return "无权限访问[" + name + "]第三方系统。";
     }
 
     private String bearerToken(HttpServletRequest request) {
