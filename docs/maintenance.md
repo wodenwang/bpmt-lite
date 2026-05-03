@@ -164,6 +164,43 @@ BPMT_API_ACT_AS=admin
 
 `BPMT_API_ACT_AS` 未配置或对应用户不可用时兜底 `admin`。`appKey` 和 `appSecret` 必须配置；默认 compose 已给出开发默认值，正式部署应覆盖。
 
+检查 OAuth 主流程：
+
+```bash
+curl -fsSI 'http://127.0.0.1/oauth/authorize?response_type=code&client_id=demo-client&redirect_uri=http%3A%2F%2F127.0.0.1%2Fdemo%2Fcallback&state=abc'
+```
+
+`v1.5.0` OAuth 主流程完全在 `bpmt-web/platform`，不改 `bpmt-api`。未登录访问 authorize 时应进入 BPMT 登录页，登录成功后回到原始 authorize 请求。`/oauth/token` 和 `/oauth/userinfo` 使用 OAuth JSON 响应，不使用 `success/data/error` 包装。
+
+检查 OAuth INFO 日志：
+
+```bash
+find runtime/platform-logs -type f | sort
+rg -n "oauth|OAuth|requestId|clientId|thirdpartKey|access_denied|invalid_grant" runtime/platform-logs runtime/tomcat-logs
+```
+
+OAuth 日志应能串联 authorize、token、userinfo 的开始和结果，并包含 `clientId`、`thirdpartKey`、`userid`、权限校验结果、错误码和失败原因。日志中禁止出现明文 `code`、`access_token`、`client_secret`、`password`；如需排障，只记录 hash 前缀、记录主键或 requestId。
+
+外部系统 `clientSecret` 轮换：
+
+1. 进入 BPMT 后台外部系统管理入口。
+2. 找到目标 `CM_THIRDPART` 记录。
+3. 执行生成或轮换 `clientSecret`。
+4. 立即记录页面展示的一次性明文 secret，并更新第三方系统服务端配置。
+5. 确认数据库仍只保存 `CLIENT_SECRET_HASH`，页面后续不可再次读取明文 secret。
+6. 使用新 secret 完成一次 authorize -> token -> userinfo 验收。
+7. 确认旧 secret 已无法换取 token。
+
+OAuth 状态表排障：
+
+| 表 | 重点字段 | 用途 |
+| --- | --- | --- |
+| `CM_THIRDPART` | `CLIENT_ID`、`CLIENT_SECRET_HASH`、`REDIRECT_URIS`、`PRI_KEY`、`ACTIVE_FLAG` | 外部系统启停、回调白名单、权限点和 client 凭证 |
+| `CM_THIRDPART_AUTH_CODE` | `CODE_HASH`、`CLIENT_ID`、`USER_ID`、`REDIRECT_URI`、`EXPIRES_AT`、`USED_AT` | 判断 code 是否存在、过期、已使用或绑定信息不一致 |
+| `CM_THIRDPART_ACCESS_TOKEN` | `TOKEN_HASH`、`CLIENT_ID`、`USER_ID`、`EXPIRES_AT`、`REVOKED_AT`、`LAST_USED_AT` | 判断 token 是否存在、过期、撤销或最近使用时间 |
+
+当前默认授权码有效期为 5 分钟，access token 有效期为 2 小时。后续可扩展为环境变量配置，例如授权码 TTL 和 access token TTL；在代码实现对应环境变量前，维护文档和部署脚本不要把这些 TTL 写成已可配置项。
+
 检查 H5 登录入口和本地资源：
 
 ```bash

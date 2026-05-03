@@ -190,6 +190,33 @@ API 文档有两种形态：
 
 API 和 Web 各自内嵌 Hazelcast，并通过 compose 网络组成同一集群；缓存保持开启。动态表结构写接口会同时更新数据库 DDL 和 BPMT 元数据表，因此调用前应明确目标表结构。
 
+## 外部系统 OAuth 登录
+
+`v1.5.0` 增加外部系统 OAuth 登录能力，BPMT 作为 OAuth2 Authorization Code 服务端，复用现有 BPMT 用户、登录页和权限体系。该能力主流程完全在 `bpmt-web/platform` 中实现，不改 `bpmt-api`，不提供 OIDC、`refresh_token` 或 `userid + thirdpartKey` 独立权限校验 API。
+
+OAuth 端点：
+
+| 方法 | 路径 | 说明 |
+| --- | --- | --- |
+| `GET` | `/oauth/authorize` | 浏览器授权入口，未登录时回 BPMT 登录页，登录后继续 authorize |
+| `POST` | `/oauth/token` | 使用一次性 code 换取不透明 access token 和 `userid` |
+| `GET` | `/oauth/userinfo` | 使用 `Authorization: Bearer <access_token>` 读取当前用户基础信息 |
+
+相关表：
+
+| 表 | 说明 |
+| --- | --- |
+| `CM_THIRDPART` | 外部系统主数据、OAuth client、回调白名单、入口 URL 和 `PRI_KEY` 权限点 |
+| `CM_THIRDPART_AUTH_CODE` | 授权码运行态；code 只保存 hash，默认 5 分钟过期且只能使用一次 |
+| `CM_THIRDPART_ACCESS_TOKEN` | token 运行态；access token 只保存 hash，默认 2 小时过期 |
+
+OAuth endpoints 使用 OAuth JSON 响应，不使用 API 的 `success/data/error` 包装。菜单第三方 URL / iframe 只是辅助入口：BPMT 只负责打开第三方页面，第三方页面没有自己的登录态时，应自行跳转 `/oauth/authorize` 发起 OAuth。
+
+参考文档：
+
+- [docs/v1.5.0/oauth-login-reference.md](docs/v1.5.0/oauth-login-reference.md)
+- [docs/v1.5.0/oauth-login-acceptance.md](docs/v1.5.0/oauth-login-acceptance.md)
+
 ## 常用配置
 
 默认 `docker-compose.yml` 只保留快速启动需要的常用项。
@@ -259,6 +286,8 @@ scripts/build-api-image.sh
 - v1.4.1 API 验收清单：[docs/v1.4.1/api-acceptance.md](docs/v1.4.1/api-acceptance.md)
 - v1.4.1 API Markdown 归档：[docs/v1.4.1/api-reference.md](docs/v1.4.1/api-reference.md)
 - v1.4.1 OpenAPI 归档：[docs/v1.4.1/openapi.json](docs/v1.4.1/openapi.json)
+- v1.5.0 OAuth 登录参考：[docs/v1.5.0/oauth-login-reference.md](docs/v1.5.0/oauth-login-reference.md)
+- v1.5.0 OAuth 验收清单：[docs/v1.5.0/oauth-login-acceptance.md](docs/v1.5.0/oauth-login-acceptance.md)
 - 维护说明：[docs/maintenance.md](docs/maintenance.md)
 
 ## 许可证与作者

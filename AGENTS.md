@@ -42,6 +42,7 @@
 - 如果后续 agent 更新运行说明、维护说明或交接说明，应与 README 的中文风格保持一致。
 - v1.3.0 期间的 source-of-truth 顺序是：`AGENTS.md` -> `docs/v1.3.0/*` -> `docs/v1.2.0/*` -> `README.md` -> implementation。
 - v1.4.0 API 规划和开发期间的 source-of-truth 顺序是：`AGENTS.md` -> `docs/superpowers/specs/2026-05-02-bpmt-lite-v1.4.0-api-design.md` -> `docs/v1.4.0/*` -> `README.md` -> implementation。
+- v1.5.0 OAuth 登录开发期间的 source-of-truth 顺序是：`AGENTS.md` -> `docs/superpowers/specs/2026-05-03-bpmt-lite-v1.5.0-oauth-login-design.md` -> `docs/v1.5.0/*` -> `README.md` -> implementation。
 - 涉及 Docker、数据库、初始化脚本、发布验收、公开文档的变更，必须同步更新对应文档，不能只改代码。
 
 ## 已验证的本地编译基线
@@ -203,6 +204,22 @@ docker compose up -d
 - JSON 响应统一为 `success/data/error` 包装，错误响应必须包含稳定 `code` 和 `requestId`。
 - 每个对外接口必须同步更新 OpenAPI、Web 文档和单测。
 - 动态表 API 只管理结构，不管理业务数据；动态表删除等危险能力默认不暴露。
+
+## v1.5.0 OAuth 开发规则
+
+- v1.5.0 OAuth 主流程完全在 `bpmt-web/platform`，不进入也不改 `bpmt-api`。
+- `bpmt-api` 的 `/api/docs/` 和 `/api/openapi.json` 只作为回归验收入口，不为 OAuth 新增 API 内容。
+- BPMT 作为 OAuth2 Authorization Code 服务端，不实现 OIDC，不提供 `refresh_token`。
+- OAuth 端点固定为 `/oauth/authorize`、`/oauth/token`、`/oauth/userinfo`。
+- OAuth endpoints 使用 OAuth JSON 响应，不使用 `success/data/error` 包装。
+- 外部系统主数据是 `CM_THIRDPART`，授权码状态是 `CM_THIRDPART_AUTH_CODE`，token 状态是 `CM_THIRDPART_ACCESS_TOKEN`。
+- `code` 和 `access_token` 只保存 hash，DB 是 OAuth 运行态 source of truth。
+- 外部系统 `clientSecret` 只展示一次，DB 只保存 `CLIENT_SECRET_HASH`。
+- 权限边界使用 `CM_THIRDPART.PRI_KEY` 对接现有 BPMT 权限体系。
+- 菜单第三方 URL / iframe 只是辅助入口，不是 OAuth 主流程；第三方页面无登录态时应自行发起 OAuth。
+- `userid + thirdpartKey` 独立权限校验 API 暂不纳入 v1.5.0 验收范围。
+- OAuth 主流程必须登记 `INFO` 日志，覆盖 authorize、token、userinfo 的开始、结果、错误码和关键状态。
+- 日志禁止记录明文 `code`、`access_token`、`client_secret`、`password`。
 
 ## 维护者构建约定
 
@@ -498,6 +515,27 @@ v1.4.0 API 设计文档：
 - 本地 Web/API Hazelcast 双 member 验证通过，日志显示 `Members [2]`。
 - `ghcr.io/wodenwang/bpmt-lite:1.4.0` 与 `ghcr.io/wodenwang/bpmt-lite-api:1.4.0` 已推送，匿名拉取验证通过；两个 `latest` tag 已同步到对应 digest。
 - 发布后已用 `v1.4.0` raw `scripts/run.sh`、最小库 `bpmt_min` 和发布镜像做独立临时 compose 验证；`/`、`/ueditor/`、API 文档、API smoke 和 Hazelcast 双 member 均通过。
+
+## v1.5.0 OAuth 登录状态
+
+截至 2026-05-03，v1.5.0 已确认规划方向：在 `bpmt-web/platform` 内新增外部系统 OAuth 登录能力，让 BPMT 作为 OAuth2 Authorization Code 服务端复用现有用户、登录页和权限体系。
+
+当前状态摘要：
+
+- OAuth 主流程只在 `bpmt-web/platform`，不改 `bpmt-api`。
+- `bpmt-api` 的 `/api/docs/` 和 `/api/openapi.json` 仍需作为回归验收项返回 200。
+- 外部系统主数据使用 `CM_THIRDPART`，授权码使用 `CM_THIRDPART_AUTH_CODE`，token 使用 `CM_THIRDPART_ACCESS_TOKEN`。
+- `code`、`access_token`、`clientSecret` 明文不入库；DB 只保存 hash，DB 是 OAuth 运行态 source of truth。
+- OAuth endpoints 使用 OAuth JSON，不使用 `success/data/error` 包装。
+- OAuth 主流程必须有 `INFO` 日志，且不能记录明文 `code`、`access_token`、`client_secret`、`password`。
+- 菜单第三方 URL / iframe 是辅助入口，不是 OAuth 主流程。
+- `userid + thirdpartKey` 独立权限校验 API 暂不纳入 v1.5.0，后续版本单独设计。
+- v1.5.0 不包含独立 `bpmt-thirdpart-login-demo` 仓库。
+
+v1.5.0 文档见：
+
+- `docs/v1.5.0/oauth-login-reference.md`
+- `docs/v1.5.0/oauth-login-acceptance.md`
 
 ## 原始项目参考源
 
