@@ -22,7 +22,7 @@ public class ThirdpartService {
         if (StringUtils.isBlank(redirectUris) || StringUtils.isBlank(candidate)) {
             return false;
         }
-        String value = candidate.trim();
+        String value = candidate;
         if (!value.startsWith("http://") && !value.startsWith("https://")) {
             return false;
         }

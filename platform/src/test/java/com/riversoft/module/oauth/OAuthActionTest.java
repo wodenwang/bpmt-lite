@@ -71,6 +71,21 @@ public class OAuthActionTest {
     }
 
     @Test
+    public void tokenRejectsNonPostMethod() throws Exception {
+        TestOAuthAction action = new TestOAuthAction();
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/oauth/token");
+        request.setParameter("grant_type", "authorization_code");
+        request.setParameter("client_id", "client-a");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        action.token(request, response);
+
+        assertEquals(405, response.getStatus());
+        assertEquals("POST", response.getHeader("Allow"));
+        assertTrue(response.getContentAsString().contains("\"error\":\"invalid_request\""));
+    }
+
+    @Test
     public void userinfoRejectsMissingBearerToken() throws Exception {
         TestOAuthAction action = new TestOAuthAction();
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/oauth/userinfo");

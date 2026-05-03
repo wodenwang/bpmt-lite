@@ -69,6 +69,15 @@ public class OAuthAction {
 
     @ActionAccess(login = false)
     public void token(HttpServletRequest request, HttpServletResponse response) {
+        if (!"POST".equalsIgnoreCase(request.getMethod())) {
+            logger.info("OAuth token rejected. clientId={} result={} reason={}", request.getParameter("client_id"),
+                    "deny", "method_not_allowed");
+            response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+            response.setHeader("Allow", "POST");
+            writeJson(request, response, OAuthJson.error("invalid_request", "token endpoint requires POST."));
+            return;
+        }
+
         String grantType = request.getParameter("grant_type");
         String clientId = request.getParameter("client_id");
         if (!"authorization_code".equals(grantType)) {

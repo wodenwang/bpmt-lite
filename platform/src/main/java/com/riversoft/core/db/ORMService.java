@@ -31,7 +31,7 @@ import com.riversoft.core.exception.SystemRuntimeException;
 /**
  * 通用数据库服务.<br>
  * 封装通用hibernate操作。
- * 
+ *
  */
 public class ORMService {
 
@@ -107,7 +107,7 @@ public class ORMService {
 
 	/**
 	 * 执行自定义HQL更新并返回影响行数.
-	 * 
+	 *
 	 * @param hql
 	 * @param values
 	 * @return 影响行数

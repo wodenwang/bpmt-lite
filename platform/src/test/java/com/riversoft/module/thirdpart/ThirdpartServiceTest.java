@@ -12,6 +12,8 @@ public class ThirdpartServiceTest {
         assertTrue(ThirdpartService.isAllowedRedirectUri("http://127.0.0.1/demo/callback",
                 "http://127.0.0.1/demo/callback"));
         assertTrue(ThirdpartService.isAllowedRedirectUri("http://a/cb\nhttp://b/cb", "http://b/cb"));
+        assertFalse(ThirdpartService.isAllowedRedirectUri("http://a/cb", " http://a/cb"));
+        assertFalse(ThirdpartService.isAllowedRedirectUri("http://a/cb", "http://a/cb "));
         assertFalse(ThirdpartService.isAllowedRedirectUri("http://a/cb", "http://a/cb/extra"));
         assertFalse(ThirdpartService.isAllowedRedirectUri("http://a/cb", "javascript:alert(1)"));
     }
