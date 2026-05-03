@@ -135,9 +135,10 @@ public class OAuthService {
         }
 
         Date now = now();
-        DataPO authCodePO = new DataPO(AUTH_CODE_ENTITY, authCode);
-        authCodePO.set("usedAt", now);
-        update(authCodePO.toEntity());
+        if (!consumeAuthorizationCode(authCode, now)) {
+            logInfo(requestId, clientId, thirdpartKey, userId, "deny", "grant_already_consumed");
+            return error("invalid_grant", "authorization code is invalid.");
+        }
 
         String accessToken = OAuthSecurity.generateOpaqueValue();
         DataPO tokenPO = new DataPO(ACCESS_TOKEN_ENTITY);
@@ -203,6 +204,16 @@ public class OAuthService {
     protected Map<String, Object> findAccessTokenByHash(String tokenHash) {
         return (Map<String, Object>) ORMService.getInstance().find(ACCESS_TOKEN_ENTITY,
                 new DataCondition().setStringEqual("tokenHash", tokenHash).toEntity());
+    }
+
+    protected boolean consumeAuthorizationCode(Map<String, Object> authCode, Date usedAt) {
+        String hql = "update " + AUTH_CODE_ENTITY
+                + " set usedAt = ? where id = ? and usedAt is null and expiresAt > ? and codeHash = ?"
+                + " and clientId = ? and thirdpartKey = ? and redirectUri = ?";
+        int rows = ORMService.getInstance().executeHQLUpdate(hql, usedAt, authCode.get("id"), usedAt,
+                authCode.get("codeHash"), authCode.get("clientId"), authCode.get("thirdpartKey"),
+                authCode.get("redirectUri"));
+        return rows == 1;
     }
 
     protected void save(Map<String, Object> po) {

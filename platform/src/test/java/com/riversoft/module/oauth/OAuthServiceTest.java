@@ -3,7 +3,6 @@ package com.riversoft.module.oauth;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -63,6 +62,23 @@ public class OAuthServiceTest {
         assertEquals("admin", first.get("userid"));
         assertEquals("invalid_grant", second.get("error"));
         assertEquals(1, service.tokens.size());
+    }
+
+    @Test
+    public void concurrentAuthCodeExchangeSignsAtMostOneToken() {
+        TestOAuthService service = new TestOAuthService();
+        service.alwaysReadFreshAuthCode = true;
+        Map<String, Object> thirdpart = thirdpart("app-a", "client-a", "secret", "http://127.0.0.1/callback");
+        service.addThirdpart(thirdpart);
+        String code = service.createAuthorizationCode(thirdpart, "admin", "http://127.0.0.1/callback", "state-a");
+
+        Map<String, Object> first = service.exchangeCode("client-a", "secret", code, "http://127.0.0.1/callback");
+        Map<String, Object> second = service.exchangeCode("client-a", "secret", code, "http://127.0.0.1/callback");
+
+        assertNotNull(first.get("access_token"));
+        assertEquals("invalid_grant", second.get("error"));
+        assertEquals(1, service.tokens.size());
+        assertEquals(2, service.consumeAttempts);
     }
 
     @Test
@@ -129,6 +145,8 @@ public class OAuthServiceTest {
         private final List<Map<String, Object>> tokens = new ArrayList<Map<String, Object>>();
         private Date now = new Date(1000000L);
         private long authCodeTtlMillis = 5L * 60L * 1000L;
+        private boolean alwaysReadFreshAuthCode;
+        private int consumeAttempts;
 
         void addThirdpart(Map<String, Object> thirdpart) {
             thirdparts.add(thirdpart);
@@ -146,7 +164,13 @@ public class OAuthServiceTest {
 
         @Override
         protected Map<String, Object> findAuthCodeByHash(String codeHash) {
-            return findByHash(authCodes, "codeHash", codeHash);
+            Map<String, Object> authCode = findByHash(authCodes, "codeHash", codeHash);
+            if (authCode == null || !alwaysReadFreshAuthCode) {
+                return authCode;
+            }
+            Map<String, Object> copy = new HashMap<String, Object>(authCode);
+            copy.put("usedAt", null);
+            return copy;
         }
 
         @Override
@@ -167,6 +191,17 @@ public class OAuthServiceTest {
         @Override
         protected void update(Map<String, Object> po) {
             // In-memory maps are updated by reference through DataPO.
+        }
+
+        @Override
+        protected boolean consumeAuthorizationCode(Map<String, Object> authCode, Date usedAt) {
+            consumeAttempts++;
+            Map<String, Object> stored = findByHash(authCodes, "codeHash", (String) authCode.get("codeHash"));
+            if (stored == null || stored.get("usedAt") != null || !((Date) stored.get("expiresAt")).after(usedAt)) {
+                return false;
+            }
+            stored.put("usedAt", usedAt);
+            return true;
         }
 
         @Override
