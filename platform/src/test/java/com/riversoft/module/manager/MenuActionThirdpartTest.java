@@ -108,10 +108,23 @@ public class MenuActionThirdpartTest {
         assertFrameMenuHandlesExternalIframe("src/main/webapp/xhtml/frame_new/menu.jsp");
     }
 
+    @Test
+    public void menuFormTogglesViewAndThirdpartUrlFields() throws IOException {
+        String jsp = new String(Files.readAllBytes(Paths.get("src/main/webapp/xhtml/manager/MenuAction/menu_form.jsp")),
+                StandardCharsets.UTF_8);
+
+        assertTrue(jsp.indexOf("toggleMenuActionFields") >= 0);
+        assertTrue(jsp.indexOf("data-menu-action-row=\"view\"") >= 0);
+        assertTrue(jsp.indexOf("data-menu-action-row=\"thirdpart\"") >= 0);
+        assertTrue(jsp.indexOf("<textarea name=\"thirdpartUrl\"") >= 0);
+    }
+
     private void assertFrameMenuHandlesExternalIframe(String path) throws IOException {
         String jsp = new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
         assertTrue(jsp.indexOf("case 2://第三方网页") >= 0);
         assertTrue(jsp.indexOf("document.createElement(\"iframe\")") >= 0);
+        assertTrue(jsp.indexOf("resizeThirdpartFrame") >= 0);
+        assertTrue(jsp.indexOf("bpmt-thirdpart-frame") >= 0);
         assertTrue(jsp.indexOf("openThirdpartFrame(action)") >= 0);
     }
 

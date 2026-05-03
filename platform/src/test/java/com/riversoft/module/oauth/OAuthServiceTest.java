@@ -47,6 +47,38 @@ public class OAuthServiceTest {
     }
 
     @Test
+    public void overlongStateReturnsInvalidRequestBeforePersistingAuthCode() {
+        TestOAuthService service = new TestOAuthService();
+        StringBuilder state = new StringBuilder();
+        for (int i = 0; i < 501; i++) {
+            state.append('s');
+        }
+        Map<String, Object> thirdpart = thirdpart("app-a", "client-a", "secret", "http://127.0.0.1/callback");
+
+        Map<String, Object> result = service.createAuthorizationCodeResult(thirdpart, "admin",
+                "http://127.0.0.1/callback", state.toString());
+
+        assertEquals("invalid_request", result.get("error"));
+        assertEquals(0, service.authCodes.size());
+    }
+
+    @Test
+    public void overlongRedirectUriReturnsInvalidRequestBeforePersistingAuthCode() {
+        TestOAuthService service = new TestOAuthService();
+        StringBuilder redirectUri = new StringBuilder("http://127.0.0.1/callback?");
+        for (int i = 0; i < 501; i++) {
+            redirectUri.append('r');
+        }
+        Map<String, Object> thirdpart = thirdpart("app-a", "client-a", "secret", redirectUri.toString());
+
+        Map<String, Object> result = service.createAuthorizationCodeResult(thirdpart, "admin", redirectUri.toString(),
+                "state-a");
+
+        assertEquals("invalid_request", result.get("error"));
+        assertEquals(0, service.authCodes.size());
+    }
+
+    @Test
     public void authCodeCanBeConsumedOnce() {
         TestOAuthService service = new TestOAuthService();
         Map<String, Object> thirdpart = thirdpart("app-a", "client-a", "secret", "http://127.0.0.1/callback");

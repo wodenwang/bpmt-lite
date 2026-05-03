@@ -7,6 +7,16 @@
 <script type="text/javascript">
 	$(function() {
 		var $zone = $('#${_zone}');
+		var toggleMenuActionFields = function() {
+			var openType = $(':input[name=openType]:checked', $zone).val();
+			if (openType == undefined || openType == '') {
+				openType = $(':input[name=openType]', $zone).val();
+			}
+			$('[data-menu-action-row=view]', $zone).toggle(openType == '1');
+			$('[data-menu-action-row=thirdpart]', $zone).toggle(openType == '2');
+		};
+		$zone.on('change click', ':input[name=openType]', toggleMenuActionFields);
+		toggleMenuActionFields();
 
 		//表单动作
 		$('form', $zone).submit(function() {
@@ -64,13 +74,13 @@
 								<th>打开类型</th>
 								<td><wcm:widget name="openType" cmd="radio[@com.riversoft.module.frame.MenuOpenType]{required:true}" value="${isCreate?1:vo.openType}"></wcm:widget></td>
 							</tr>
-							<tr>
+							<tr data-menu-action-row="view">
 								<th>链接视图</th>
 								<td><wcm:widget name="action" cmd="view[MENU]" value="${vo.action}" /></td>
 							</tr>
-							<tr>
+							<tr data-menu-action-row="thirdpart">
 								<th>第三方网页地址</th>
-								<td><input type="text" name="thirdpartUrl" value="<c:out value='${vo.action}' />" style="width: 90%;" /> <font color="red" tip="true" title="打开类型为第三方网页时使用该地址，可填写 http://、https:// 或 / 开头的地址。">(提示)</font></td>
+								<td><textarea name="thirdpartUrl" rows="4" style="width: 90%;"><c:out value='${vo.action}' /></textarea> <font color="red" tip="true" title="打开类型为第三方网页时使用该地址，可填写 http://、https:// 或 / 开头的地址。">(提示)</font></td>
 							</tr>
 						</c:when>
 						<c:otherwise>

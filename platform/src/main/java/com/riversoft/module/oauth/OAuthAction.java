@@ -62,7 +62,15 @@ public class OAuthAction {
             return;
         }
 
-        String code = service.createAuthorizationCode(thirdpart, userId, redirectUri, state);
+        Map<String, Object> codeResult = service.createAuthorizationCodeResult(thirdpart, userId, redirectUri, state);
+        if (hasError(codeResult)) {
+            logger.info("OAuth authorize rejected before code. requestId={} clientId={} userId={} result={} reason={}",
+                    requestId, clientId, userId, "deny", codeResult.get("error"));
+            redirectExternal(response, appendErrorQuery(redirectUri, stringValue(codeResult.get("error")),
+                    stringValue(codeResult.get("error_description")), validStateForRedirect(state)));
+            return;
+        }
+        String code = stringValue(codeResult.get("code"));
         logger.info("OAuth authorize issued code. requestId={} clientId={} userId={} result={} reason={}",
                 requestId, clientId, userId, "allow", "code_issued");
         redirectExternal(response, appendQuery(redirectUri, "code", code, state));
@@ -130,9 +138,11 @@ public class OAuthAction {
         String userId = stringValue(tokenInfo.get("userid"));
         UsUser user = loadUser(userId);
         if (user == null) {
-            user = new UsUser();
-            user.setUid(userId);
-            user.setBusiName(userId);
+            logger.info("OAuth userinfo rejected. clientId={} userId={} result={} reason={}", tokenInfo.get("client_id"),
+                    userId, "deny", "user_not_found");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            writeJson(request, response, OAuthJson.error("invalid_token", "user is inactive or not found."));
+            return;
         }
         logger.info("OAuth userinfo success. clientId={} userId={} result={} reason={}", tokenInfo.get("client_id"),
                 userId, "allow", "userinfo");
@@ -187,6 +197,8 @@ public class OAuthAction {
     }
 
     protected void writeJson(HttpServletRequest request, HttpServletResponse response, Map<String, Object> body) {
+        response.setHeader("Cache-Control", "no-store");
+        response.setHeader("Pragma", "no-cache");
         Actions.showJson(request, response, body);
     }
 
@@ -267,5 +279,9 @@ public class OAuthAction {
 
     private String stringValue(Object value) {
         return value == null ? null : String.valueOf(value);
+    }
+
+    private String validStateForRedirect(String state) {
+        return state != null && state.length() <= 500 ? state : null;
     }
 }

@@ -84,6 +84,8 @@ public class OAuthActionTest {
         assertTrue(json.contains("\"token_type\":\"Bearer\""));
         assertTrue(json.contains("\"expires_in\":7200"));
         assertTrue(json.contains("\"userid\":\"admin\""));
+        assertEquals("no-store", response.getHeader("Cache-Control"));
+        assertEquals("no-cache", response.getHeader("Pragma"));
     }
 
     @Test
@@ -105,6 +107,20 @@ public class OAuthActionTest {
     public void userinfoRejectsMissingBearerToken() throws Exception {
         TestOAuthAction action = new TestOAuthAction();
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/oauth/userinfo");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        action.userinfo(request, response);
+
+        assertEquals(401, response.getStatus());
+        assertTrue(response.getContentAsString().contains("\"error\":\"invalid_token\""));
+    }
+
+    @Test
+    public void userinfoRejectsTokenWhenUserNoLongerExists() throws Exception {
+        TestOAuthAction action = new TestOAuthAction();
+        action.userExists = false;
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/oauth/userinfo");
+        request.addHeader("Authorization", "Bearer token-a");
         MockHttpServletResponse response = new MockHttpServletResponse();
 
         action.userinfo(request, response);
@@ -165,6 +181,7 @@ public class OAuthActionTest {
         private String currentUserId;
         private String code = "code-a";
         private String loginTarget;
+        private boolean userExists = true;
         private final Map<String, Object> tokenResult = new HashMap<String, Object>();
 
         @Override
@@ -191,6 +208,9 @@ public class OAuthActionTest {
 
         @Override
         protected UsUser loadUser(String userId) {
+            if (!userExists) {
+                return null;
+            }
             UsUser user = new UsUser();
             user.setUid(userId);
             user.setBusiName("管理员");
@@ -238,6 +258,14 @@ public class OAuthActionTest {
         public String createAuthorizationCode(Map<String, Object> thirdpart, String userId, String redirectUri,
                 String state) {
             return action.code;
+        }
+
+        @Override
+        public Map<String, Object> createAuthorizationCodeResult(Map<String, Object> thirdpart, String userId,
+                String redirectUri, String state) {
+            Map<String, Object> result = new HashMap<String, Object>();
+            result.put("code", action.code);
+            return result;
         }
 
         @Override

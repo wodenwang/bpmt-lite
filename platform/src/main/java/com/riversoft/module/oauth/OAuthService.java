@@ -24,6 +24,8 @@ public class OAuthService {
     private static final long AUTH_CODE_TTL_MILLIS = 5L * 60L * 1000L;
     private static final long ACCESS_TOKEN_TTL_MILLIS = 7200L * 1000L;
     private static final long ACCESS_TOKEN_EXPIRES_IN = 7200L;
+    private static final int AUTH_CODE_REDIRECT_URI_MAX_LENGTH = 500;
+    private static final int AUTH_CODE_STATE_MAX_LENGTH = 500;
 
     private final ThirdpartService thirdpartService = new ThirdpartService();
 
@@ -84,9 +86,24 @@ public class OAuthService {
 
     public String createAuthorizationCode(Map<String, Object> thirdpart, String userId, String redirectUri,
             String state) {
+        Map<String, Object> result = createAuthorizationCodeResult(thirdpart, userId, redirectUri, state);
+        return stringValue(result.get("code"));
+    }
+
+    public Map<String, Object> createAuthorizationCodeResult(Map<String, Object> thirdpart, String userId,
+            String redirectUri, String state) {
         String requestId = requestId();
         String clientId = thirdpart == null ? null : stringValue(thirdpart.get("clientId"));
         String thirdpartKey = thirdpart == null ? null : stringValue(thirdpart.get("thirdpartKey"));
+        if (exceedsMaxLength(redirectUri, AUTH_CODE_REDIRECT_URI_MAX_LENGTH)) {
+            logInfo(requestId, clientId, thirdpartKey, userId, "deny", "redirect_uri_too_long");
+            return error("invalid_request", "redirect_uri is too long.");
+        }
+        if (exceedsMaxLength(state, AUTH_CODE_STATE_MAX_LENGTH)) {
+            logInfo(requestId, clientId, thirdpartKey, userId, "deny", "state_too_long");
+            return error("invalid_request", "state is too long.");
+        }
+
         String code = OAuthSecurity.generateOpaqueValue();
         Date now = now();
 
@@ -103,7 +120,10 @@ public class OAuthService {
         save(po.toEntity());
 
         logInfo(requestId, clientId, thirdpartKey, userId, "issue_code", "ok");
-        return code;
+        Map<String, Object> result = new HashMap<String, Object>();
+        result.put("code", code);
+        result.put("requestId", requestId);
+        return result;
     }
 
     public Map<String, Object> exchangeCode(String clientId, String clientSecret, String code, String redirectUri) {
@@ -242,6 +262,10 @@ public class OAuthService {
 
     private boolean isExpired(Date expiresAt) {
         return expiresAt == null || !expiresAt.after(now());
+    }
+
+    private boolean exceedsMaxLength(String value, int maxLength) {
+        return value != null && value.length() > maxLength;
     }
 
     private Map<String, Object> error(String error, String description) {
