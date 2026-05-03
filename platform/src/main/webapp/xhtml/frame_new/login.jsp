@@ -125,7 +125,11 @@
 					dataType : 'json',
 					successFn : function(d) {
 						if (d.flag) {
-							window.location.reload();
+							if (d.redirectUrl) {
+								window.location.href = d.redirectUrl;
+							} else {
+								window.location.reload();
+							}
 						} else {
 							if(d.errorCount >= allowErrorCount){
 

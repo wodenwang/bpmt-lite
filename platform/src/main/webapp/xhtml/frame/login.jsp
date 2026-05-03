@@ -53,7 +53,11 @@
 				dataType : 'json',
 				successFn : function(json) {
 					if (json.flag) {
-						window.location.reload();
+						if (json.redirectUrl) {
+							window.location.href = json.redirectUrl;
+						} else {
+							window.location.reload();
+						}
 					} else {
 						Ui.msg('${_zone}_msg', json.msg, 'error');
 						errorCount = json.errorCount;

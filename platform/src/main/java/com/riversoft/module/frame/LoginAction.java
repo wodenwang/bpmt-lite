@@ -34,6 +34,7 @@ import com.riversoft.core.web.RequestUtils;
 import com.riversoft.core.web.annotation.ActionAccess;
 import com.riversoft.core.web.annotation.ActionMode;
 import com.riversoft.core.web.annotation.ActionMode.Mode;
+import com.riversoft.module.oauth.OAuthSessionKeys;
 import com.riversoft.platform.SessionManager;
 import com.riversoft.platform.SessionManager.SessionAttributeKey;
 import com.riversoft.platform.db.ORMAdapterService;
@@ -151,7 +152,12 @@ public class LoginAction {
 
 		// 处理登陆
 		try {
-			SessionManager.doUserLogin(request);
+			doUserLogin(request);
+			Object returnUrl = request.getSession().getAttribute(OAuthSessionKeys.RETURN_URL);
+			if (returnUrl != null) {
+				request.getSession().removeAttribute(OAuthSessionKeys.RETURN_URL);
+				result.put("redirectUrl", returnUrl.toString());
+			}
 		} catch (SystemRuntimeException e) {
 			result.put("flag", false);
 			result.put("msg", e.getMessage());
@@ -159,6 +165,10 @@ public class LoginAction {
 		}
 
 		Actions.showJson(request, response, result);
+	}
+
+	protected void doUserLogin(HttpServletRequest request) {
+		SessionManager.doUserLogin(request);
 	}
 
 	/**
