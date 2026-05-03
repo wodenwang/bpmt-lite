@@ -36,12 +36,14 @@ OAuth 外部系统主数据和运行态都落库保存，数据库是 source of 
 
 - 新增、编辑、启停外部系统主数据。
 - 配置 `THIRDPART_KEY`、`THIRDPART_NAME`、`CLIENT_ID`、`REDIRECT_URIS`、`HOME_URL`、`PRI_KEY`。
-- 生成或轮换 `clientSecret`。
+- 新增外部系统时由系统生成 `clientSecret`。
+- 编辑外部系统时可由维护者手工输入“重置密钥”，保存后不回显。
 - 为外部系统选择或同步创建 `PRI_KEY` 权限点。
 
 安全约束：
 
-- `clientSecret` 只在生成或轮换时展示一次。
+- 新增外部系统时，系统生成的 `clientSecret` 只展示一次。
+- 编辑页手工输入“重置密钥”后，系统保存 hash，不生成也不回显新的明文 secret。
 - 数据库只保存 `CLIENT_SECRET_HASH`，不保存明文 `clientSecret`。
 - `PRI_KEY` 对应外部系统权限，OAuth `authorize` 时必须校验当前 BPMT 用户是否拥有该权限。
 - 菜单权限只控制菜单是否可见；OAuth 登录是否允许进入第三方系统，以 `CM_THIRDPART.PRI_KEY` 为准。
@@ -123,13 +125,13 @@ Authorization: Bearer <access_token>
 ```json
 {
   "userid": "admin",
-  "username": "管理员",
+  "name": "管理员",
   "group": {
-    "id": "default",
+    "groupKey": "default",
     "name": "默认组织"
   },
   "role": {
-    "id": "admin",
+    "roleKey": "admin",
     "name": "管理员"
   }
 }
@@ -137,7 +139,7 @@ Authorization: Bearer <access_token>
 
 ## 响应和错误模型
 
-OAuth 端点使用 OAuth 风格 JSON 响应，不使用 `success/data/error` 包装。`success/data/error` 是 `bpmt-api` 业务 API 的响应模型，不适用于 `/oauth/*`。
+`/oauth/token` 和 `/oauth/userinfo` 使用 OAuth 风格 JSON 响应，不使用 `success/data/error` 包装。`/oauth/authorize` 是浏览器跳转或 BPMT OAuth 错误页，不是 JSON 业务接口。`success/data/error` 是 `bpmt-api` 业务 API 的响应模型，不适用于 OAuth token 和 userinfo 响应。
 
 稳定错误码：
 

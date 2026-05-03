@@ -210,7 +210,7 @@ OAuth 端点：
 | `CM_THIRDPART_AUTH_CODE` | 授权码运行态；code 只保存 hash，默认 5 分钟过期且只能使用一次 |
 | `CM_THIRDPART_ACCESS_TOKEN` | token 运行态；access token 只保存 hash，默认 2 小时过期 |
 
-OAuth endpoints 使用 OAuth JSON 响应，不使用 API 的 `success/data/error` 包装。菜单第三方 URL / iframe 只是辅助入口：BPMT 只负责打开第三方页面，第三方页面没有自己的登录态时，应自行跳转 `/oauth/authorize` 发起 OAuth。
+`/oauth/token` 和 `/oauth/userinfo` 使用 OAuth JSON 响应，不使用 API 的 `success/data/error` 包装；`/oauth/authorize` 是浏览器跳转或错误页。菜单第三方 URL / iframe 只是辅助入口：BPMT 只负责打开第三方页面，第三方页面没有自己的登录态时，应自行跳转 `/oauth/authorize` 发起 OAuth。
 
 参考文档：
 

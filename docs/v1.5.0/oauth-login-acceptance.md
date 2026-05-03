@@ -12,7 +12,7 @@
 | 2 | 外部系统主数据新增 | 可新增外部系统，保存 `THIRDPART_KEY`、`CLIENT_ID`、`REDIRECT_URIS`、`HOME_URL`、`PRI_KEY` 等字段 |
 | 3 | 外部系统主数据编辑 | 可编辑名称、回调白名单、入口 URL、权限点等非敏感配置 |
 | 4 | 外部系统启停 | 停用后 authorize/token 不再允许该 client 继续完成登录链路 |
-| 5 | `clientSecret` 只展示一次 | 新增或轮换时只展示一次明文 `clientSecret`，数据库只保存 hash，后续页面不可再次读取明文 |
+| 5 | `clientSecret` 只展示一次 | 新增外部系统时系统生成明文 `clientSecret` 并只展示一次；编辑页手工输入“重置密钥”后保存 hash，不生成也不回显新 secret |
 | 6 | authorize 未登录回登录页 | 未登录访问 `/oauth/authorize` 时进入现有 BPMT 登录页 |
 | 7 | 登录后回 authorize | 用户完成 BPMT 登录后回到原始 authorize 请求，并继续生成授权码 |
 | 8 | `redirect_uri` 白名单 | 不在 `CM_THIRDPART.REDIRECT_URIS` 白名单内的回调地址被拒绝，不回跳不可信地址 |

@@ -181,15 +181,17 @@ rg -n "oauth|OAuth|requestId|clientId|thirdpartKey|access_denied|invalid_grant" 
 
 OAuth 日志应能串联 authorize、token、userinfo 的开始和结果，并包含 `clientId`、`thirdpartKey`、`userid`、权限校验结果、错误码和失败原因。日志中禁止出现明文 `code`、`access_token`、`client_secret`、`password`；如需排障，只记录 hash 前缀、记录主键或 requestId。
 
-外部系统 `clientSecret` 轮换：
+外部系统 `clientSecret` 重置：
 
 1. 进入 BPMT 后台外部系统管理入口。
 2. 找到目标 `CM_THIRDPART` 记录。
-3. 执行生成或轮换 `clientSecret`。
-4. 立即记录页面展示的一次性明文 secret，并更新第三方系统服务端配置。
-5. 确认数据库仍只保存 `CLIENT_SECRET_HASH`，页面后续不可再次读取明文 secret。
+3. 进入编辑页，在“重置密钥”输入框手工填写新 secret。
+4. 保存后系统只写入新的 `CLIENT_SECRET_HASH`，不会回显新 secret。
+5. 将同一新 secret 更新到第三方系统服务端配置。
 6. 使用新 secret 完成一次 authorize -> token -> userinfo 验收。
 7. 确认旧 secret 已无法换取 token。
+
+注意：新增外部系统时，系统会生成 `clientSecret` 并只展示一次；编辑页重置密钥不是系统生成展示流程，而是维护者手工输入新 secret 后保存。
 
 OAuth 状态表排障：
 
