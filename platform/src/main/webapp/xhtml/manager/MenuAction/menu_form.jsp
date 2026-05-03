@@ -70,7 +70,7 @@
 							</tr>
 							<tr>
 								<th>第三方网页地址</th>
-								<td><input type="text" name="thirdpartUrl" value="${vo.action}" style="width: 90%;" /> <font color="red" tip="true" title="打开类型为第三方网页时使用该地址，可填写 http://、https:// 或 / 开头的地址。">(提示)</font></td>
+								<td><input type="text" name="thirdpartUrl" value="<c:out value='${vo.action}' />" style="width: 90%;" /> <font color="red" tip="true" title="打开类型为第三方网页时使用该地址，可填写 http://、https:// 或 / 开头的地址。">(提示)</font></td>
 							</tr>
 						</c:when>
 						<c:otherwise>

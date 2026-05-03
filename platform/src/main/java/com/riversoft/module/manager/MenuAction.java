@@ -264,8 +264,23 @@ public class MenuAction {
 	}
 
 	private boolean isValidThirdpartUrl(String url) {
-		return StringUtils.isNotBlank(url)
-				&& (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("/"));
+		if (StringUtils.isBlank(url) || containsUnsafeUrlChar(url)) {
+			return false;
+		}
+		if (url.startsWith("//")) {
+			return false;
+		}
+		return url.startsWith("http://") || url.startsWith("https://") || url.startsWith("/");
+	}
+
+	private boolean containsUnsafeUrlChar(String url) {
+		for (int i = 0; i < url.length(); i++) {
+			char ch = url.charAt(i);
+			if (ch == '"' || ch == '\'' || ch == '<' || ch == '>' || ch < 32 || ch == 127) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**

@@ -38,6 +38,42 @@ public class MenuActionThirdpartTest {
         request.setParameter("openType", "2");
         request.setParameter("thirdpartUrl", "javascript:alert(1)");
 
+        assertRejectsThirdpartUrl(action, request);
+    }
+
+    @Test
+    public void submitMenuFormRejectsThirdpartUrlWithAttributeBreakingCharacters() {
+        TestMenuAction action = new TestMenuAction();
+        MockHttpServletRequest request = filledRequest();
+        request.setParameter("openType", "2");
+        request.setParameter("thirdpartUrl", "https://x\" autofocus onfocus=\"alert(1)");
+
+        assertRejectsThirdpartUrl(action, request);
+    }
+
+    @Test
+    public void submitMenuFormRejectsProtocolRelativeThirdpartUrl() {
+        TestMenuAction action = new TestMenuAction();
+        MockHttpServletRequest request = filledRequest();
+        request.setParameter("openType", "2");
+        request.setParameter("thirdpartUrl", "//evil.example/path");
+
+        assertRejectsThirdpartUrl(action, request);
+    }
+
+    @Test
+    public void submitMenuFormAcceptsSiteLocalThirdpartPath() {
+        TestMenuAction action = new TestMenuAction();
+        MockHttpServletRequest request = filledRequest();
+        request.setParameter("openType", "2");
+        request.setParameter("thirdpartUrl", "/thirdpart/app");
+
+        action.submitMenuForm(request, new MockHttpServletResponse());
+
+        assertEquals("/thirdpart/app", action.writtenMenu.get("action"));
+    }
+
+    private void assertRejectsThirdpartUrl(TestMenuAction action, MockHttpServletRequest request) {
         try {
             action.submitMenuForm(request, new MockHttpServletResponse());
         } catch (SystemRuntimeException e) {
