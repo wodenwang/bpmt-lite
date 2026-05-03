@@ -11,6 +11,17 @@
 		var $main = $('[main-zone]');//主刷新区域
 
 		//触发事件
+		var openThirdpartFrame = function(src) {
+			$main.empty();
+			var iframe = document.createElement("iframe");
+			iframe.setAttribute("src", src);
+			iframe.setAttribute("frameborder", "0");
+			iframe.setAttribute("width", "100%");
+			iframe.setAttribute("height", "100%");
+			iframe.setAttribute("style", "width:100%;height:100%;border:0;");
+			$main.append(iframe);
+		};
+
 		var clickFunc = function(treeNode, params) {
 			if (params == undefined || params == null) {
 				params = "";
@@ -33,6 +44,9 @@
 					Ajax.post($main, _cp + action + params, {
 						data : data
 					});
+					break;
+				case 2://第三方网页
+					openThirdpartFrame(action);
 					break;
 				default:
 					break;

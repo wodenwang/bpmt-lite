@@ -3,6 +3,10 @@ package com.riversoft.module.manager;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Map;
 
 import org.junit.Test;
@@ -96,6 +100,19 @@ public class MenuActionThirdpartTest {
 
         assertEquals("dyn/DemoAction/list.shtml", action.writtenMenu.get("action"));
         assertEquals(Integer.valueOf(1), action.writtenMenu.get("openType"));
+    }
+
+    @Test
+    public void frameMenusOpenExternalIframeWithDomApi() throws IOException {
+        assertFrameMenuHandlesExternalIframe("src/main/webapp/xhtml/frame/menu.jsp");
+        assertFrameMenuHandlesExternalIframe("src/main/webapp/xhtml/frame_new/menu.jsp");
+    }
+
+    private void assertFrameMenuHandlesExternalIframe(String path) throws IOException {
+        String jsp = new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
+        assertTrue(jsp.indexOf("case 2://第三方网页") >= 0);
+        assertTrue(jsp.indexOf("document.createElement(\"iframe\")") >= 0);
+        assertTrue(jsp.indexOf("openThirdpartFrame(action)") >= 0);
     }
 
     private static MockHttpServletRequest filledRequest() {
