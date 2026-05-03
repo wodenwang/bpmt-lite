@@ -19,7 +19,7 @@
 				$(':input', $row).prop('disabled', !active);
 			});
 		};
-		$zone.on('change click', ':input[name=openType]', toggleMenuActionFields);
+		$zone.on('change click ifChecked', ':input[name=openType]', toggleMenuActionFields);
 		toggleMenuActionFields();
 
 		//表单动作

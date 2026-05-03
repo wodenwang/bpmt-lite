@@ -119,6 +119,7 @@ public class MenuActionThirdpartTest {
         assertTrue(jsp.indexOf("<th>打开网址</th>") >= 0);
         assertTrue(jsp.indexOf("<th>打开第三方网址</th>") >= 0);
         assertTrue(jsp.indexOf(":input", jsp.indexOf("toggleMenuActionFields")) >= 0);
+        assertTrue(jsp.indexOf("ifChecked") >= 0);
         assertTrue(jsp.indexOf("<textarea name=\"thirdpartUrl\"") >= 0);
     }
 
