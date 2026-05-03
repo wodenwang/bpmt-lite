@@ -17,7 +17,7 @@
 
 - `bpmt.sql.gz` 解压后可导入。
 - `bpmt` 和 `bpmt_min` 可在同一个 MariaDB 实例中共存。
-- 导入后 `bpmt` 包含 377 张表或视图；`bpmt_min` 包含 173 张表。
+- 导入后 `bpmt` 包含 380 张表或视图；`bpmt_min` 包含 176 张表。
 
 ## 最小库来源
 
@@ -27,10 +27,11 @@
 - Activiti 表结构来自 `activiti-engine-5.16.3.jar` 内置的 MySQL DDL。
 - Quartz 表结构来自 `com.riversoft:quartz-ddl:2.2.1` 中的 MySQL DDL。
 - 初始化数据来自旧项目 `package/database/bpmt_init_data.xlsx`。
+- `v1.5.0` 追加 `database/v1.5.0-oauth-tables.sql`，包含 `CM_THIRDPART`、`CM_THIRDPART_AUTH_CODE`、`CM_THIRDPART_ACCESS_TOKEN` 三张 OAuth 登录表。
 
 已验证结果：
 
-- 导入后 `bpmt_min` 包含 173 张表，其中 Activiti 24 张、Quartz 11 张。
+- 导入后 `bpmt_min` 包含 176 张表，其中 Activiti 24 张、Quartz 11 张、OAuth 登录表 3 张。
 - 最小初始化数据包含 1 个用户、26 个菜单、27 条权限和 1 条用户角色关系。
 
 ## 完整库来源

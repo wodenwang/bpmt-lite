@@ -8,7 +8,7 @@
 
 | 序号 | 项目 | 通过标准 |
 | --- | --- | --- |
-| 1 | HBM 映射存在 | `CM_THIRDPART.hbm.xml`、`CM_THIRDPART_AUTH_CODE.hbm.xml`、`CM_THIRDPART_ACCESS_TOKEN.hbm.xml` 在 platform classpath 可加载 |
+| 1 | HBM 映射与初始化 SQL 存在 | `CM_THIRDPART.hbm.xml`、`CM_THIRDPART_AUTH_CODE.hbm.xml`、`CM_THIRDPART_ACCESS_TOKEN.hbm.xml` 在 platform classpath 可加载；`database/bpmt.sql.gz` 和 `database/bpmt-min.sql.gz` 默认初始化后包含三张表 |
 | 2 | 外部系统主数据新增 | 可新增外部系统，保存 `THIRDPART_KEY`、`CLIENT_ID`、`REDIRECT_URIS`、`HOME_URL`、`PRI_KEY` 等字段 |
 | 3 | 外部系统主数据编辑 | 可编辑名称、回调白名单、入口 URL、权限点等非敏感配置 |
 | 4 | 外部系统启停 | 停用后 authorize/token 不再允许该 client 继续完成登录链路 |

@@ -31,8 +31,8 @@
 - MariaDB 默认初始化数据库名：`bpmt`
 - MariaDB 最小初始化数据库名：`bpmt_min`
 - README 中记录的发布验收基线是：
-  - 使用 `database/bpmt-min.sql.gz` 最小库初始化后 173 张表
-  - 使用 `database/bpmt.sql.gz` 完整库初始化后 377 张表
+  - 使用 `database/bpmt-min.sql.gz` 最小库初始化后 176 张表
+  - 使用 `database/bpmt.sql.gz` 完整库初始化后 380 张表
   - `/` 返回 200
   - `/ueditor/` 返回 200
 
@@ -213,6 +213,7 @@ docker compose up -d
 - OAuth 端点固定为 `/oauth/authorize`、`/oauth/token`、`/oauth/userinfo`。
 - `/oauth/token` 和 `/oauth/userinfo` 使用 OAuth JSON 响应，不使用 `success/data/error` 包装；`/oauth/authorize` 是浏览器跳转或错误页。
 - 外部系统主数据是 `CM_THIRDPART`，授权码状态是 `CM_THIRDPART_AUTH_CODE`，token 状态是 `CM_THIRDPART_ACCESS_TOKEN`。
+- 三张 OAuth 表必须进入 `database/bpmt.sql.gz`、`database/bpmt-min.sql.gz` 和 `database/bpmt-db.sql` 默认初始化路径；Docker 默认 `HIBERNATE_AUTOUPDATE=false`，不能依赖 Hibernate 自动建表。
 - `code` 和 `access_token` 只保存 hash，DB 是 OAuth 运行态 source of truth。
 - 外部系统 `clientSecret` 只展示一次，DB 只保存 `CLIENT_SECRET_HASH`。
 - 权限边界使用 `CM_THIRDPART.PRI_KEY` 对接现有 BPMT 权限体系。
@@ -525,6 +526,7 @@ v1.4.0 API 设计文档：
 - OAuth 主流程只在 `bpmt-web/platform`，不改 `bpmt-api`。
 - `bpmt-api` 的 `/api/docs/` 和 `/api/openapi.json` 仍需作为回归验收项返回 200。
 - 外部系统主数据使用 `CM_THIRDPART`，授权码使用 `CM_THIRDPART_AUTH_CODE`，token 使用 `CM_THIRDPART_ACCESS_TOKEN`。
+- `database/v1.5.0-oauth-tables.sql` 是三张 OAuth 表的初始化 SQL 片段，已追加进完整库、最小库和旧明文最小库。
 - `code`、`access_token`、`clientSecret` 明文不入库；DB 只保存 hash，DB 是 OAuth 运行态 source of truth。
 - `/oauth/token` 和 `/oauth/userinfo` 使用 OAuth JSON，不使用 `success/data/error` 包装；`/oauth/authorize` 是浏览器跳转或错误页。
 - OAuth 主流程必须有 `INFO` 日志，且不能记录明文 `code`、`access_token`、`client_secret`、`password`。

@@ -138,8 +138,10 @@ def normalize_framework_sql(sql):
     return "\n".join(lines).strip()
 
 
-def build_sql(ddl_path, workbook_path, output_path, activiti_jar_path, quartz_ddl_zip_path, database_name):
+def build_sql(ddl_path, workbook_path, output_path, activiti_jar_path, quartz_ddl_zip_path, database_name,
+              oauth_schema_path):
     ddl = ddl_path.read_text(encoding="utf-8")
+    oauth_schema = oauth_schema_path.read_text(encoding="utf-8")
     activiti_ddls = [normalize_framework_sql(zip_text(activiti_jar_path, resource)) for resource in ACTIVITI_SQL_RESOURCES]
     quartz_ddl = normalize_framework_sql(zip_text(quartz_ddl_zip_path, QUARTZ_SQL_RESOURCE))
     tables = parse_workbook(workbook_path)
@@ -158,6 +160,8 @@ def build_sql(ddl_path, workbook_path, output_path, activiti_jar_path, quartz_dd
     output.append("")
     output.append("-- hbm2ddl platform schema")
     output.append(ddl.rstrip())
+    output.append("")
+    output.append(oauth_schema.rstrip())
     output.append("")
     output.append("-- Activiti 5.16.3 schema")
     for activiti_ddl in activiti_ddls:
@@ -191,6 +195,7 @@ def main():
     parser.add_argument("--quartz-ddl-zip", default="/Volumes/vm/maven/repository/com/riversoft/quartz-ddl/2.2.1/quartz-ddl-2.2.1.zip")
     parser.add_argument("--output", default="database/bpmt-min.sql")
     parser.add_argument("--database-name", default="bpmt_min")
+    parser.add_argument("--oauth-schema", default="database/v1.5.0-oauth-tables.sql")
     args = parser.parse_args()
 
     build_sql(
@@ -200,6 +205,7 @@ def main():
         Path(args.activiti_jar),
         Path(args.quartz_ddl_zip),
         args.database_name,
+        Path(args.oauth_schema),
     )
 
 

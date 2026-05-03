@@ -22,6 +22,8 @@ OAuth 外部系统主数据和运行态都落库保存，数据库是 source of 
 | `CM_THIRDPART_AUTH_CODE` | 授权码运行态 | 保存 `CODE_HASH`、`CLIENT_ID`、`THIRDPART_KEY`、`USER_ID`、`REDIRECT_URI`、过期时间和一次性使用状态 |
 | `CM_THIRDPART_ACCESS_TOKEN` | token 运行态 | 保存 `TOKEN_HASH`、`CLIENT_ID`、`THIRDPART_KEY`、`USER_ID`、过期、撤销和最后使用状态 |
 
+三张表的初始化 SQL 源片段是 `database/v1.5.0-oauth-tables.sql`，已追加进 `database/bpmt.sql.gz`、`database/bpmt-min.sql.gz` 和旧明文最小库 `database/bpmt-db.sql`。默认 Docker 配置不依赖 Hibernate 自动建表。
+
 默认生命周期：
 
 - 授权码默认 5 分钟过期，只能使用一次。

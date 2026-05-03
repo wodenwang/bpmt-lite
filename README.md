@@ -54,7 +54,7 @@ http://127.0.0.1/login.jsp?_action_mode=h5
 密码：admin
 ```
 
-最小库包含 173 张表和最小系统数据，适合快速体验、自动化验收和 issue 复现。
+最小库包含 176 张表和最小系统数据，适合快速体验、自动化验收和 issue 复现。
 
 如果要使用完整业务库，执行：
 
@@ -209,6 +209,8 @@ OAuth 端点：
 | `CM_THIRDPART` | 外部系统主数据、OAuth client、回调白名单、入口 URL 和 `PRI_KEY` 权限点 |
 | `CM_THIRDPART_AUTH_CODE` | 授权码运行态；code 只保存 hash，默认 5 分钟过期且只能使用一次 |
 | `CM_THIRDPART_ACCESS_TOKEN` | token 运行态；access token 只保存 hash，默认 2 小时过期 |
+
+三张 OAuth 表已经进入默认初始化 SQL：`database/bpmt.sql.gz` 完整库和 `database/bpmt-min.sql.gz` 最小库都会创建这些表。Docker 默认不会开启 Hibernate 自动建表，因此升级已有数据库时需要自行执行 `database/v1.5.0-oauth-tables.sql`。
 
 `/oauth/token` 和 `/oauth/userinfo` 使用 OAuth JSON 响应，不使用 API 的 `success/data/error` 包装；`/oauth/authorize` 是浏览器跳转或错误页。菜单第三方 URL / iframe 只是辅助入口：BPMT 只负责打开第三方页面，第三方页面没有自己的登录态时，应自行跳转 `/oauth/authorize` 发起 OAuth。
 

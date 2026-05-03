@@ -130,7 +130,7 @@ docker compose exec -T mariadb mariadb -uroot -p123456 -N \
   -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='bpmt_min';"
 ```
 
-`v1.3.0` 最小初始化库 `database/bpmt-min.sql.gz` 的期望结果仍是 `173`，其中 Activiti 24 张、Quartz 11 张。完整库以 `database/bpmt.sql.gz` 压缩交付，默认 `admin` 密码为 `admin`。
+`v1.5.0` 最小初始化库 `database/bpmt-min.sql.gz` 的期望结果是 `176`，其中 Activiti 24 张、Quartz 11 张、OAuth 登录表 3 张。完整库 `database/bpmt.sql.gz` 的期望结果是 `380` 张表或视图，默认 `admin` 密码为 `admin`。
 
 检查 Web：
 
@@ -250,7 +250,7 @@ API 容器对应日志分别落在 `runtime/api-platform-logs/` 和 `runtime/api
 - Java 8 + public-only 临时 Maven settings + 空本地 Maven 仓库：`mvn -s <tmp-settings> -DskipTests compile` 通过。
 - `scripts/build-image.sh` 通过，生成本地镜像 `ghcr.io/wodenwang/bpmt-lite:1.1.0`。
 - 使用 `database/bpmt-db.sql` 从零初始化 MariaDB 通过。
-- 初始化后 `kyq` 表数量为 173，Activiti 24 张，Quartz 11 张。
+- 初始化后 `kyq` 表数量为 176，Activiti 24 张，Quartz 11 张，OAuth 登录表 3 张。
 - `http://127.0.0.1:<test-port>/` 返回 200。
 - `http://127.0.0.1:<test-port>/ueditor/` 返回 200。
 - `config/overrides/page.properties` 覆盖已验证。
