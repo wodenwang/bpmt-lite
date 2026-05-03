@@ -201,6 +201,7 @@ public class MenuAction {
 		String name = RequestUtils.getStringValue(request, "name");
 		String icon = RequestUtils.getStringValue(request, "icon");
 		String action = RequestUtils.getStringValue(request, "action");
+		String thirdpartUrl = RequestUtils.getStringValue(request, "thirdpartUrl");
 		String domainKey = RequestUtils.getStringValue(request, "domainKey");
 		String parentId = RequestUtils.getStringValue(request, "parentId");
 		Integer openType = RequestUtils.getIntegerValue(request, "openType");
@@ -208,15 +209,20 @@ public class MenuAction {
 		Integer paramType = RequestUtils.getIntegerValue(request, "paramType");
 		String paramScript = RequestUtils.getStringValue(request, "paramScript");
 		CmPri pri = RequestUtils.getValue(request, "pri", CmPri.class);
+		if (Integer.valueOf(2).equals(openType)) {
+			action = thirdpartUrl == null ? null : thirdpartUrl.trim();
+			if (!isValidThirdpartUrl(action)) {
+				throw new SystemRuntimeException(ExceptionType.BUSINESS, "第三方网页地址格式不正确.");
+			}
+		}
 
 		DataPO po;
 		if (isCreate == 1) {// 新增
-			po = new DataPO("CmMenu");
+			po = newMenuPO();
 			po.set("id", RequestUtils.getStringValue(request, "id"));
 			po.set("sysFlag", 0);
 		} else {// 编辑
-			po = new DataPO("CmMenu", (Map<String, Object>) ORMService.getInstance().findByPk("CmMenu",
-					RequestUtils.getStringValue(request, "id")));
+			po = new DataPO("CmMenu", findMenu(RequestUtils.getStringValue(request, "id")));
 		}
 
 		po.set("icon", icon);
@@ -230,14 +236,36 @@ public class MenuAction {
 		po.set("paramScript", paramScript);
 		po.set("pri", pri);
 
-		MenuService service = BeanFactory.getInstance().getBean(MenuService.class);
+		MenuService service = menuService();
 		if (isCreate == 1) {
 			service.save(po.toEntity());
 		} else {
 			service.update(po.toEntity());
 		}
 
-		Actions.redirectInfoPage(request, response, "编辑菜单[" + name + "]成功.");
+		redirectInfoPage(request, response, "编辑菜单[" + name + "]成功.");
+	}
+
+	protected DataPO newMenuPO() {
+		return new DataPO("CmMenu");
+	}
+
+	@SuppressWarnings("unchecked")
+	protected Map<String, Object> findMenu(String id) {
+		return (Map<String, Object>) ORMService.getInstance().findByPk("CmMenu", id);
+	}
+
+	protected MenuService menuService() {
+		return BeanFactory.getInstance().getBean(MenuService.class);
+	}
+
+	protected void redirectInfoPage(HttpServletRequest request, HttpServletResponse response, String message) {
+		Actions.redirectInfoPage(request, response, message);
+	}
+
+	private boolean isValidThirdpartUrl(String url) {
+		return StringUtils.isNotBlank(url)
+				&& (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("/"));
 	}
 
 	/**

@@ -15,7 +15,7 @@ import com.riversoft.core.db.po.Code2NameVO;
  */
 public enum MenuOpenType implements Code2NameVO {
 
-    NONE(0, "无操作"), AJAX_ZONE(1, "打开网址")
+    NONE(0, "无操作"), AJAX_ZONE(1, "打开网址"), EXTERNAL_IFRAME(2, "第三方网页")
 
     ;
     private Object code;
