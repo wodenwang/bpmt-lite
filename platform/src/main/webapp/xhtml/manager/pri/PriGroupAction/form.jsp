@@ -70,6 +70,7 @@
 		<div title="菜单权限" init="${_acp}/menuPri.shtml?groupId=${vo.groupId}"></div>
 		<div title="视图权限" init="${_acp}/viewPri.shtml?groupId=${vo.groupId}"></div>
 		<div title="控件权限" init="${_acp}/widgetPri.shtml?groupId=${vo.groupId}"></div>
+		<div title="第三方系统权限" init="${_acp}/thirdpartPri.shtml?groupId=${vo.groupId}"></div>
 		<div title="角色归属" init="${_acp}/roleList.shtml?groupId=${vo.groupId}"></div>
 	</c:if>
 

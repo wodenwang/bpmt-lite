@@ -19,17 +19,35 @@
 		});
 
 		Core.fn('${_zone}_list', 'toggleActive', function(key, activeFlag) {
-			Ajax.post('${_zone}_msg', '${_acp}/toggleActive.shtml', {
-				data : {
-					thirdpartKey : key,
-					activeFlag : activeFlag
-				},
-				callback : function(flag) {
-					if (flag) {
-						$('#${_zone}_list_form').submit();
-					}
-				}
-			});
+			if (activeFlag == '1') {
+				Ui.confirm('确认启用第三方系统[' + key + ']?', function() {
+					Ajax.post('${_zone}_msg', '${_acp}/toggleActive.shtml', {
+						data : {
+							thirdpartKey : key,
+							activeFlag : activeFlag
+						},
+						callback : function(flag) {
+							if (flag) {
+								$('#${_zone}_list_form').submit();
+							}
+						}
+					});
+				});
+			} else {
+				Ui.confirm('确认停用第三方系统[' + key + ']?', function() {
+					Ajax.post('${_zone}_msg', '${_acp}/toggleActive.shtml', {
+						data : {
+							thirdpartKey : key,
+							activeFlag : activeFlag
+						},
+						callback : function(flag) {
+							if (flag) {
+								$('#${_zone}_list_form').submit();
+							}
+						}
+					});
+				});
+			}
 		});
 
 		Core.fn($zone, 'submitForm', function($form, $tab, option) {
@@ -49,7 +67,7 @@
 </script>
 
 <div tabs="true" max="10" id="${_zone}_tabs" main="true">
-	<div title="外部系统管理">
+	<div title="第三方系统">
 		<form zone="${_zone}_list" action="${_acp}/list.shtml" query="true" id="${_zone}_list_form" method="get">
 			<input type="hidden" name="_field" value="thirdpartKey" />
 			<input type="hidden" name="_dir" value="asc" />
@@ -63,14 +81,8 @@
 				<tr>
 					<th>Client ID(模糊)</th>
 					<td><wcm:widget name="_sl_clientId" cmd="text" /></td>
-					<th>启用状态</th>
-					<td>
-						<select name="_ne_activeFlag">
-							<option value="">全部</option>
-							<option value="1">启用</option>
-							<option value="0">停用</option>
-						</select>
-					</td>
+					<th>是否启用</th>
+					<td><wcm:widget name="_ne_activeFlag" cmd="select[YES_NO(全部)]" /></td>
 				</tr>
 				<tr>
 					<th class="ws-bar">

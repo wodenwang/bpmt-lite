@@ -291,7 +291,7 @@ public class CmPri implements Serializable {
 	}
 
 	public static enum Catelog implements Code2NameVO {
-		MENU(1, "菜单/域权限"), VIEW(2, "视图权限"), WIDGET(3, "控件权限"), NONE(-1, "检索错误");
+		MENU(1, "菜单/域权限"), VIEW(2, "视图权限"), WIDGET(3, "控件权限"), THIRDPART(4, "第三方系统权限"), NONE(-1, "检索错误");
 		private int code;
 		private String showName;
 

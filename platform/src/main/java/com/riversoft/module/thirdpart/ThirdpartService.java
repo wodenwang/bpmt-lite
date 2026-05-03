@@ -85,6 +85,7 @@ public class ThirdpartService {
         if (pri == null) {
             throw new SystemRuntimeException(ExceptionType.BUSINESS, "权限点不能为空.");
         }
+        prepareThirdpartPri(pri, thirdpartKey, trimToNull(input.get("thirdpartName")));
 
         String clientSecret = OAuthSecurity.generateOpaqueValue();
         Date now = new Date();
@@ -131,6 +132,7 @@ public class ThirdpartService {
         }
         setIfPresent(po, input, "description");
         if (pri != null) {
+            prepareThirdpartPri(pri, thirdpartKey, trimToNull(po.get("thirdpartName")));
             po.set("pri", pri);
         }
         po.set("updateTime", new Date());
@@ -181,6 +183,16 @@ public class ThirdpartService {
             return Integer.valueOf(0);
         }
         throw new SystemRuntimeException(ExceptionType.BUSINESS, "activeFlag格式不正确.");
+    }
+
+    static void prepareThirdpartPri(CmPri pri, String thirdpartKey, String thirdpartName) {
+        if (pri == null) {
+            return;
+        }
+        validateThirdpartKey(thirdpartKey);
+        pri.setCatelogType((Integer) CmPri.Catelog.THIRDPART.getCode());
+        pri.setCatelogKey(thirdpartKey);
+        pri.setBusiName(thirdpartName);
     }
 
     private static String trimToNull(Object value) {

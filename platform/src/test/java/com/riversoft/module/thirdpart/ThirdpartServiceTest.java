@@ -1,9 +1,12 @@
 package com.riversoft.module.thirdpart;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
+
+import com.riversoft.platform.po.CmPri;
 
 public class ThirdpartServiceTest {
 
@@ -21,5 +24,16 @@ public class ThirdpartServiceTest {
     @Test
     public void hashesAndMatchesClientSecret() {
         assertTrue(ThirdpartService.matchesSecret(ThirdpartService.hashSecret("secret"), "secret"));
+    }
+
+    @Test
+    public void preparesThirdpartPermissionCatalog() {
+        CmPri pri = new CmPri();
+
+        ThirdpartService.prepareThirdpartPri(pri, "demo-app", "演示系统");
+
+        assertEquals(CmPri.Catelog.THIRDPART.getCode(), pri.getCatelogType());
+        assertEquals("demo-app", pri.getCatelogKey());
+        assertEquals("演示系统", pri.getBusiName());
     }
 }

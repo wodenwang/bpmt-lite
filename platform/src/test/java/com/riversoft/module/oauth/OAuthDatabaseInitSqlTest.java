@@ -25,14 +25,14 @@ public class OAuthDatabaseInitSqlTest {
             "UNIQUE KEY `UK_CM_THIRDPART_AUTH_CODE_HASH`",
             "UNIQUE KEY `UK_CM_THIRDPART_ACCESS_TOKEN_HASH`" };
 
-    private static final String[] REQUIRED_MENU_TOKENS = {
-            "('sys_thirdpart', '1', 'sys', '/thirdpart/ThirdpartAction/index.shtml', 'manage', 'link_edit.png', '外部第三方系统管理', '1', '13'",
-            "('sys_thirdpart', '1', 'sys_thirdpart', '外部第三方系统管理', NULL, '1', '2', '${true}')" };
+	private static final String[] REQUIRED_MENU_TOKENS = {
+			"('sys_thirdpart', '1', 'sys', '/thirdpart/ThirdpartAction/index.shtml', 'manage', 'link_edit.png', '第三方系统', '1', '13'",
+			"('sys_thirdpart', '1', 'sys_thirdpart', '第三方系统', NULL, '1', '2', '${true}')" };
 
-    private static final String[] REQUIRED_FULL_MENU_TOKENS = {
-            "('sys_menu',1,'sys','/manager/MenuAction/index.shtml','manage','application_side_list.png','用户菜单',1,195",
-            "('sys_thirdpart',1,'sys','/thirdpart/ThirdpartAction/index.shtml','manage','link_edit.png','外部第三方系统管理',1,196",
-            "('sys_thirdpart',1,'sys_thirdpart','外部第三方系统管理',NULL,1,2,'${true}')" };
+	private static final String[] REQUIRED_FULL_MENU_TOKENS = {
+			"('sys_menu',1,'sys','/manager/MenuAction/index.shtml','manage','application_side_list.png','用户菜单',1,195",
+			"('sys_thirdpart',1,'sys','/thirdpart/ThirdpartAction/index.shtml','manage','link_edit.png','第三方系统',1,196",
+			"('sys_thirdpart',1,'sys_thirdpart','第三方系统',NULL,1,2,'${true}')" };
 
     @Test
     public void defaultInitializationSqlContainsOAuthTables() throws Exception {

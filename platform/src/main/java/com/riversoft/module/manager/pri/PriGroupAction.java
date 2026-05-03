@@ -57,7 +57,7 @@ public class PriGroupAction {
 
 	/**
 	 * 框架页
-	 * 
+	 *
 	 * @param request
 	 * @param response
 	 */
@@ -67,7 +67,7 @@ public class PriGroupAction {
 
 	/**
 	 * 菜单树
-	 * 
+	 *
 	 * @param request
 	 * @param response
 	 */
@@ -90,7 +90,7 @@ public class PriGroupAction {
 
 	/**
 	 * 保存位置
-	 * 
+	 *
 	 * @param request
 	 * @param response
 	 */
@@ -103,7 +103,7 @@ public class PriGroupAction {
 
 	/**
 	 * 删除节点
-	 * 
+	 *
 	 * @param request
 	 * @param response
 	 */
@@ -116,7 +116,7 @@ public class PriGroupAction {
 
 	/**
 	 * 编辑节点
-	 * 
+	 *
 	 * @param request
 	 * @param response
 	 */
@@ -134,7 +134,7 @@ public class PriGroupAction {
 
 	/**
 	 * 新增节点
-	 * 
+	 *
 	 * @param request
 	 * @param response
 	 */
@@ -144,7 +144,7 @@ public class PriGroupAction {
 
 	/**
 	 * 表单提交
-	 * 
+	 *
 	 * @param request
 	 * @param response
 	 */
@@ -186,7 +186,7 @@ public class PriGroupAction {
 
 	/**
 	 * 保存权限设置
-	 * 
+	 *
 	 * @param request
 	 * @param response
 	 */
@@ -204,7 +204,7 @@ public class PriGroupAction {
 
 	/**
 	 * 菜单,域权限设置
-	 * 
+	 *
 	 * @param request
 	 * @param response
 	 */
@@ -345,7 +345,7 @@ public class PriGroupAction {
 
 	/**
 	 * 视图权限
-	 * 
+	 *
 	 * @param request
 	 * @param response
 	 */
@@ -411,7 +411,7 @@ public class PriGroupAction {
 
 	/**
 	 * 控件权限
-	 * 
+	 *
 	 * @param request
 	 * @param response
 	 */
@@ -464,8 +464,79 @@ public class PriGroupAction {
 	}
 
 	/**
+	 * 第三方系统权限
+	 *
+	 * @param request
+	 * @param response
+	 */
+	public void thirdpartPri(HttpServletRequest request, HttpServletResponse response) {
+		final String cp = Actions.Util.getContextPath(request);
+		String groupId = RequestUtils.getStringValue(request, "groupId");
+
+		List<String> singlePriKeys = service.queryHQL("select distinct priKey from CmPriGroupRelate where groupId = ?",
+				groupId);
+		List<String> singleCatelogKeys = singlePriKeys.size() > 0 ? service.queryHQL("select distinct catelogKey from "
+				+ CmPri.class.getName() + " where catelogType = :catelogType and priKey in (:list)", new QueryVO(
+				"catelogType", CmPri.Catelog.THIRDPART.getCode()), new QueryVO("list", singlePriKeys))
+				: Collections.EMPTY_LIST;
+
+		List<String> checkPriKeys = ORMService.getInstance().queryHQL(
+				"select priKey from CmPriGroupRelate where groupId = ?", groupId);
+		List<Map<String, Object>> treeList = new ArrayList<>();
+		List<CmPri> pris = new ArrayList<>();
+
+		{
+			Map<String, Object> root = new HashMap<>();
+			root.put("name", "第三方系统");
+			root.put("id", "_thirdpart");
+			root.put("parentId", null);
+			root.put("icon", cp + "/css/icon/folder_explore.png");
+			root.put("chkDisabled", true);
+			root.put("title", "");
+			treeList.add(root);
+		}
+
+		List<Map<String, Object>> thirdparts = ORMService.getInstance().query("CmThirdpart",
+				new DataCondition().setOrderByAsc("thirdpartName").toEntity());
+		for (Map<String, Object> thirdpart : thirdparts) {
+			CmPri pri = (CmPri) thirdpart.get("pri");
+			if (pri == null) {
+				continue;
+			}
+
+			Map<String, Object> obj = new HashMap<>();
+			if (pri.getType() == 1) {
+				if (checkPriKeys.contains(pri.getPriKey())) {
+					obj.put("checked", true);
+				}
+			} else {
+				obj.put("chkDisabled", true);
+			}
+			obj.put("pri", pri);
+			obj.put("id", "thirdpart_" + thirdpart.get("thirdpartKey"));
+			obj.put("name", thirdpart.get("thirdpartName"));
+			obj.put("parentId", "_thirdpart");
+			obj.put("icon", cp + "/css/icon/link_edit.png");
+			obj.put("title", "");
+
+			if (singleCatelogKeys.contains(thirdpart.get("thirdpartKey"))) {
+				obj.put("font", "{'font-weight':'bold','color':'red'}");
+				obj.put("title", "直接关联");
+			}
+
+			pris.add(pri);
+			treeList.add(obj);
+		}
+
+		request.setAttribute("groupId", groupId);
+		request.setAttribute("pris", pris);
+		request.setAttribute("menu", JsonMapper.defaultMapper().toJson(treeList));
+		Actions.includePage(request, response, Util.getPagePath(request, "menu_pri.jsp"));
+	}
+
+	/**
 	 * 权限归属
-	 * 
+	 *
 	 * @param request
 	 * @param response
 	 */

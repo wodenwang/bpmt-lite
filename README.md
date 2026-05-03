@@ -212,7 +212,7 @@ OAuth 端点：
 
 三张 OAuth 表已经进入默认初始化 SQL：`database/bpmt.sql.gz` 完整库和 `database/bpmt-min.sql.gz` 最小库都会创建这些表。Docker 默认不会开启 Hibernate 自动建表，因此升级已有数据库时需要自行执行 `database/v1.5.0-oauth-tables.sql`。
 
-外部系统管理入口在后台菜单 `系统开发 -> 外部第三方系统管理`，初始化数据会把该入口放在 `用户菜单` 下方。
+外部系统管理入口在后台菜单 `系统开发 -> 第三方系统`，初始化数据会把该入口放在 `用户菜单` 下方。外部系统访问权限在 `权限组管理 -> 第三方系统权限` 中分配。
 
 `/oauth/token` 和 `/oauth/userinfo` 使用 OAuth JSON 响应，不使用 API 的 `success/data/error` 包装；`/oauth/authorize` 是浏览器跳转或错误页。菜单第三方 URL / iframe 只是辅助入口：BPMT 只负责打开第三方页面，第三方页面没有自己的登录态时，应自行跳转 `/oauth/authorize` 发起 OAuth。
 
