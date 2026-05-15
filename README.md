@@ -74,6 +74,17 @@ curl -fsSI http://127.0.0.1/api/openapi.json
 - 变更预检：写接口支持 `dryRun=true`，也可使用 `POST /api/v1/dynamic-table-views:validate` 做纯校验。
 - 文档归档：[动态表视图 API](docs/v1.7.0/api-reference.md)，[OpenAPI 快照](docs/v1.7.0/openapi.json)。
 
+## 报表视图 API
+
+`v1.7.1` 新增报表视图配置 API，面向外部 AI agent、自动化平台和集成脚本开放 `rep_list` 报表视图配置管理能力。
+
+- 接口前缀：`/api/v1/report-views`
+- 能力范围：读取、校验、创建、整体替换、分区 patch、带确认删除 `/{viewKey}.view` 对应的 `rep_list` 报表视图配置。
+- 安全边界：只管理 `VW_URL` 与 `VW_REPORT*` 元数据，不管理菜单、首页卡片、外部入口或报表业务数据；删除视图不会删除业务数据。
+- 风险提示：API 不执行 SQL、按钮动作或客户端脚本，调用方需要通过实际业务页面或验收脚本确认 SQL 语义、结果列、权限过滤和运行性能。
+- 变更预检：写接口支持 `dryRun=true`，也可使用 `POST /api/v1/report-views:validate` 做纯校验。
+- 文档归档：[v1.7.1 API 归档](docs/v1.7.1/api-reference.md)，[v1.7.1 OpenAPI](docs/v1.7.1/openapi.json)。
+
 ## 文件结构
 
 安装后的 `bpmt-lite/` 运行目录主要包含：
@@ -113,6 +124,7 @@ docker compose up -d
 
 | 版本 | 发布日期 | 说明 | 文档 |
 | --- | --- | --- | --- |
+| `v1.7.1` | 预发布 | 基于 `v1.7.0` 新增报表视图配置 API，开放 `rep_list` 报表视图的创建、导出、校验、全量替换、局部替换和删除能力。 | [API](docs/v1.7.1/api-reference.md)、[OpenAPI](docs/v1.7.1/openapi.json) |
 | `v1.7.0` | 2026-05-10 | 开放动态表视图配置 API，支持 validate、dry-run、导出、创建、替换、分区 patch 和带确认删除。 | [API](docs/v1.7.0/api-reference.md) |
 | `v1.6.2` | 2026-05-06 | 修复第三方系统管理界面和 OAuth 无权限提示，新增安装/升级脚本，重构 README。 | [release](docs/release-v1.6.2.md) |
 | `v1.6.1` | 2026-05-05 | 增强微信生态第三方 OAuth 登录态传导。 | [release](docs/release-v1.6.1.md) |
@@ -133,13 +145,17 @@ docker compose up -d
 
 - [bpmt-doc](https://github.com/wodenwang/bpmt-doc)：面向低代码用户的 SOP 文档项目。
 - [维护说明](docs/maintenance.md)：维护者构建、验证、镜像发布和升级策略。
-- [API 文档](docs/v1.7.0/api-reference.md)：动态表视图 API 的 Markdown 归档，完整接口以 OpenAPI 快照为准。
-- [OpenAPI 快照](docs/v1.7.0/openapi.json)：给 AI agent、N8N、飞书集成平台使用的接口契约。
+- [v1.7.1 API 归档](docs/v1.7.1/api-reference.md)：报表视图 API 的 Markdown 归档，完整接口以 OpenAPI 快照为准。
+- [v1.7.1 OpenAPI](docs/v1.7.1/openapi.json)：给 AI agent、N8N、飞书集成平台使用的接口契约。
+- [v1.7.0 API 文档](docs/v1.7.0/api-reference.md)：动态表视图 API 的 Markdown 归档。
+- [v1.7.0 OpenAPI 快照](docs/v1.7.0/openapi.json)：v1.7.0 的接口契约归档。
 - [第三方 OAuth 登录](docs/v1.5.0/oauth-login-reference.md)：BPMT 作为 OAuth2 Authorization Code 服务端的接入说明。
 - [HTTPS 验收](docs/v1.6.0/https-acceptance.md)：内置 nginx HTTPS 和可信上游 TLS 的验证记录。
 - [微信生态 OAuth 登录](docs/v1.6.1/wechat-oauth-thirdpart-acceptance.md)：企业号/服务号登录态传导的验收记录。
 - [v1.7.0 设计说明](docs/superpowers/specs/2026-05-10-bpmt-lite-v1.7.0-dynamic-table-view-api-design.md)：动态表视图 API 的需求边界和方案。
 - [v1.7.0 执行计划](docs/superpowers/plans/2026-05-10-bpmt-lite-v1.7.0-dynamic-table-view-api.md)：本版本实施步骤和验证清单。
+- [v1.7.1 设计说明](docs/superpowers/specs/2026-05-15-bpmt-lite-v1.7.1-report-view-api-design.md)：报表视图 API 的需求边界和方案。
+- [v1.7.1 执行计划](docs/superpowers/plans/2026-05-15-bpmt-lite-v1.7.1-report-view-api.md)：本版本实施步骤和验证清单。
 
 ## 许可证与作者
 

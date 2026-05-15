@@ -10,6 +10,7 @@ import com.riversoft.api.ApiServlet;
 import com.riversoft.api.modules.database_operations.DatabaseOperationController;
 import com.riversoft.api.modules.dynamic_tables.DynamicTableController;
 import com.riversoft.api.modules.dynamic_table_views.DynamicTableViewController;
+import com.riversoft.api.modules.report_views.ReportViewController;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -115,6 +116,91 @@ public class ApiServletTest {
         assertTrue(response.getContentAsString().contains("\"viewKey\":\"CRM-CUSTOMER\""));
     }
 
+    @Test
+    public void reportViewValidateRouteIsNotCapturedAsViewKey() throws Exception {
+        ApiServlet servlet = servletWithReportViewRouteProbe();
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/v1/report-views:validate");
+        request.setPathInfo("/report-views:validate");
+        request.setContentType("application/json");
+        request.setContent("{}".getBytes("UTF-8"));
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        servlet.service((javax.servlet.ServletRequest) request, (javax.servlet.ServletResponse) response);
+
+        assertTrue(response.getStatus() == 200);
+        assertTrue(response.getContentAsString().contains("\"route\":\"report-validate\""));
+    }
+
+    @Test
+    public void reportViewListRouteDispatchesToController() throws Exception {
+        ApiServlet servlet = servletWithReportViewRouteProbe();
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/v1/report-views");
+        request.setPathInfo("/report-views");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        servlet.service((javax.servlet.ServletRequest) request, (javax.servlet.ServletResponse) response);
+
+        assertTrue(response.getStatus() == 200);
+        assertTrue(response.getContentAsString().contains("\"route\":\"report-list\""));
+    }
+
+    @Test
+    public void reportViewCreateRouteDispatchesToController() throws Exception {
+        ApiServlet servlet = servletWithReportViewRouteProbe();
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/v1/report-views");
+        request.setPathInfo("/report-views");
+        request.setContentType("application/json");
+        request.setContent("{}".getBytes("UTF-8"));
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        servlet.service((javax.servlet.ServletRequest) request, (javax.servlet.ServletResponse) response);
+
+        assertTrue(response.getStatus() == 200);
+        assertTrue(response.getContentAsString().contains("\"route\":\"report-create\""));
+    }
+
+    @Test
+    public void reportViewDetailDecodesViewKey() throws Exception {
+        ApiServlet servlet = servletWithReportViewRouteProbe();
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/v1/report-views/SALES%2DREPORT");
+        request.setPathInfo("/report-views/SALES%2DREPORT");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        servlet.service((javax.servlet.ServletRequest) request, (javax.servlet.ServletResponse) response);
+
+        assertTrue(response.getStatus() == 200);
+        assertTrue(response.getContentAsString().contains("\"viewKey\":\"SALES-REPORT\""));
+    }
+
+    @Test
+    public void malformedReportViewPathReturnsInvalidPath() throws Exception {
+        ApiServlet servlet = new ApiServlet();
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/v1/report-views/%E0%A4%A");
+        request.setPathInfo("/report-views/%E0%A4%A");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        servlet.service((javax.servlet.ServletRequest) request, (javax.servlet.ServletResponse) response);
+
+        assertTrue(response.getStatus() == 400);
+        assertTrue(response.getContentAsString().contains("\"code\":\"API_INVALID_PATH\""));
+    }
+
+    @Test
+    public void reportViewPatchRouteDecodesViewKeyAndSection() throws Exception {
+        ApiServlet servlet = servletWithReportViewRouteProbe();
+        MockHttpServletRequest request = new MockHttpServletRequest("PATCH", "/v1/report-views/SALES%2DREPORT/base");
+        request.setPathInfo("/report-views/SALES%2DREPORT/base");
+        request.setContentType("application/json");
+        request.setContent("{}".getBytes("UTF-8"));
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        servlet.service((javax.servlet.ServletRequest) request, (javax.servlet.ServletResponse) response);
+
+        assertTrue(response.getStatus() == 200);
+        assertTrue(response.getContentAsString().contains("\"viewKey\":\"SALES-REPORT\""));
+        assertTrue(response.getContentAsString().contains("\"section\":\"base\""));
+    }
+
     private ApiServlet servletWithDynamicTableViewRouteProbe() {
         DynamicTableViewController viewController = new DynamicTableViewController() {
             @Override
@@ -132,5 +218,47 @@ public class ApiServletTest {
             }
         };
         return new ApiServlet(new DynamicTableController(), new DatabaseOperationController(), viewController);
+    }
+
+    private ApiServlet servletWithReportViewRouteProbe() {
+        ReportViewController reportController = new ReportViewController() {
+            @Override
+            public Map<String, Object> list(ApiRequest request) {
+                Map<String, Object> result = new LinkedHashMap<String, Object>();
+                result.put("route", "report-list");
+                return result;
+            }
+
+            @Override
+            public Map<String, Object> create(ApiRequest request) {
+                Map<String, Object> result = new LinkedHashMap<String, Object>();
+                result.put("route", "report-create");
+                return result;
+            }
+
+            @Override
+            public Map<String, Object> validate(ApiRequest request) {
+                Map<String, Object> result = new LinkedHashMap<String, Object>();
+                result.put("route", "report-validate");
+                return result;
+            }
+
+            @Override
+            public Map<String, Object> detail(String viewKey) {
+                Map<String, Object> result = new LinkedHashMap<String, Object>();
+                result.put("viewKey", viewKey);
+                return result;
+            }
+
+            @Override
+            public Map<String, Object> patch(String viewKey, String section, ApiRequest request) {
+                Map<String, Object> result = new LinkedHashMap<String, Object>();
+                result.put("viewKey", viewKey);
+                result.put("section", section);
+                return result;
+            }
+        };
+        return new ApiServlet(new DynamicTableController(), new DatabaseOperationController(),
+                new DynamicTableViewController(), reportController);
     }
 }

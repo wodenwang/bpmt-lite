@@ -3,6 +3,7 @@ package com.riversoft.api;
 import com.riversoft.api.modules.dynamic_tables.DynamicTableController;
 import com.riversoft.api.modules.dynamic_table_views.DynamicTableViewController;
 import com.riversoft.api.modules.database_operations.DatabaseOperationController;
+import com.riversoft.api.modules.report_views.ReportViewController;
 import com.riversoft.api.http.ApiError;
 import com.riversoft.api.http.ApiException;
 import com.riversoft.api.http.ApiJson;
@@ -26,22 +27,34 @@ public class ApiServlet extends HttpServlet {
     private final DynamicTableController dynamicTableController;
     private final DatabaseOperationController databaseOperationController;
     private final DynamicTableViewController dynamicTableViewController;
+    private final ReportViewController reportViewController;
 
     public ApiServlet() {
-        this(new DynamicTableController(), new DatabaseOperationController(), new DynamicTableViewController());
+        this(new DynamicTableController(), new DatabaseOperationController(), new DynamicTableViewController(),
+                new ReportViewController());
     }
 
     public ApiServlet(DynamicTableController dynamicTableController,
                       DatabaseOperationController databaseOperationController) {
-        this(dynamicTableController, databaseOperationController, new DynamicTableViewController());
+        this(dynamicTableController, databaseOperationController, new DynamicTableViewController(),
+                new ReportViewController());
     }
 
     public ApiServlet(DynamicTableController dynamicTableController,
                       DatabaseOperationController databaseOperationController,
                       DynamicTableViewController dynamicTableViewController) {
+        this(dynamicTableController, databaseOperationController, dynamicTableViewController,
+                new ReportViewController());
+    }
+
+    public ApiServlet(DynamicTableController dynamicTableController,
+                      DatabaseOperationController databaseOperationController,
+                      DynamicTableViewController dynamicTableViewController,
+                      ReportViewController reportViewController) {
         this.dynamicTableController = dynamicTableController;
         this.databaseOperationController = databaseOperationController;
         this.dynamicTableViewController = dynamicTableViewController;
+        this.reportViewController = reportViewController;
     }
 
     @Override
@@ -60,6 +73,47 @@ public class ApiServlet extends HttpServlet {
     private Object dispatch(ApiRequest request) {
         String method = StringUtils.upperCase(request.getMethod());
         String path = normalizePath(request.getPathInfo());
+
+        if ("/report-views".equals(path)) {
+            if ("GET".equals(method)) {
+                return reportViewController.list(request);
+            }
+            if ("POST".equals(method)) {
+                return reportViewController.create(request);
+            }
+            throw methodNotAllowed();
+        }
+
+        if ("/report-views:validate".equals(path)) {
+            if ("POST".equals(method)) {
+                return reportViewController.validate(request);
+            }
+            throw methodNotAllowed();
+        }
+
+        if (path.startsWith("/report-views/")) {
+            String tail = path.substring("/report-views/".length());
+            String[] parts = tail.split("/");
+            if (parts.length == 1 && StringUtils.isNotBlank(parts[0])) {
+                String viewKey = decode(parts[0]);
+                if ("GET".equals(method)) {
+                    return reportViewController.detail(viewKey);
+                }
+                if ("PUT".equals(method)) {
+                    return reportViewController.replace(viewKey, request);
+                }
+                if ("DELETE".equals(method)) {
+                    return reportViewController.delete(viewKey, request);
+                }
+                throw methodNotAllowed();
+            }
+            if (parts.length == 2 && StringUtils.isNotBlank(parts[0]) && StringUtils.isNotBlank(parts[1])) {
+                if ("PATCH".equals(method)) {
+                    return reportViewController.patch(decode(parts[0]), decode(parts[1]), request);
+                }
+                throw methodNotAllowed();
+            }
+        }
 
         if ("/dynamic-table-views".equals(path)) {
             if ("GET".equals(method)) {
@@ -204,6 +258,8 @@ public class ApiServlet extends HttpServlet {
         try {
             return URLDecoder.decode(value, "UTF-8");
         } catch (UnsupportedEncodingException e) {
+            throw new ApiException(400, "API_INVALID_PATH", "API 路径无法解析。");
+        } catch (IllegalArgumentException e) {
             throw new ApiException(400, "API_INVALID_PATH", "API 路径无法解析。");
         }
     }
