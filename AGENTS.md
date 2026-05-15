@@ -28,10 +28,10 @@
 - `v1.6.0` 是新增 HTTPS 入口支持的发布版本，支持内置 nginx TLS 和可信上游 TLS。
 - `v1.6.1` 是基于 `v1.6.0` 增强微信生态第三方 OAuth 登录态传导的补丁版本。
 - `v1.6.2` 是修复第三方系统管理界面和 OAuth 无权限提示，并新增安装/升级脚本的补丁版本。
-- `v1.7.0` 是当前版本，新增动态表视图配置 API，开放 `/{viewKey}.view` 对应的 dyn 视图完整配置管理能力。
-- `v1.7.1` 是基于 `v1.7.0` 新增报表视图配置 API 的补丁版本，开放 `rep_list` 对应的 `/{viewKey}.view` 配置管理能力。
-- 默认 Web 镜像：`ghcr.io/wodenwang/bpmt-lite:1.7.0`
-- 默认 API 镜像：`ghcr.io/wodenwang/bpmt-lite-api:1.7.0`
+- `v1.7.0` 是动态表视图配置 API 发布版本，开放 `/{viewKey}.view` 对应的 dyn 视图完整配置管理能力。
+- `v1.7.1` 是当前版本，基于 `v1.7.0` 新增报表视图配置 API，开放 `rep_list` 对应的 `/{viewKey}.view` 配置管理能力。
+- 默认 Web 镜像：`ghcr.io/wodenwang/bpmt-lite:1.7.1`
+- 默认 API 镜像：`ghcr.io/wodenwang/bpmt-lite-api:1.7.1`
 - 同步镜像 tag：发布后同步到 `ghcr.io/wodenwang/bpmt-lite:latest` 和 `ghcr.io/wodenwang/bpmt-lite-api:latest`
 - 默认访问地址：`http://127.0.0.1/`
 - HTTPS 访问地址：`https://127.0.0.1/`，需要 `BPMT_HTTPS_ENABLED=1`

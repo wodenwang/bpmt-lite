@@ -2,7 +2,7 @@
 set -eu
 
 MODE="${1:-full}"
-REF="${BPMT_REF:-v1.7.0}"
+REF="${BPMT_REF:-v1.7.1}"
 REMOTE_ASSETS=0
 RAW_BASE_URL="${BPMT_RAW_BASE_URL:-}"
 SQL_BASE_URL="${BPMT_SQL_BASE_URL:-}"

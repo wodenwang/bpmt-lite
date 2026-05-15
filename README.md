@@ -6,10 +6,10 @@
 
 本仓只处理遗留 BPMT 的发行工程：代码结构、打包方式、配置方式、Docker 运行方式、初始化数据和升级脚本。不升级 Java/Tomcat/MariaDB 技术栈，不重写业务功能。
 
-当前版本：`v1.7.0`
+当前版本：`v1.7.1`
 
-- Web 镜像：`ghcr.io/wodenwang/bpmt-lite:1.7.0`
-- API 镜像：`ghcr.io/wodenwang/bpmt-lite-api:1.7.0`
+- Web 镜像：`ghcr.io/wodenwang/bpmt-lite:1.7.1`
+- API 镜像：`ghcr.io/wodenwang/bpmt-lite-api:1.7.1`
 - 同步镜像：`ghcr.io/wodenwang/bpmt-lite:latest`、`ghcr.io/wodenwang/bpmt-lite-api:latest`
 - 默认访问地址：`http://127.0.0.1/`
 - API 文档：`http://127.0.0.1/api/docs/`
@@ -21,7 +21,7 @@
 不需要 clone 项目，直接执行一条命令完成安装、初始化数据库并启动服务：
 
 ```bash
-curl -fsSL https://github.com/wodenwang/bpmt-lite/raw/refs/tags/v1.7.0/scripts/install.sh | bash
+curl -fsSL https://github.com/wodenwang/bpmt-lite/raw/refs/tags/v1.7.1/scripts/install.sh | bash
 ```
 
 脚本会创建 `bpmt-lite/` 运行目录，下载 `docker-compose.yml`、初始化脚本、升级脚本、nginx 配置模板和默认数据库，并执行 `docker compose up -d`。
@@ -42,7 +42,7 @@ http://127.0.0.1/
 启用本地 HTTPS：
 
 ```bash
-curl -fsSL https://github.com/wodenwang/bpmt-lite/raw/refs/tags/v1.7.0/scripts/install.sh | BPMT_HTTPS_ENABLED=1 bash
+curl -fsSL https://github.com/wodenwang/bpmt-lite/raw/refs/tags/v1.7.1/scripts/install.sh | BPMT_HTTPS_ENABLED=1 bash
 ```
 
 升级到最新版本：
@@ -52,7 +52,7 @@ cd bpmt-lite
 sh ./upgrade.sh
 ```
 
-`upgrade.sh` 会根据 GitHub 最新 release/tag 下载参考 compose 文件，例如 `docker-compose-v1.7.0.yml`；不会覆盖当前 `docker-compose.yml`。升级时只拉取 BPMT Web/API 的 `latest` 镜像并重启这两个服务，不自动升级 `mariadb`、`nginx` 等第三方容器。升级状态记录在 `.bpmt-lite/` 下，不写入业务数据库。
+`upgrade.sh` 会根据 GitHub 最新 release/tag 下载参考 compose 文件，例如 `docker-compose-v1.7.1.yml`；不会覆盖当前 `docker-compose.yml`。升级时只拉取 BPMT Web/API 的 `latest` 镜像并重启这两个服务，不自动升级 `mariadb`、`nginx` 等第三方容器。升级状态记录在 `.bpmt-lite/` 下，不写入业务数据库。
 
 常用检查：
 
@@ -124,7 +124,7 @@ docker compose up -d
 
 | 版本 | 发布日期 | 说明 | 文档 |
 | --- | --- | --- | --- |
-| `v1.7.1` | 预发布 | 基于 `v1.7.0` 新增报表视图配置 API，开放 `rep_list` 报表视图的创建、导出、校验、全量替换、局部替换和删除能力。 | [API](docs/v1.7.1/api-reference.md)、[OpenAPI](docs/v1.7.1/openapi.json) |
+| `v1.7.1` | 2026-05-16 | 基于 `v1.7.0` 新增报表视图配置 API，开放 `rep_list` 报表视图的创建、导出、校验、全量替换、局部替换和删除能力。 | [API](docs/v1.7.1/api-reference.md)、[OpenAPI](docs/v1.7.1/openapi.json) |
 | `v1.7.0` | 2026-05-10 | 开放动态表视图配置 API，支持 validate、dry-run、导出、创建、替换、分区 patch 和带确认删除。 | [API](docs/v1.7.0/api-reference.md) |
 | `v1.6.2` | 2026-05-06 | 修复第三方系统管理界面和 OAuth 无权限提示，新增安装/升级脚本，重构 README。 | [release](docs/release-v1.6.2.md) |
 | `v1.6.1` | 2026-05-05 | 增强微信生态第三方 OAuth 登录态传导。 | [release](docs/release-v1.6.1.md) |
