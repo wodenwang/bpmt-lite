@@ -30,7 +30,7 @@ public class ReportViewService {
     private final ReportViewPermissionService permissionService = new ReportViewPermissionService();
 
     public ReportViewService() {
-        this.repository = null;
+        this(new OrmReportViewRepository());
     }
 
     ReportViewService(ReportViewRepository repository) {
@@ -155,9 +155,6 @@ public class ReportViewService {
     }
 
     private ReportViewRepository repository() {
-        if (repository == null) {
-            throw new ApiException(501, "REPORT_VIEW_NOT_IMPLEMENTED", "报表视图 API 尚未实现。");
-        }
         return repository;
     }
 
@@ -315,152 +312,6 @@ public class ReportViewService {
             return Integer.parseInt(StringUtils.trim(value));
         } catch (NumberFormatException e) {
             throw new ApiException(400, "API_INVALID_PARAMETER", "分页参数无效。");
-        }
-    }
-}
-
-class ReportViewPermissionService {
-    ReportViewResponse.WritePlan apply(String viewKey,
-                                       ReportViewSnapshot oldSnapshot,
-                                       ReportViewSnapshot target) {
-        ReportViewResponse.WritePlan plan = new ReportViewResponse.WritePlan();
-        if (target == null) {
-            collectDeletes(oldSnapshot, plan);
-            return plan;
-        }
-        applyPermissions(viewKey, target);
-        collectRemovedPermissions(oldSnapshot, target, plan);
-        return plan;
-    }
-
-    private void applyPermissions(String viewKey, ReportViewSnapshot snapshot) {
-        if (snapshot == null) {
-            return;
-        }
-        ReportViewSnapshot normalized = new ReportViewDefaults().normalize(snapshot);
-        for (ReportViewSnapshot.ShowColumn column : normalized.getColumns().getShow()) {
-            if (column.getPermissions() == null) {
-                column.setPermissions(new ReportViewSnapshot.PermissionSet());
-            }
-            ensurePermission(column.getPermissions(), "report." + viewKey + ".column." + column.getStableKey() + ".view");
-        }
-        for (ReportViewSnapshot.LineColumn line : normalized.getColumns().getLines()) {
-            if (line.getPermissions() == null) {
-                line.setPermissions(new ReportViewSnapshot.PermissionSet());
-            }
-            ensurePermission(line.getPermissions(), "report." + viewKey + ".line." + line.getStableKey() + ".view");
-        }
-        for (ReportViewSnapshot.Limit limit : normalized.getLimits()) {
-            if (limit.getPermissions() == null) {
-                limit.setPermissions(new ReportViewSnapshot.PermissionSet());
-            }
-            ensurePermission(limit.getPermissions(), "report." + viewKey + ".limit." + limit.getStableKey() + ".view");
-        }
-        for (ReportViewSnapshot.ViewTab tab : normalized.getSubviews().getViewTabs()) {
-            if (tab.getPermissions() == null) {
-                tab.setPermissions(new ReportViewSnapshot.PermissionSet());
-            }
-            ensurePermission(tab.getPermissions(), "report." + viewKey + ".subview." + tab.getStableKey() + ".view");
-        }
-        for (ReportViewSnapshot.SystemButton button : normalized.getButtons().getSystem()) {
-            if (button.getPermissions() == null) {
-                button.setPermissions(new ReportViewSnapshot.PermissionSet());
-            }
-            ensurePermission(button.getPermissions(), "report." + viewKey + ".button.system." + button.getName() + ".view");
-        }
-        for (ReportViewSnapshot.CustomButton button : normalized.getButtons().getItem()) {
-            if (button.getPermissions() == null) {
-                button.setPermissions(new ReportViewSnapshot.PermissionSet());
-            }
-            ensurePermission(button.getPermissions(), "report." + viewKey + ".button.item." + button.getStableKey() + ".view");
-        }
-        for (ReportViewSnapshot.CustomButton button : normalized.getButtons().getSummary()) {
-            if (button.getPermissions() == null) {
-                button.setPermissions(new ReportViewSnapshot.PermissionSet());
-            }
-            ensurePermission(button.getPermissions(), "report." + viewKey + ".button.summary." + button.getStableKey() + ".view");
-        }
-        if (normalized.getWeixin() != null) {
-            if (normalized.getWeixin().getPermissions() == null) {
-                normalized.getWeixin().setPermissions(new ReportViewSnapshot.PermissionSet());
-            }
-            ensurePermission(normalized.getWeixin().getPermissions(), "report." + viewKey + ".weixin.view");
-        }
-    }
-
-    private void collectRemovedPermissions(ReportViewSnapshot oldSnapshot,
-                                           ReportViewSnapshot target,
-                                           ReportViewResponse.WritePlan plan) {
-        Set<String> oldKeys = collectKeys(oldSnapshot);
-        Set<String> targetKeys = collectKeys(target);
-        for (String key : oldKeys) {
-            if (!targetKeys.contains(key)) {
-                plan.getPermissionDeletes().add(key);
-            }
-        }
-    }
-
-    private void collectDeletes(ReportViewSnapshot oldSnapshot, ReportViewResponse.WritePlan plan) {
-        plan.getPermissionDeletes().addAll(collectKeys(oldSnapshot));
-    }
-
-    private Set<String> collectKeys(ReportViewSnapshot snapshot) {
-        Set<String> keys = new LinkedHashSet<String>();
-        if (snapshot == null) {
-            return keys;
-        }
-        ReportViewSnapshot normalized = new ReportViewDefaults().normalize(snapshot);
-        for (ReportViewSnapshot.ShowColumn column : normalized.getColumns().getShow()) {
-            collectPermission(keys, column.getPermissions());
-        }
-        for (ReportViewSnapshot.LineColumn line : normalized.getColumns().getLines()) {
-            collectPermission(keys, line.getPermissions());
-        }
-        for (ReportViewSnapshot.Limit limit : normalized.getLimits()) {
-            collectPermission(keys, limit.getPermissions());
-        }
-        for (ReportViewSnapshot.ViewTab tab : normalized.getSubviews().getViewTabs()) {
-            collectPermission(keys, tab.getPermissions());
-        }
-        for (ReportViewSnapshot.SystemButton button : normalized.getButtons().getSystem()) {
-            collectPermission(keys, button.getPermissions());
-        }
-        for (ReportViewSnapshot.CustomButton button : normalized.getButtons().getItem()) {
-            collectPermission(keys, button.getPermissions());
-        }
-        for (ReportViewSnapshot.CustomButton button : normalized.getButtons().getSummary()) {
-            collectPermission(keys, button.getPermissions());
-        }
-        if (normalized.getWeixin() != null) {
-            collectPermission(keys, normalized.getWeixin().getPermissions());
-        }
-        return keys;
-    }
-
-    private void ensurePermission(ReportViewSnapshot.PermissionSet permissions, String generatedKey) {
-        if (permissions == null) {
-            return;
-        }
-        if (permissions.getView() == null) {
-            permissions.setView(new ArrayList<String>());
-        }
-        for (String value : permissions.getView()) {
-            if (StringUtils.isNotBlank(value)) {
-                return;
-            }
-        }
-        permissions.getView().clear();
-        permissions.getView().add(generatedKey);
-    }
-
-    private void collectPermission(Set<String> keys, ReportViewSnapshot.PermissionSet permissions) {
-        if (permissions == null || permissions.getView() == null) {
-            return;
-        }
-        for (String key : permissions.getView()) {
-            if (StringUtils.isNotBlank(key)) {
-                keys.add(key);
-            }
         }
     }
 }
