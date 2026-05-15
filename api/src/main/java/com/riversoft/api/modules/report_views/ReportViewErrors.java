@@ -22,6 +22,14 @@ final class ReportViewErrors {
         return new ApiException(400, "REPORT_VIEW_INVALID_SNAPSHOT", message);
     }
 
+    static ApiException invalidSqlConfig(String message) {
+        return new ApiException(400, "REPORT_VIEW_INVALID_SQL_CONFIG", message);
+    }
+
+    static ApiException invalidScriptConfig(String message) {
+        return new ApiException(400, "REPORT_VIEW_INVALID_SCRIPT_CONFIG", message);
+    }
+
     static ApiException confirmRequired() {
         return new ApiException(400, "REPORT_VIEW_CONFIRM_REQUIRED", "删除报表视图必须传入 confirmViewKey 并与 viewKey 一致。");
     }
