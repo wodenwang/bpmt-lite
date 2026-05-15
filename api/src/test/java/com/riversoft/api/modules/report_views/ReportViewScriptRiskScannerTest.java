@@ -56,4 +56,91 @@ public class ReportViewScriptRiskScannerTest {
         assertTrue(Fixtures.warningCodes(new ReportViewScriptRiskScanner().scan(buttonSnapshot))
                 .contains("CLIENT_SCRIPT_PRESENT"));
     }
+
+    @Test
+    public void warnsForSummaryContentClientScript() {
+        ReportViewSnapshot snapshot = scannerOnlySnapshot("SUMMARY_CONTENT_REPORT");
+        snapshot.getColumns().getShow().get(0).setSummaryContent(Fixtures.script("return vo.TOTAL;"));
+
+        assertClientScriptPresent(snapshot);
+    }
+
+    @Test
+    public void warnsForScriptsListClientScript() {
+        ReportViewSnapshot snapshot = scannerOnlySnapshot("LIST_SCRIPT_REPORT");
+        snapshot.getScripts().setList(Fixtures.script("console.log('loaded');"));
+
+        assertClientScriptPresent(snapshot);
+    }
+
+    @Test
+    public void warnsForSubviewParamClientScript() {
+        ReportViewSnapshot snapshot = scannerOnlySnapshot("SUBVIEW_PARAM_REPORT");
+        ReportViewSnapshot.ViewTab tab = new ReportViewSnapshot.ViewTab();
+        tab.setStableKey("detail");
+        tab.setParam(Fixtures.script("return 'id=' + vo.ID;"));
+        snapshot.getSubviews().getViewTabs().add(tab);
+
+        assertClientScriptPresent(snapshot);
+    }
+
+    @Test
+    public void warnsForItemButtonParamClientScript() {
+        ReportViewSnapshot snapshot = scannerOnlySnapshot("ITEM_BUTTON_PARAM_REPORT");
+        ReportViewSnapshot.CustomButton button = new ReportViewSnapshot.CustomButton();
+        button.setStableKey("open");
+        button.setParam(Fixtures.script("return vo.ID;"));
+        snapshot.getButtons().getItem().add(button);
+
+        assertClientScriptPresent(snapshot);
+    }
+
+    @Test
+    public void warnsForSummaryButtonParamClientScript() {
+        ReportViewSnapshot snapshot = scannerOnlySnapshot("SUMMARY_BUTTON_PARAM_REPORT");
+        ReportViewSnapshot.CustomButton button = new ReportViewSnapshot.CustomButton();
+        button.setStableKey("summary");
+        button.setParam(Fixtures.script("return vo.ID;"));
+        snapshot.getButtons().getSummary().add(button);
+
+        assertClientScriptPresent(snapshot);
+    }
+
+    @Test
+    public void warnsForWeixinClientScripts() {
+        assertClientScriptPresent(weixinSnapshot("WEIXIN_TITLE_REPORT", "title"));
+        assertClientScriptPresent(weixinSnapshot("WEIXIN_IMAGE_REPORT", "image"));
+        assertClientScriptPresent(weixinSnapshot("WEIXIN_DESCRIPTION_REPORT", "description"));
+        assertClientScriptPresent(weixinSnapshot("WEIXIN_DATE_REPORT", "date"));
+    }
+
+    private ReportViewSnapshot scannerOnlySnapshot(String viewKey) {
+        ReportViewSnapshot snapshot = Fixtures.reportSnapshot(viewKey);
+        snapshot.getColumns().getShow().get(0).setContent(null);
+        return snapshot;
+    }
+
+    private ReportViewSnapshot weixinSnapshot(String viewKey, String field) {
+        ReportViewSnapshot snapshot = scannerOnlySnapshot(viewKey);
+        ReportViewSnapshot.Weixin weixin = new ReportViewSnapshot.Weixin();
+        if ("title".equals(field)) {
+            weixin.setTitle(Fixtures.script("return vo.TITLE;"));
+        }
+        if ("image".equals(field)) {
+            weixin.setImage(Fixtures.script("return vo.IMAGE;"));
+        }
+        if ("description".equals(field)) {
+            weixin.setDescription(Fixtures.script("return vo.DESCRIPTION;"));
+        }
+        if ("date".equals(field)) {
+            weixin.setDate(Fixtures.script("return vo.CREATE_DATE;"));
+        }
+        snapshot.setWeixin(weixin);
+        return snapshot;
+    }
+
+    private void assertClientScriptPresent(ReportViewSnapshot snapshot) {
+        assertTrue(Fixtures.warningCodes(new ReportViewScriptRiskScanner().scan(snapshot))
+                .contains("CLIENT_SCRIPT_PRESENT"));
+    }
 }

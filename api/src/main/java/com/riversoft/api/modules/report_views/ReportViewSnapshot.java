@@ -846,59 +846,59 @@ public class ReportViewSnapshot {
     }
 
     public static class Weixin {
-        private String listMode;
-        private String urlMode;
-        private String title;
-        private String image;
-        private String description;
-        private String date;
+        private Integer listMode;
+        private Integer urlMode;
+        private ScriptValue title;
+        private ScriptValue image;
+        private ScriptValue description;
+        private ScriptValue date;
         private PermissionSet permissions;
 
-        public String getListMode() {
+        public Integer getListMode() {
             return listMode;
         }
 
-        public void setListMode(String listMode) {
+        public void setListMode(Integer listMode) {
             this.listMode = listMode;
         }
 
-        public String getUrlMode() {
+        public Integer getUrlMode() {
             return urlMode;
         }
 
-        public void setUrlMode(String urlMode) {
+        public void setUrlMode(Integer urlMode) {
             this.urlMode = urlMode;
         }
 
-        public String getTitle() {
+        public ScriptValue getTitle() {
             return title;
         }
 
-        public void setTitle(String title) {
+        public void setTitle(ScriptValue title) {
             this.title = title;
         }
 
-        public String getImage() {
+        public ScriptValue getImage() {
             return image;
         }
 
-        public void setImage(String image) {
+        public void setImage(ScriptValue image) {
             this.image = image;
         }
 
-        public String getDescription() {
+        public ScriptValue getDescription() {
             return description;
         }
 
-        public void setDescription(String description) {
+        public void setDescription(ScriptValue description) {
             this.description = description;
         }
 
-        public String getDate() {
+        public ScriptValue getDate() {
             return date;
         }
 
-        public void setDate(String date) {
+        public void setDate(ScriptValue date) {
             this.date = date;
         }
 

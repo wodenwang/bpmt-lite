@@ -24,6 +24,7 @@ public class ReportViewScriptRiskScanner {
         scanVariables(normalized.getVariables(), warnings, codes);
         scanSubviews(normalized.getSubviews(), warnings, codes);
         scanButtons(normalized.getButtons(), warnings, codes);
+        scanWeixin(normalized.getWeixin(), warnings, codes);
         scanScripts(normalized.getScripts(), warnings, codes);
         return warnings;
     }
@@ -150,6 +151,18 @@ public class ReportViewScriptRiskScanner {
         if (scripts != null && hasScript(scripts.getList())) {
             scanClientScript(scripts.getList(), "scripts.list", warnings, codes);
         }
+    }
+
+    private void scanWeixin(ReportViewSnapshot.Weixin weixin,
+                            List<ReportViewResponse.Warning> warnings,
+                            Set<String> codes) {
+        if (weixin == null) {
+            return;
+        }
+        scanClientScript(weixin.getTitle(), "weixin.title", warnings, codes);
+        scanClientScript(weixin.getImage(), "weixin.image", warnings, codes);
+        scanClientScript(weixin.getDescription(), "weixin.description", warnings, codes);
+        scanClientScript(weixin.getDate(), "weixin.date", warnings, codes);
     }
 
     private void scanSqlScript(ReportViewSnapshot.ScriptValue value,

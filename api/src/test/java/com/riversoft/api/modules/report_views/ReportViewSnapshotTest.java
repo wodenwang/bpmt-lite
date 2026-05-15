@@ -24,6 +24,11 @@ public class ReportViewSnapshotTest {
                 + "\"param\":{\"type\":1,\"script\":\"return 'id=' + vo.ID;\"}}]},"
                 + "\"buttons\":{\"system\":[],\"item\":[{\"stableKey\":\"open\",\"displayName\":\"打开\","
                 + "\"param\":{\"type\":1,\"script\":\"return vo.ID;\"}}],\"summary\":[]},"
+                + "\"weixin\":{\"listMode\":1,\"urlMode\":2,"
+                + "\"title\":{\"type\":1,\"script\":\"return vo.TITLE;\"},"
+                + "\"image\":{\"type\":1,\"script\":\"return vo.IMAGE;\"},"
+                + "\"description\":{\"type\":1,\"script\":\"return vo.DESCRIPTION;\"},"
+                + "\"date\":{\"type\":1,\"script\":\"return vo.CREATE_DATE;\"}},"
                 + "\"scripts\":{\"list\":{\"type\":1,\"script\":\"console.log('loaded');\"}}}";
 
         ReportViewSnapshot snapshot = ApiJson.fromJson(new ByteArrayInputStream(json.getBytes("UTF-8")),
@@ -37,6 +42,12 @@ public class ReportViewSnapshotTest {
         assertEquals("return vo.TIP;", snapshot.getColumns().getLines().get(0).getTip().getScript());
         assertEquals("return 'id=' + vo.ID;", snapshot.getSubviews().getViewTabs().get(0).getParam().getScript());
         assertEquals("return vo.ID;", snapshot.getButtons().getItem().get(0).getParam().getScript());
+        assertEquals(Integer.valueOf(1), snapshot.getWeixin().getListMode());
+        assertEquals(Integer.valueOf(2), snapshot.getWeixin().getUrlMode());
+        assertEquals("return vo.TITLE;", snapshot.getWeixin().getTitle().getScript());
+        assertEquals("return vo.IMAGE;", snapshot.getWeixin().getImage().getScript());
+        assertEquals("return vo.DESCRIPTION;", snapshot.getWeixin().getDescription().getScript());
+        assertEquals("return vo.CREATE_DATE;", snapshot.getWeixin().getDate().getScript());
     }
 
     @Test

@@ -95,4 +95,81 @@ public class ReportViewValidatorTest {
         assertTrue(Fixtures.errorCodes(result).contains("REPORT_VIEW_INVALID_SCRIPT_CONFIG"));
         assertTrue(Fixtures.errorPaths(result).contains("columns.lines[0].tip"));
     }
+
+    @Test
+    public void rejectsInvalidSummaryContentScriptConfig() {
+        ReportViewSnapshot snapshot = Fixtures.reportSnapshot("SALES_REPORT");
+        snapshot.getColumns().getShow().get(0).setSummaryContent(new ReportViewSnapshot.ScriptValue());
+
+        assertInvalidScriptPath(snapshot, "columns.show[0].summaryContent");
+    }
+
+    @Test
+    public void rejectsInvalidSubviewParamScriptConfig() {
+        ReportViewSnapshot snapshot = Fixtures.reportSnapshot("SALES_REPORT");
+        ReportViewSnapshot.ViewTab tab = new ReportViewSnapshot.ViewTab();
+        tab.setStableKey("detail");
+        tab.setParam(new ReportViewSnapshot.ScriptValue());
+        snapshot.getSubviews().getViewTabs().add(tab);
+
+        assertInvalidScriptPath(snapshot, "subviews.viewTabs[0].param");
+    }
+
+    @Test
+    public void rejectsInvalidItemButtonParamScriptConfig() {
+        ReportViewSnapshot snapshot = Fixtures.reportSnapshot("SALES_REPORT");
+        ReportViewSnapshot.CustomButton button = new ReportViewSnapshot.CustomButton();
+        button.setStableKey("open");
+        button.setParam(new ReportViewSnapshot.ScriptValue());
+        snapshot.getButtons().getItem().add(button);
+
+        assertInvalidScriptPath(snapshot, "buttons.item[0].param");
+    }
+
+    @Test
+    public void rejectsInvalidSummaryButtonParamScriptConfig() {
+        ReportViewSnapshot snapshot = Fixtures.reportSnapshot("SALES_REPORT");
+        ReportViewSnapshot.CustomButton button = new ReportViewSnapshot.CustomButton();
+        button.setStableKey("summary");
+        button.setParam(new ReportViewSnapshot.ScriptValue());
+        snapshot.getButtons().getSummary().add(button);
+
+        assertInvalidScriptPath(snapshot, "buttons.summary[0].param");
+    }
+
+    @Test
+    public void rejectsInvalidScriptsListConfig() {
+        ReportViewSnapshot snapshot = Fixtures.reportSnapshot("SALES_REPORT");
+        snapshot.getScripts().setList(new ReportViewSnapshot.ScriptValue());
+
+        assertInvalidScriptPath(snapshot, "scripts.list");
+    }
+
+    @Test
+    public void rejectsInvalidWeixinScriptConfig() {
+        ReportViewSnapshot snapshot = Fixtures.reportSnapshot("SALES_REPORT");
+        ReportViewSnapshot.Weixin weixin = new ReportViewSnapshot.Weixin();
+        weixin.setTitle(new ReportViewSnapshot.ScriptValue());
+        weixin.setImage(new ReportViewSnapshot.ScriptValue());
+        weixin.setDescription(new ReportViewSnapshot.ScriptValue());
+        weixin.setDate(new ReportViewSnapshot.ScriptValue());
+        snapshot.setWeixin(weixin);
+
+        ReportViewValidationResult result = new ReportViewValidator().validate(snapshot);
+
+        assertFalse(result.isValid());
+        assertTrue(Fixtures.errorCodes(result).contains("REPORT_VIEW_INVALID_SCRIPT_CONFIG"));
+        assertTrue(Fixtures.errorPaths(result).contains("weixin.title"));
+        assertTrue(Fixtures.errorPaths(result).contains("weixin.image"));
+        assertTrue(Fixtures.errorPaths(result).contains("weixin.description"));
+        assertTrue(Fixtures.errorPaths(result).contains("weixin.date"));
+    }
+
+    private void assertInvalidScriptPath(ReportViewSnapshot snapshot, String path) {
+        ReportViewValidationResult result = new ReportViewValidator().validate(snapshot);
+
+        assertFalse(result.isValid());
+        assertTrue(Fixtures.errorCodes(result).contains("REPORT_VIEW_INVALID_SCRIPT_CONFIG"));
+        assertTrue(Fixtures.errorPaths(result).contains(path));
+    }
 }

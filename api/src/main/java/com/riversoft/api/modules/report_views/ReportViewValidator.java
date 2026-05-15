@@ -26,6 +26,7 @@ public class ReportViewValidator {
         validateVariables(normalized.getVariables(), result);
         validateSubviews(normalized.getSubviews(), result);
         validateButtons(normalized.getButtons(), result);
+        validateWeixin(normalized.getWeixin(), result);
         validateScripts(normalized.getScripts(), result);
         validateUnsupportedPermissions(normalized, result);
         result.setWarnings(scanner.scan(normalized));
@@ -165,6 +166,16 @@ public class ReportViewValidator {
         if (scripts != null) {
             validateScriptIfPresent(scripts.getList(), "scripts.list", result);
         }
+    }
+
+    private void validateWeixin(ReportViewSnapshot.Weixin weixin, ReportViewValidationResult result) {
+        if (weixin == null) {
+            return;
+        }
+        validateScriptIfPresent(weixin.getTitle(), "weixin.title", result);
+        validateScriptIfPresent(weixin.getImage(), "weixin.image", result);
+        validateScriptIfPresent(weixin.getDescription(), "weixin.description", result);
+        validateScriptIfPresent(weixin.getDate(), "weixin.date", result);
     }
 
     private void validateUnsupportedPermissions(ReportViewSnapshot snapshot, ReportViewValidationResult result) {
