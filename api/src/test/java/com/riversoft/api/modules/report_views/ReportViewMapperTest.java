@@ -44,6 +44,8 @@ public class ReportViewMapperTest {
         Map<String, Object> query = firstMap(map.get("querys"));
         assertEquals("VwReportQuery", query.get("$type$"));
         assertEquals("keyword", query.get("name"));
+        assertEquals(Integer.valueOf(1), query.get("widgetParamType"));
+        assertEquals("{placeholder:'订单号'}", query.get("widgetParamScript"));
         assertEquals("return ' and ORDER_NO like ?';", query.get("sqlScript"));
 
         Map<String, Object> limit = firstMap(map.get("limits"));
@@ -92,13 +94,15 @@ public class ReportViewMapperTest {
         assertEquals("line tip", snapshot.getColumns().getLines().get(0).getTip().getScript());
 
         assertEquals("keyword", snapshot.getQueries().get(0).getName());
+        assertEquals(Integer.valueOf(1), snapshot.getQueries().get(0).getWidgetParam().getType());
+        assertEquals("{placeholder:'订单号'}", snapshot.getQueries().get(0).getWidgetParam().getScript());
         assertEquals("return ' and ORDER_NO like ?';", snapshot.getQueries().get(0).getSql().getScript());
 
         assertEquals("limit-tenant", snapshot.getLimits().get(0).getStableKey());
         assertEquals("return ' and TENANT_ID = ?';", snapshot.getLimits().get(0).getSql().getScript());
 
         assertEquals("detail", snapshot.getButtons().getItem().get(0).getStableKey());
-        assertEquals("2", snapshot.getButtons().getItem().get(0).getOpenType());
+        assertEquals(Integer.valueOf(2), snapshot.getButtons().getItem().get(0).getOpenType());
         assertEquals("return {id: vo.ID};", snapshot.getButtons().getItem().get(0).getParam().getScript());
 
         assertNotNull(snapshot.getWeixin());
@@ -154,7 +158,7 @@ public class ReportViewMapperTest {
         query.setName("keyword");
         query.setDisplayName("关键字");
         query.setWidget("textfield");
-        query.setWidgetParam("{placeholder:'订单号'}");
+        query.setWidgetParam(Fixtures.script("{placeholder:'订单号'}"));
         query.setDefaultValue("");
         query.setSql(Fixtures.script("return ' and ORDER_NO like ?';"));
         query.setDescription("按订单号模糊查询");
@@ -172,7 +176,7 @@ public class ReportViewMapperTest {
         item.setDisplayName("查看");
         item.setIcon("zoomin");
         item.setAction("/detail");
-        item.setOpenType("2");
+        item.setOpenType(Integer.valueOf(2));
         item.setParam(Fixtures.script("return {id: vo.ID};"));
         item.setConfirmMessage("确认查看？");
         item.setDescription("查看明细");
@@ -258,6 +262,7 @@ public class ReportViewMapperTest {
         query.put("busiName", "关键字");
         query.put("name", "keyword");
         query.put("widget", "textfield");
+        query.put("widgetParamType", Integer.valueOf(1));
         query.put("widgetParamScript", "{placeholder:'订单号'}");
         query.put("defVal", "");
         query.put("sort", Integer.valueOf(1));

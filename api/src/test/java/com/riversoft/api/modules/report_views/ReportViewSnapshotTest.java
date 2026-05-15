@@ -19,10 +19,14 @@ public class ReportViewSnapshotTest {
                 + "\"content\":{\"type\":1,\"script\":\"return vo.ORDER_NO;\"}}],"
                 + "\"lines\":[{\"stableKey\":\"line1\",\"displayName\":\"分组\",\"tip\":{\"type\":1,\"script\":\"return vo.TIP;\"}}],"
                 + "\"listOrder\":[\"ORDER_NO\"]},"
-                + "\"queries\":[],\"limits\":[],\"variables\":{\"prepared\":[]},"
+                + "\"queries\":[{\"name\":\"keyword\",\"displayName\":\"关键字\",\"widget\":\"textfield\","
+                + "\"widgetParam\":{\"type\":1,\"script\":\"{placeholder:'订单号'}\"},"
+                + "\"sql\":{\"type\":1,\"script\":\"return ' and ORDER_NO like ?';\"}}],"
+                + "\"limits\":[],\"variables\":{\"prepared\":[]},"
                 + "\"subviews\":{\"viewTabs\":[{\"stableKey\":\"detail\",\"displayName\":\"明细\","
                 + "\"param\":{\"type\":1,\"script\":\"return 'id=' + vo.ID;\"}}]},"
                 + "\"buttons\":{\"system\":[],\"item\":[{\"stableKey\":\"open\",\"displayName\":\"打开\","
+                + "\"openType\":2,"
                 + "\"param\":{\"type\":1,\"script\":\"return vo.ID;\"}}],\"summary\":[]},"
                 + "\"weixin\":{\"listMode\":1,\"urlMode\":2,"
                 + "\"title\":{\"type\":1,\"script\":\"return vo.TITLE;\"},"
@@ -40,7 +44,9 @@ public class ReportViewSnapshotTest {
         assertEquals("CREATE_DATE desc", snapshot.getBase().getOrderBySql());
         assertEquals("ORDER_NO", snapshot.getColumns().getShow().get(0).getStableKey());
         assertEquals("return vo.TIP;", snapshot.getColumns().getLines().get(0).getTip().getScript());
+        assertEquals("{placeholder:'订单号'}", snapshot.getQueries().get(0).getWidgetParam().getScript());
         assertEquals("return 'id=' + vo.ID;", snapshot.getSubviews().getViewTabs().get(0).getParam().getScript());
+        assertEquals(Integer.valueOf(2), snapshot.getButtons().getItem().get(0).getOpenType());
         assertEquals("return vo.ID;", snapshot.getButtons().getItem().get(0).getParam().getScript());
         assertEquals(Integer.valueOf(1), snapshot.getWeixin().getListMode());
         assertEquals(Integer.valueOf(2), snapshot.getWeixin().getUrlMode());

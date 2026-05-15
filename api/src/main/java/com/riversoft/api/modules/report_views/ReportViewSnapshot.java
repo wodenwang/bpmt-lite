@@ -426,7 +426,7 @@ public class ReportViewSnapshot {
         private String name;
         private String displayName;
         private String widget;
-        private String widgetParam;
+        private ScriptValue widgetParam;
         private String defaultValue;
         private ScriptValue sql;
         private String description;
@@ -456,11 +456,11 @@ public class ReportViewSnapshot {
             this.widget = widget;
         }
 
-        public String getWidgetParam() {
+        public ScriptValue getWidgetParam() {
             return widgetParam;
         }
 
-        public void setWidgetParam(String widgetParam) {
+        public void setWidgetParam(ScriptValue widgetParam) {
             this.widgetParam = widgetParam;
         }
 
@@ -758,7 +758,7 @@ public class ReportViewSnapshot {
         private String icon;
         private String styleClass;
         private String action;
-        private String openType;
+        private Integer openType;
         private ScriptValue param;
         private String confirmMessage;
         private String description;
@@ -804,11 +804,11 @@ public class ReportViewSnapshot {
             this.action = action;
         }
 
-        public String getOpenType() {
+        public Integer getOpenType() {
             return openType;
         }
 
-        public void setOpenType(String openType) {
+        public void setOpenType(Integer openType) {
             this.openType = openType;
         }
 

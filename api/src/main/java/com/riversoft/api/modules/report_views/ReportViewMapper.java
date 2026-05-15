@@ -139,7 +139,7 @@ class ReportViewMapper {
             query.setName(stringValue(row, "name"));
             query.setDisplayName(stringValue(row, "busiName"));
             query.setWidget(stringValue(row, "widget"));
-            query.setWidgetParam(firstString(row, null, "widgetParam", "widgetParamScript"));
+            query.setWidgetParam(script(row, "widgetParamType", "widgetParamScript"));
             query.setDefaultValue(stringValue(row, "defVal"));
             query.setSql(script(row, "sqlType", "sqlScript"));
             query.setDescription(stringValue(row, "description"));
@@ -227,7 +227,7 @@ class ReportViewMapper {
             button.setIcon(stringValue(row, "icon"));
             button.setStyleClass(stringValue(row, "styleClass"));
             button.setAction(stringValue(row, "action"));
-            button.setOpenType(stringValue(row, "openType"));
+            button.setOpenType(intValue(row, "openType"));
             button.setParam(script(row, "paramType", "paramScript"));
             button.setConfirmMessage(stringValue(row, "confirmMsg"));
             button.setDescription(stringValue(row, "description"));
@@ -324,8 +324,7 @@ class ReportViewMapper {
             row.put("busiName", query.getDisplayName());
             row.put("name", query.getName());
             row.put("widget", query.getWidget());
-            row.put("widgetParamType", null);
-            row.put("widgetParamScript", query.getWidgetParam());
+            putScript(row, "widgetParamType", "widgetParamScript", query.getWidgetParam());
             row.put("defVal", query.getDefaultValue());
             row.put("sort", Integer.valueOf(i));
             putScript(row, "sqlType", "sqlScript", query.getSql());
@@ -457,7 +456,7 @@ class ReportViewMapper {
             row.put("styleClass", button.getStyleClass());
             row.put("icon", button.getIcon());
             row.put("action", button.getAction());
-            row.put("openType", openType(button.getOpenType()));
+            row.put("openType", button.getOpenType());
             row.put("description", button.getDescription());
             row.put("sort", Integer.valueOf(i));
             putScript(row, "paramType", "paramScript", button.getParam());
@@ -635,17 +634,6 @@ class ReportViewMapper {
             return null;
         }
         return Integer.valueOf(String.valueOf(value));
-    }
-
-    private Object openType(String value) {
-        if (value == null || value.trim().length() == 0) {
-            return null;
-        }
-        try {
-            return Integer.valueOf(value);
-        } catch (NumberFormatException e) {
-            return value;
-        }
     }
 
     @SuppressWarnings("unchecked")
