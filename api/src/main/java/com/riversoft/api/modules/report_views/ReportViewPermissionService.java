@@ -227,7 +227,7 @@ class ReportViewPermissionService {
                 return old;
             }
         }
-        return null;
+        return itemAt(oldColumns, index);
     }
 
     private ReportViewSnapshot.LineColumn matchLineColumn(List<ReportViewSnapshot.LineColumn> oldLines,
@@ -246,7 +246,7 @@ class ReportViewPermissionService {
                 return old;
             }
         }
-        return null;
+        return itemAt(oldLines, index);
     }
 
     private ReportViewSnapshot.Limit matchLimit(List<ReportViewSnapshot.Limit> oldLimits,
@@ -265,7 +265,7 @@ class ReportViewPermissionService {
                 return old;
             }
         }
-        return null;
+        return itemAt(oldLimits, index);
     }
 
     private ReportViewSnapshot.ViewTab matchViewTab(List<ReportViewSnapshot.ViewTab> oldTabs,
@@ -284,7 +284,7 @@ class ReportViewPermissionService {
                 return old;
             }
         }
-        return null;
+        return itemAt(oldTabs, index);
     }
 
     private ReportViewSnapshot.SystemButton matchSystemButton(List<ReportViewSnapshot.SystemButton> oldButtons,
@@ -303,7 +303,7 @@ class ReportViewPermissionService {
                 return old;
             }
         }
-        return null;
+        return itemAt(oldButtons, index);
     }
 
     private ReportViewSnapshot.CustomButton matchCustomButton(List<ReportViewSnapshot.CustomButton> oldButtons,
@@ -322,7 +322,7 @@ class ReportViewPermissionService {
                 return old;
             }
         }
-        return null;
+        return itemAt(oldButtons, index);
     }
 
     private <T> T itemAt(List<T> items, int index) {

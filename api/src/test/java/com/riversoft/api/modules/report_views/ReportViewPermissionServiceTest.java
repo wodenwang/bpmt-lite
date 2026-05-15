@@ -82,6 +82,40 @@ public class ReportViewPermissionServiceTest {
     }
 
     @Test
+    public void copiesOldColumnPermissionByOrderWhenStableKeyNoLongerMatches() {
+        ReportViewSnapshot oldSnapshot = snapshotWithManagedPermissions("SALES_REPORT");
+        oldSnapshot.getColumns().getShow().get(0).setStableKey("OLD_ORDER_NO");
+        oldSnapshot.getColumns().getShow().get(0).setPermissions(permission("custom.old.order.view"));
+        ReportViewSnapshot target = snapshotWithManagedPermissions("SALES_REPORT");
+        target.getColumns().getShow().get(0).setStableKey("NEW_ORDER_NO");
+        target.getColumns().getShow().get(0).setPermissions(null);
+
+        ReportViewResponse.WritePlan plan = new ReportViewPermissionService()
+                .apply("SALES_REPORT", oldSnapshot, target);
+
+        assertEquals("custom.old.order.view",
+                target.getColumns().getShow().get(0).getPermissions().getView().get(0));
+        assertTrue(!plan.getPermissionDeletes().contains("custom.old.order.view"));
+    }
+
+    @Test
+    public void copiesOldSystemButtonPermissionByOrderWhenNameNoLongerMatches() {
+        ReportViewSnapshot oldSnapshot = snapshotWithManagedPermissions("SALES_REPORT");
+        oldSnapshot.getButtons().getSystem().get(0).setName("oldExport");
+        oldSnapshot.getButtons().getSystem().get(0).setPermissions(permission("custom.old.export.view"));
+        ReportViewSnapshot target = snapshotWithManagedPermissions("SALES_REPORT");
+        target.getButtons().getSystem().get(0).setName("newExport");
+        target.getButtons().getSystem().get(0).setPermissions(null);
+
+        ReportViewResponse.WritePlan plan = new ReportViewPermissionService()
+                .apply("SALES_REPORT", oldSnapshot, target);
+
+        assertEquals("custom.old.export.view",
+                target.getButtons().getSystem().get(0).getPermissions().getView().get(0));
+        assertTrue(!plan.getPermissionDeletes().contains("custom.old.export.view"));
+    }
+
+    @Test
     public void deletionPlanCollectsAllManagedOldKeys() {
         ReportViewSnapshot oldSnapshot = snapshotWithManagedPermissions("SALES_REPORT");
         new ReportViewPermissionService().apply("SALES_REPORT", null, oldSnapshot);
