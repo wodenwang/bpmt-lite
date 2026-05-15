@@ -173,6 +173,19 @@ public class ApiServletTest {
     }
 
     @Test
+    public void malformedReportViewPathReturnsInvalidPath() throws Exception {
+        ApiServlet servlet = new ApiServlet();
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/v1/report-views/%E0%A4%A");
+        request.setPathInfo("/report-views/%E0%A4%A");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        servlet.service((javax.servlet.ServletRequest) request, (javax.servlet.ServletResponse) response);
+
+        assertTrue(response.getStatus() == 400);
+        assertTrue(response.getContentAsString().contains("\"code\":\"API_INVALID_PATH\""));
+    }
+
+    @Test
     public void reportViewPatchRouteDecodesViewKeyAndSection() throws Exception {
         ApiServlet servlet = servletWithReportViewRouteProbe();
         MockHttpServletRequest request = new MockHttpServletRequest("PATCH", "/v1/report-views/SALES%2DREPORT/base");

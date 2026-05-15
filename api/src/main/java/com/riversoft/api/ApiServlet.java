@@ -259,6 +259,8 @@ public class ApiServlet extends HttpServlet {
             return URLDecoder.decode(value, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             throw new ApiException(400, "API_INVALID_PATH", "API 路径无法解析。");
+        } catch (IllegalArgumentException e) {
+            throw new ApiException(400, "API_INVALID_PATH", "API 路径无法解析。");
         }
     }
 

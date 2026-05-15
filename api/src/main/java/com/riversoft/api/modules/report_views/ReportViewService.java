@@ -1,34 +1,39 @@
 package com.riversoft.api.modules.report_views;
 
-import java.util.LinkedHashMap;
+import com.riversoft.api.http.ApiException;
+
 import java.util.Map;
 
 class ReportViewService {
     Map<String, Object> list(String start, String limit) {
-        return new LinkedHashMap<String, Object>();
+        throw notImplemented();
     }
 
     Map<String, Object> create(ReportViewSnapshot snapshot, boolean dryRun) {
-        return new LinkedHashMap<String, Object>();
+        throw notImplemented();
     }
 
     Map<String, Object> export(String viewKey) {
-        return new LinkedHashMap<String, Object>();
+        throw notImplemented();
     }
 
     Map<String, Object> replace(String viewKey, ReportViewSnapshot snapshot, boolean dryRun) {
-        return new LinkedHashMap<String, Object>();
+        throw notImplemented();
     }
 
     Map<String, Object> patch(String viewKey, ReportViewSection section, Object body, boolean dryRun) {
-        return new LinkedHashMap<String, Object>();
+        throw notImplemented();
     }
 
     Map<String, Object> delete(String viewKey, String confirmViewKey) {
-        return new LinkedHashMap<String, Object>();
+        throw notImplemented();
     }
 
     Map<String, Object> validate(ReportViewSnapshot snapshot) {
-        return new LinkedHashMap<String, Object>();
+        throw notImplemented();
+    }
+
+    private ApiException notImplemented() {
+        return new ApiException(501, "REPORT_VIEW_NOT_IMPLEMENTED", "报表视图 API 尚未实现。");
     }
 }
