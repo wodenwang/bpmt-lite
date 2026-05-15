@@ -2,8 +2,8 @@
   "openapi": "3.0.3",
   "info": {
     "title": "BPMT Lite v1.7.0 API",
-    "version": "1.7.0",
-    "description": "BPMT Lite v1.7.0 API. The API surface remains compatible with v1.6.2 and adds dyn dynamic table view configuration management. Dynamic table view APIs only manage dyn view configuration for /{viewKey}.view and do not create menu entries, homepage cards, or external button entry points. Deleting a view never deletes the underlying dynamic table, business data, log table, or log data. Auth uses appKey/appSecret based HMAC headers from container environment variables. Signature canonical string is METHOD, PATH, NORMALIZED_QUERY, TIMESTAMP, NONCE, SHA256_HEX(BODY), joined by newline. PATH must be the public request URI such as /api/v1/dynamic-table-views. NORMALIZED_QUERY sorts decoded query pairs by name and value, then URL-encodes them with spaces as %20."
+    "version": "1.7.1",
+    "description": "BPMT Lite v1.7.1 API. Adds rep_list report view configuration management under /api/v1/report-views. Report view APIs manage VW_URL and VW_REPORT* metadata only; API 不执行 SQL, button actions, or client scripts. Signature PATH must use the public request URI such as /api/v1/report-views."
   },
   "servers": [
     {
@@ -1175,6 +1175,650 @@
           }
         }
       }
+    },
+    "/v1/report-views": {
+      "get": {
+        "tags": [
+          "Report Views"
+        ],
+        "summary": "List rep_list report views",
+        "description": "分页列出 rep_list 报表视图摘要。只管理报表视图配置，不读取或执行报表 SQL。",
+        "operationId": "listReportViews",
+        "x-bpmt-writes-metadata": false,
+        "x-bpmt-executes-ddl": false,
+        "x-bpmt-risk-level": "read",
+        "parameters": [
+          {
+            "name": "start",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Report view list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportViewListEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Report Views"
+        ],
+        "summary": "Create a rep_list report view",
+        "description": "创建 rep_list 报表视图配置。dryRun 是 query 参数；dryRun=true 时只校验并返回写入计划，不写入 VW_URL/VW_REPORT*。API 不执行 mainSql、查询 SQL、约束 SQL、按钮动作或客户端脚本。",
+        "operationId": "createReportView",
+        "x-bpmt-writes-metadata": true,
+        "x-bpmt-executes-ddl": false,
+        "x-bpmt-risk-level": "high",
+        "parameters": [
+          {
+            "name": "dryRun",
+            "in": "query",
+            "required": false,
+            "description": "true 或 1 表示仅校验和返回写入计划，不落库。",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportViewSnapshot"
+              },
+              "example": {
+                "viewKey": "SALES_REPORT",
+                "description": "销售报表",
+                "loginRequired": true,
+                "base": {
+                  "displayName": "销售报表",
+                  "dbKey": null,
+                  "mainSql": {
+                    "type": 1,
+                    "script": "select ID, ORDER_NO, CUSTOMER_NAME, AMOUNT from SALES_ORDER where 1=1"
+                  },
+                  "primaryKey": {
+                    "value": {
+                      "type": 1,
+                      "script": "return vo.ID;"
+                    }
+                  },
+                  "layoutColumns": 2,
+                  "initQuery": true,
+                  "pagination": {
+                    "enabled": true,
+                    "pageLimit": 20
+                  }
+                },
+                "columns": {
+                  "show": [
+                    {
+                      "stableKey": "ORDER_NO",
+                      "displayName": "订单号",
+                      "content": {
+                        "type": 1,
+                        "script": "return vo.ORDER_NO;"
+                      }
+                    }
+                  ],
+                  "lines": [],
+                  "listOrder": [
+                    "ORDER_NO"
+                  ]
+                },
+                "queries": [
+                  {
+                    "name": "customerName",
+                    "displayName": "客户名称",
+                    "widget": "text",
+                    "sql": {
+                      "type": 1,
+                      "script": "and CUSTOMER_NAME like concat('%', :customerName, '%')"
+                    }
+                  }
+                ],
+                "limits": [],
+                "variables": {
+                  "prepared": []
+                },
+                "subviews": {
+                  "viewTabs": []
+                },
+                "buttons": {
+                  "system": [],
+                  "item": [],
+                  "summary": []
+                },
+                "scripts": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Created or planned report view",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportViewWriteEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "409": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "422": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/v1/report-views:validate": {
+      "post": {
+        "tags": [
+          "Report Views"
+        ],
+        "summary": "Validate a rep_list report view snapshot",
+        "description": "校验并规范化报表视图快照，不写入元数据。validate 会检查结构、section 内容、脚本风险和 permissions 限制。查询、变量、SQL 本体 permissions 会被校验拒绝。API 不执行 SQL，因此不能保证 SQL 语义、结果列、权限过滤或运行性能正确。",
+        "operationId": "validateReportView",
+        "x-bpmt-writes-metadata": false,
+        "x-bpmt-executes-ddl": false,
+        "x-bpmt-risk-level": "read",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportViewSnapshot"
+              },
+              "example": {
+                "viewKey": "SALES_REPORT",
+                "description": "销售报表",
+                "loginRequired": true,
+                "base": {
+                  "displayName": "销售报表",
+                  "dbKey": null,
+                  "mainSql": {
+                    "type": 1,
+                    "script": "select ID, ORDER_NO, CUSTOMER_NAME, AMOUNT from SALES_ORDER where 1=1"
+                  },
+                  "primaryKey": {
+                    "value": {
+                      "type": 1,
+                      "script": "return vo.ID;"
+                    }
+                  },
+                  "layoutColumns": 2,
+                  "initQuery": true,
+                  "pagination": {
+                    "enabled": true,
+                    "pageLimit": 20
+                  }
+                },
+                "columns": {
+                  "show": [
+                    {
+                      "stableKey": "ORDER_NO",
+                      "displayName": "订单号",
+                      "content": {
+                        "type": 1,
+                        "script": "return vo.ORDER_NO;"
+                      }
+                    }
+                  ],
+                  "lines": [],
+                  "listOrder": [
+                    "ORDER_NO"
+                  ]
+                },
+                "queries": [
+                  {
+                    "name": "customerName",
+                    "displayName": "客户名称",
+                    "widget": "text",
+                    "sql": {
+                      "type": 1,
+                      "script": "and CUSTOMER_NAME like concat('%', :customerName, '%')"
+                    }
+                  }
+                ],
+                "limits": [],
+                "variables": {
+                  "prepared": []
+                },
+                "subviews": {
+                  "viewTabs": []
+                },
+                "buttons": {
+                  "system": [],
+                  "item": [],
+                  "summary": []
+                },
+                "scripts": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Validation result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportViewValidationEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "422": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/v1/report-views/{viewKey}": {
+      "get": {
+        "tags": [
+          "Report Views"
+        ],
+        "summary": "Export a rep_list report view snapshot",
+        "description": "导出 /{viewKey}.view 对应完整报表视图快照。GET 返回的 snapshot 可以作为 PUT 替换基线。仅支持 rep_list 视图，非 rep_list 返回 REPORT_VIEW_NOT_REP_LIST。",
+        "operationId": "exportReportView",
+        "x-bpmt-writes-metadata": false,
+        "x-bpmt-executes-ddl": false,
+        "x-bpmt-risk-level": "read",
+        "parameters": [
+          {
+            "name": "viewKey",
+            "in": "path",
+            "required": true,
+            "description": "报表视图 key，对应 /{viewKey}.view。",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Report view snapshot",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportViewEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "409": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Report Views"
+        ],
+        "summary": "Replace a rep_list report view snapshot",
+        "description": "以完整 snapshot 替换 /{viewKey}.view 对应报表视图配置。dryRun 是 query 参数。只写 VW_URL/VW_REPORT* 和权限资源，不执行 SQL，不修改业务数据。",
+        "operationId": "replaceReportView",
+        "x-bpmt-writes-metadata": true,
+        "x-bpmt-executes-ddl": false,
+        "x-bpmt-risk-level": "high",
+        "parameters": [
+          {
+            "name": "viewKey",
+            "in": "path",
+            "required": true,
+            "description": "报表视图 key，对应 /{viewKey}.view。",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dryRun",
+            "in": "query",
+            "required": false,
+            "description": "true 或 1 表示仅校验和返回写入计划，不落库。",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportViewSnapshot"
+              },
+              "example": {
+                "viewKey": "SALES_REPORT",
+                "description": "销售报表",
+                "loginRequired": true,
+                "base": {
+                  "displayName": "销售报表",
+                  "dbKey": null,
+                  "mainSql": {
+                    "type": 1,
+                    "script": "select ID, ORDER_NO, CUSTOMER_NAME, AMOUNT from SALES_ORDER where 1=1"
+                  },
+                  "primaryKey": {
+                    "value": {
+                      "type": 1,
+                      "script": "return vo.ID;"
+                    }
+                  },
+                  "layoutColumns": 2,
+                  "initQuery": true,
+                  "pagination": {
+                    "enabled": true,
+                    "pageLimit": 20
+                  }
+                },
+                "columns": {
+                  "show": [
+                    {
+                      "stableKey": "ORDER_NO",
+                      "displayName": "订单号",
+                      "content": {
+                        "type": 1,
+                        "script": "return vo.ORDER_NO;"
+                      }
+                    }
+                  ],
+                  "lines": [],
+                  "listOrder": [
+                    "ORDER_NO"
+                  ]
+                },
+                "queries": [
+                  {
+                    "name": "customerName",
+                    "displayName": "客户名称",
+                    "widget": "text",
+                    "sql": {
+                      "type": 1,
+                      "script": "and CUSTOMER_NAME like concat('%', :customerName, '%')"
+                    }
+                  }
+                ],
+                "limits": [],
+                "variables": {
+                  "prepared": []
+                },
+                "subviews": {
+                  "viewTabs": []
+                },
+                "buttons": {
+                  "system": [],
+                  "item": [],
+                  "summary": []
+                },
+                "scripts": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Replaced or planned report view",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportViewWriteEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "409": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "422": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Report Views"
+        ],
+        "summary": "Delete a rep_list report view configuration",
+        "description": "删除 rep_list 报表视图配置，不删除菜单、首页卡片、外部入口、业务表或业务数据。必须传入 confirmViewKey 且与 viewKey 一致，否则返回 REPORT_VIEW_CONFIRM_REQUIRED。",
+        "operationId": "deleteReportView",
+        "x-bpmt-writes-metadata": true,
+        "x-bpmt-executes-ddl": false,
+        "x-bpmt-risk-level": "high",
+        "parameters": [
+          {
+            "name": "viewKey",
+            "in": "path",
+            "required": true,
+            "description": "报表视图 key，对应 /{viewKey}.view。",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "confirmViewKey",
+            "in": "query",
+            "required": true,
+            "description": "删除确认值，必须与 path 中的 viewKey 完全一致。",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted report view configuration only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportViewDeleteEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "409": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/v1/report-views/{viewKey}/{section}": {
+      "patch": {
+        "tags": [
+          "Report Views"
+        ],
+        "summary": "Patch one rep_list report view section",
+        "description": "局部替换 /{viewKey}.view 的一个 section。dryRun 是 query 参数。支持 section：base、columns、queries、limits、variables、subviews、buttons、weixin、scripts。API 不执行 SQL 或脚本；SQL 语义需要调用方另行验收。",
+        "operationId": "patchReportViewSection",
+        "x-bpmt-writes-metadata": true,
+        "x-bpmt-executes-ddl": false,
+        "x-bpmt-risk-level": "high",
+        "parameters": [
+          {
+            "name": "viewKey",
+            "in": "path",
+            "required": true,
+            "description": "报表视图 key，对应 /{viewKey}.view。",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "section",
+            "in": "path",
+            "required": true,
+            "description": "要局部替换的报表视图区块。",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "base",
+                "columns",
+                "queries",
+                "limits",
+                "variables",
+                "subviews",
+                "buttons",
+                "weixin",
+                "scripts"
+              ]
+            }
+          },
+          {
+            "name": "dryRun",
+            "in": "query",
+            "required": false,
+            "description": "true 或 1 表示仅校验和返回写入计划，不落库。",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ReportViewBase"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ReportViewColumns"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ReportViewQuery"
+                    }
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ReportViewLimit"
+                    }
+                  },
+                  {
+                    "$ref": "#/components/schemas/ReportViewVariables"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ReportViewSubviews"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ReportViewButtons"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ReportViewWeixin"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ReportViewScripts"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Patched or planned report view section",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportViewWriteEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "409": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "422": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1541,6 +2185,785 @@
             "nullable": true
           }
         }
+      },
+      "ReportViewListEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/ReportViewListResult"
+          },
+          "error": {
+            "nullable": true
+          }
+        }
+      },
+      "ReportViewEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/ReportViewExportResult"
+          },
+          "error": {
+            "nullable": true
+          }
+        }
+      },
+      "ReportViewWriteEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/ReportViewWriteResult"
+          },
+          "error": {
+            "nullable": true
+          }
+        }
+      },
+      "ReportViewValidationEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/ReportViewValidationResult"
+          },
+          "error": {
+            "nullable": true
+          }
+        }
+      },
+      "ReportViewDeleteEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/ReportViewDeleteResult"
+          },
+          "error": {
+            "nullable": true
+          }
+        }
+      },
+      "ReportViewListResult": {
+        "type": "object",
+        "properties": {
+          "start": {
+            "type": "integer",
+            "example": 0
+          },
+          "limit": {
+            "type": "integer",
+            "example": 20
+          },
+          "totalRecord": {
+            "type": "integer",
+            "example": 1
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "viewKey": {
+                  "type": "string",
+                  "example": "SALES_REPORT"
+                },
+                "description": {
+                  "type": "string",
+                  "example": "销售报表"
+                },
+                "url": {
+                  "type": "string",
+                  "example": "/SALES_REPORT.view"
+                },
+                "loginRequired": {
+                  "type": "boolean",
+                  "example": true
+                }
+              }
+            }
+          }
+        }
+      },
+      "ReportViewExportResult": {
+        "type": "object",
+        "properties": {
+          "snapshot": {
+            "$ref": "#/components/schemas/ReportViewSnapshot"
+          }
+        }
+      },
+      "ReportViewWriteResult": {
+        "type": "object",
+        "properties": {
+          "snapshot": {
+            "$ref": "#/components/schemas/ReportViewSnapshot"
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReportViewWarning"
+            }
+          },
+          "plan": {
+            "$ref": "#/components/schemas/ReportViewWritePlan"
+          }
+        }
+      },
+      "ReportViewValidationResult": {
+        "type": "object",
+        "properties": {
+          "valid": {
+            "type": "boolean",
+            "example": true
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReportViewWarning"
+            }
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReportViewValidationError"
+            }
+          },
+          "normalizedSnapshot": {
+            "$ref": "#/components/schemas/ReportViewSnapshot"
+          }
+        }
+      },
+      "ReportViewWarningCode": {
+        "type": "string",
+        "enum": [
+          "SQL_SCRIPT_PRESENT",
+          "CLIENT_SCRIPT_PRESENT",
+          "BUTTON_ACTION_PRESENT",
+          "EXTERNAL_DB_KEY_PRESENT",
+          "UNEXECUTED_SQL_SEMANTICS"
+        ],
+        "description": "报表视图 API 风险提示码。API 不执行 SQL 或脚本，只提示存在风险配置。"
+      },
+      "ReportViewWarning": {
+        "type": "object",
+        "properties": {
+          "level": {
+            "type": "string",
+            "enum": [
+              "info",
+              "warn",
+              "high"
+            ],
+            "example": "warn"
+          },
+          "path": {
+            "type": "string",
+            "example": "base.mainSql.script"
+          },
+          "code": {
+            "$ref": "#/components/schemas/ReportViewWarningCode"
+          },
+          "message": {
+            "type": "string",
+            "example": "API 不执行 SQL，不能保证 SQL 语义、结果列或运行性能正确。"
+          }
+        }
+      },
+      "ReportViewValidationError": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "example": "queries[0].permissions"
+          },
+          "code": {
+            "$ref": "#/components/schemas/ReportViewErrorCode"
+          },
+          "message": {
+            "type": "string",
+            "example": "查询条件不支持 permissions。"
+          }
+        }
+      },
+      "ReportViewWritePlan": {
+        "type": "object",
+        "description": "写入计划列出将要写入、更新、删除的 VW_URL/VW_REPORT* 配置和权限资源；dryRun=true 时不会落库。",
+        "properties": {
+          "dryRun": {
+            "type": "boolean",
+            "example": true
+          },
+          "creates": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "updates": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "deletes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "updatedSections": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "permissionDeletes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ReportViewDeleteResult": {
+        "type": "object",
+        "properties": {
+          "viewKey": {
+            "type": "string",
+            "example": "SALES_REPORT"
+          },
+          "deleted": {
+            "type": "boolean",
+            "example": true
+          },
+          "businessDataDeleted": {
+            "type": "boolean",
+            "example": false
+          }
+        }
+      },
+      "ReportViewSnapshot": {
+        "type": "object",
+        "required": [
+          "viewKey",
+          "base"
+        ],
+        "description": "完整 rep_list 报表视图快照。管理 VW_URL 与 VW_REPORT* 配置，不执行 SQL、按钮动作或客户端脚本。导出的 GET 快照可作为 PUT baseline。",
+        "properties": {
+          "viewKey": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_-]*$",
+            "example": "SALES_REPORT"
+          },
+          "description": {
+            "type": "string",
+            "example": "销售报表"
+          },
+          "loginRequired": {
+            "type": "boolean",
+            "default": true
+          },
+          "base": {
+            "$ref": "#/components/schemas/ReportViewBase"
+          },
+          "columns": {
+            "$ref": "#/components/schemas/ReportViewColumns"
+          },
+          "queries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReportViewQuery"
+            }
+          },
+          "limits": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReportViewLimit"
+            }
+          },
+          "variables": {
+            "$ref": "#/components/schemas/ReportViewVariables"
+          },
+          "subviews": {
+            "$ref": "#/components/schemas/ReportViewSubviews"
+          },
+          "buttons": {
+            "$ref": "#/components/schemas/ReportViewButtons"
+          },
+          "weixin": {
+            "$ref": "#/components/schemas/ReportViewWeixin"
+          },
+          "scripts": {
+            "$ref": "#/components/schemas/ReportViewScripts"
+          },
+          "permissions": {
+            "type": "object",
+            "description": "仅底层支持 CmPri 的对象可配置 permissions。查询、变量和 SQL 本体中的 permissions 会被 REPORT_VIEW_UNSUPPORTED_PERMISSION 拒绝。",
+            "properties": {
+              "view": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "example": [
+                  "report.SALES_REPORT.column.ORDER_NO.view"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "ReportViewBase": {
+        "type": "object",
+        "description": "报表基础配置。mainSql/primaryKey/orderBySql 只做结构校验和风险提示，API 不执行 SQL。",
+        "properties": {
+          "displayName": {
+            "type": "string",
+            "example": "销售报表"
+          },
+          "dbKey": {
+            "type": "string",
+            "nullable": true,
+            "description": "非默认 dbKey 会产生 EXTERNAL_DB_KEY_PRESENT warning。"
+          },
+          "mainSql": {
+            "type": "object",
+            "description": "脚本配置只做结构校验和风险提示，API 不执行脚本。",
+            "properties": {
+              "type": {
+                "type": "integer",
+                "example": 1
+              },
+              "script": {
+                "type": "string",
+                "example": "return vo.ORDER_NO;"
+              }
+            }
+          },
+          "primaryKey": {
+            "type": "object",
+            "properties": {
+              "value": {
+                "type": "object",
+                "description": "脚本配置只做结构校验和风险提示，API 不执行脚本。",
+                "properties": {
+                  "type": {
+                    "type": "integer",
+                    "example": 1
+                  },
+                  "script": {
+                    "type": "string",
+                    "example": "return vo.ORDER_NO;"
+                  }
+                }
+              },
+              "sql": {
+                "type": "object",
+                "description": "脚本配置只做结构校验和风险提示，API 不执行脚本。",
+                "properties": {
+                  "type": {
+                    "type": "integer",
+                    "example": 1
+                  },
+                  "script": {
+                    "type": "string",
+                    "example": "return vo.ORDER_NO;"
+                  }
+                }
+              }
+            }
+          },
+          "layoutColumns": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5,
+            "example": 2
+          },
+          "initQuery": {
+            "type": "boolean",
+            "example": true
+          },
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "type": "boolean",
+                "example": true
+              },
+              "pageLimit": {
+                "type": "integer",
+                "minimum": 1,
+                "example": 20
+              }
+            }
+          },
+          "summaryEnabled": {
+            "type": "boolean"
+          },
+          "orderBySql": {
+            "type": "string",
+            "description": "只保存配置，不执行语义校验。"
+          }
+        }
+      },
+      "ReportViewPermissionSet": {
+        "type": "object",
+        "description": "仅底层支持 CmPri 的对象可配置 permissions。查询、变量和 SQL 本体中的 permissions 会被 REPORT_VIEW_UNSUPPORTED_PERMISSION 拒绝。",
+        "properties": {
+          "view": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "report.SALES_REPORT.column.ORDER_NO.view"
+            ]
+          }
+        }
+      },
+      "ReportViewScriptValue": {
+        "type": "object",
+        "description": "脚本配置只做结构校验和风险提示，API 不执行脚本。",
+        "properties": {
+          "type": {
+            "type": "integer",
+            "example": 1
+          },
+          "script": {
+            "type": "string",
+            "example": "return vo.ORDER_NO;"
+          }
+        }
+      },
+      "ReportViewColumns": {
+        "type": "object",
+        "properties": {
+          "show": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "展示列，支持 permissions，content/summaryContent 会触发脚本风险提示。",
+              "additionalProperties": true
+            }
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "分割线，支持 permissions，tip 会触发脚本风险提示。",
+              "additionalProperties": true
+            }
+          },
+          "listOrder": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ReportViewQuery": {
+        "type": "object",
+        "description": "查询条件不支持 permissions，传入非空 permissions 会被校验拒绝并返回 REPORT_VIEW_UNSUPPORTED_PERMISSION。sql 只做结构校验，API 不执行 SQL。",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "customerName"
+          },
+          "displayName": {
+            "type": "string",
+            "example": "客户名称"
+          },
+          "widget": {
+            "type": "string",
+            "example": "text"
+          },
+          "widgetParam": {
+            "type": "object",
+            "description": "脚本配置只做结构校验和风险提示，API 不执行脚本。",
+            "properties": {
+              "type": {
+                "type": "integer",
+                "example": 1
+              },
+              "script": {
+                "type": "string",
+                "example": "return vo.ORDER_NO;"
+              }
+            }
+          },
+          "defaultValue": {
+            "type": "string",
+            "nullable": true
+          },
+          "sql": {
+            "type": "object",
+            "description": "脚本配置只做结构校验和风险提示，API 不执行脚本。",
+            "properties": {
+              "type": {
+                "type": "integer",
+                "example": 1
+              },
+              "script": {
+                "type": "string",
+                "example": "return vo.ORDER_NO;"
+              }
+            }
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "permissions": {
+            "type": "object",
+            "description": "仅底层支持 CmPri 的对象可配置 permissions。查询、变量和 SQL 本体中的 permissions 会被 REPORT_VIEW_UNSUPPORTED_PERMISSION 拒绝。",
+            "properties": {
+              "view": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "example": [
+                  "report.SALES_REPORT.column.ORDER_NO.view"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "ReportViewLimit": {
+        "type": "object",
+        "description": "报表约束，支持 permissions；sql 只做结构校验，API 不执行 SQL。",
+        "properties": {
+          "stableKey": {
+            "type": "string",
+            "example": "SELF_DEPARTMENT"
+          },
+          "description": {
+            "type": "string"
+          },
+          "sql": {
+            "type": "object",
+            "description": "脚本配置只做结构校验和风险提示，API 不执行脚本。",
+            "properties": {
+              "type": {
+                "type": "integer",
+                "example": 1
+              },
+              "script": {
+                "type": "string",
+                "example": "return vo.ORDER_NO;"
+              }
+            }
+          },
+          "permissions": {
+            "type": "object",
+            "description": "仅底层支持 CmPri 的对象可配置 permissions。查询、变量和 SQL 本体中的 permissions 会被 REPORT_VIEW_UNSUPPORTED_PERMISSION 拒绝。",
+            "properties": {
+              "view": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "example": [
+                  "report.SALES_REPORT.column.ORDER_NO.view"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "ReportViewVariables": {
+        "type": "object",
+        "description": "变量区块不支持 permissions，传入 permissions 会被校验拒绝并返回 REPORT_VIEW_UNSUPPORTED_PERMISSION。",
+        "properties": {
+          "prepared": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "预置变量不支持 permissions，exec 会触发脚本风险提示。",
+              "additionalProperties": true
+            }
+          }
+        }
+      },
+      "ReportViewSubviews": {
+        "type": "object",
+        "properties": {
+          "viewTabs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "子视图页签，支持 permissions，param 会触发脚本风险提示。",
+              "additionalProperties": true
+            }
+          }
+        }
+      },
+      "ReportViewButtons": {
+        "type": "object",
+        "properties": {
+          "system": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "系统按钮，支持 permissions。",
+              "additionalProperties": true
+            }
+          },
+          "item": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "行按钮，支持 permissions；action 会产生 BUTTON_ACTION_PRESENT warning。",
+              "additionalProperties": true
+            }
+          },
+          "summary": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "汇总按钮，支持 permissions；action 会产生 BUTTON_ACTION_PRESENT warning。",
+              "additionalProperties": true
+            }
+          }
+        }
+      },
+      "ReportViewWeixin": {
+        "type": "object",
+        "description": "微信配置支持 permissions。",
+        "properties": {
+          "listMode": {
+            "type": "integer"
+          },
+          "urlMode": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "object",
+            "description": "脚本配置只做结构校验和风险提示，API 不执行脚本。",
+            "properties": {
+              "type": {
+                "type": "integer",
+                "example": 1
+              },
+              "script": {
+                "type": "string",
+                "example": "return vo.ORDER_NO;"
+              }
+            }
+          },
+          "image": {
+            "type": "object",
+            "description": "脚本配置只做结构校验和风险提示，API 不执行脚本。",
+            "properties": {
+              "type": {
+                "type": "integer",
+                "example": 1
+              },
+              "script": {
+                "type": "string",
+                "example": "return vo.ORDER_NO;"
+              }
+            }
+          },
+          "description": {
+            "type": "object",
+            "description": "脚本配置只做结构校验和风险提示，API 不执行脚本。",
+            "properties": {
+              "type": {
+                "type": "integer",
+                "example": 1
+              },
+              "script": {
+                "type": "string",
+                "example": "return vo.ORDER_NO;"
+              }
+            }
+          },
+          "date": {
+            "type": "object",
+            "description": "脚本配置只做结构校验和风险提示，API 不执行脚本。",
+            "properties": {
+              "type": {
+                "type": "integer",
+                "example": 1
+              },
+              "script": {
+                "type": "string",
+                "example": "return vo.ORDER_NO;"
+              }
+            }
+          },
+          "permissions": {
+            "type": "object",
+            "description": "仅底层支持 CmPri 的对象可配置 permissions。查询、变量和 SQL 本体中的 permissions 会被 REPORT_VIEW_UNSUPPORTED_PERMISSION 拒绝。",
+            "properties": {
+              "view": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "example": [
+                  "report.SALES_REPORT.column.ORDER_NO.view"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "ReportViewScripts": {
+        "type": "object",
+        "description": "客户端列表脚本只做结构校验和风险提示，API 不执行脚本。",
+        "properties": {
+          "list": {
+            "type": "object",
+            "description": "脚本配置只做结构校验和风险提示，API 不执行脚本。",
+            "properties": {
+              "type": {
+                "type": "integer",
+                "example": 1
+              },
+              "script": {
+                "type": "string",
+                "example": "return vo.ORDER_NO;"
+              }
+            }
+          }
+        }
+      },
+      "ReportViewErrorCode": {
+        "type": "string",
+        "enum": [
+          "REPORT_VIEW_NOT_FOUND",
+          "REPORT_VIEW_NOT_REP_LIST",
+          "REPORT_VIEW_ALREADY_EXISTS",
+          "REPORT_VIEW_INVALID_SNAPSHOT",
+          "REPORT_VIEW_CONFIRM_REQUIRED",
+          "REPORT_VIEW_UNSUPPORTED_PERMISSION",
+          "REPORT_VIEW_UNSUPPORTED_SECTION",
+          "REPORT_VIEW_INVALID_SQL_CONFIG",
+          "REPORT_VIEW_INVALID_SCRIPT_CONFIG"
+        ],
+        "description": "报表视图 API 可能返回的稳定错误码。"
       },
       "DynamicTableViewListEnvelope": {
         "type": "object",
@@ -2216,6 +3639,10 @@
     {
       "name": "Dynamic Table Views",
       "description": "Manage dyn dynamic table view configuration snapshots for /{viewKey}.view."
+    },
+    {
+      "name": "Report Views",
+      "description": "Manage rep_list report view configuration snapshots for /{viewKey}.view. API does not execute SQL or scripts."
     }
   ]
 }

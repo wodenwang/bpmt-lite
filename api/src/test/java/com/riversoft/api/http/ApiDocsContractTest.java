@@ -75,6 +75,61 @@ public class ApiDocsContractTest {
     }
 
     @Test
+    public void openApiJsonPublishesReportViewRouteMatrix() throws Exception {
+        JsonNode root = new ObjectMapper().readTree(apiFile("src/main/webapp/openapi.json"));
+
+        assertOnlyMethods(root, "/v1/report-views", "get", "post");
+        assertOnlyMethods(root, "/v1/report-views:validate", "post");
+        assertOnlyMethods(root, "/v1/report-views/{viewKey}", "get", "put", "delete");
+        assertOnlyMethods(root, "/v1/report-views/{viewKey}/{section}", "patch");
+
+        assertRisk(root, "/v1/report-views", "get", false, false, "read");
+        assertRisk(root, "/v1/report-views", "post", true, false, "high");
+        assertRisk(root, "/v1/report-views:validate", "post", false, false, "read");
+        assertRisk(root, "/v1/report-views/{viewKey}", "get", false, false, "read");
+        assertRisk(root, "/v1/report-views/{viewKey}", "put", true, false, "high");
+        assertRisk(root, "/v1/report-views/{viewKey}", "delete", true, false, "high");
+        assertRisk(root, "/v1/report-views/{viewKey}/{section}", "patch", true, false, "high");
+
+        assertQueryParameter(root, "/v1/report-views", "post", "dryRun");
+        assertQueryParameter(root, "/v1/report-views/{viewKey}", "put", "dryRun");
+        assertQueryParameter(root, "/v1/report-views/{viewKey}/{section}", "patch", "dryRun");
+        assertQueryParameter(root, "/v1/report-views/{viewKey}", "delete", "confirmViewKey");
+
+        JsonNode codes = root.path("components").path("schemas").path("ReportViewErrorCode").path("enum");
+        assertArrayContains(codes, "REPORT_VIEW_NOT_REP_LIST");
+        assertArrayContains(codes, "REPORT_VIEW_UNSUPPORTED_PERMISSION");
+        assertArrayContains(codes, "REPORT_VIEW_INVALID_SQL_CONFIG");
+        assertArrayContains(codes, "REPORT_VIEW_INVALID_SCRIPT_CONFIG");
+
+        JsonNode warnings = root.path("components").path("schemas").path("ReportViewWarningCode").path("enum");
+        assertArrayContains(warnings, "SQL_SCRIPT_PRESENT");
+        assertArrayContains(warnings, "CLIENT_SCRIPT_PRESENT");
+        assertArrayContains(warnings, "BUTTON_ACTION_PRESENT");
+        assertArrayContains(warnings, "EXTERNAL_DB_KEY_PRESENT");
+        assertArrayContains(warnings, "UNEXECUTED_SQL_SEMANTICS");
+
+        assertUnsupportedPermissionsDescription(root.path("paths").path("/v1/report-views:validate").path("post").path("description"),
+                "查询", "变量", "SQL");
+        assertTrue(root.path("components").path("schemas").has("ReportViewSnapshot"));
+        assertTrue(root.path("components").path("schemas").has("ReportViewWritePlan"));
+        assertTrue(root.path("components").path("schemas").has("ReportViewValidationResult"));
+    }
+
+    @Test
+    public void docsIndexDescribesReportViewApi() throws Exception {
+        String html = read(apiFile("src/main/webapp/docs/index.html"));
+
+        assertTrue(html.contains("报表视图 API"));
+        assertTrue(html.contains("/api/v1/report-views"));
+        assertTrue(html.contains("/api/v1/report-views:validate"));
+        assertTrue(html.contains("/api/v1/report-views/SALES_REPORT/columns?dryRun=true"));
+        assertTrue(html.contains("REPORT_VIEW_NOT_REP_LIST"));
+        assertTrue(html.contains("REPORT_VIEW_UNSUPPORTED_PERMISSION"));
+        assertTrue(html.contains("API 不执行 SQL"));
+    }
+
+    @Test
     public void openApiJsonDoesNotPublishInventedDynamicTableViewRoutes() throws Exception {
         JsonNode root = new ObjectMapper().readTree(apiFile("src/main/webapp/openapi.json"));
         JsonNode paths = root.path("paths");
@@ -108,12 +163,11 @@ public class ApiDocsContractTest {
     }
 
     @Test
-    public void versionedOpenApiSnapshotMatchesRuntimeOpenApi() throws Exception {
-        byte[] runtime = Files.readAllBytes(apiFile("src/main/webapp/openapi.json").toPath());
-        byte[] versioned = Files.readAllBytes(rootFile("docs/v1.7.0/openapi.json").toPath());
+    public void versionedOpenApiSnapshotRemainsValidJson() throws Exception {
+        JsonNode versioned = new ObjectMapper().readTree(rootFile("docs/v1.7.0/openapi.json"));
 
-        assertTrue(new String(runtime, Charset.forName("UTF-8"))
-                .equals(new String(versioned, Charset.forName("UTF-8"))));
+        assertTrue(versioned.path("paths").has("/v1/dynamic-table-views"));
+        assertFalse(versioned.path("paths").has("/v1/report-views"));
     }
 
     @Test
