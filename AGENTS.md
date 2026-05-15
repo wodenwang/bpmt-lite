@@ -727,6 +727,37 @@ v1.7.0 文档见：
 - `docs/v1.7.0/dynamic-table-view-acceptance.md`
 - `docs/release-v1.7.0.md`
 
+## v1.7.1 报表视图 API 发布状态
+
+截至 2026-05-16，v1.7.1 已完成发布收口，目标是把原本依赖前端页面操作的 `rep_list` 报表视图配置能力开放给外部系统和 AI agent。
+
+发布结果：
+
+- Maven 项目版本已切到 `1.7.1`。
+- 默认 Web/API 镜像 tag、安装脚本默认 release tag 和 README 当前版本已切到 `1.7.1`。
+- Git tag：`v1.7.1`。
+- GitHub Release：`https://github.com/wodenwang/bpmt-lite/releases/tag/v1.7.1`。
+- `ghcr.io/wodenwang/bpmt-lite:1.7.1` 已推送，manifest digest 为 `sha256:8c82eabc4e87193d02c024f62e1d64a42570520cb41de9e3de3e481a88c34009`，包含 `linux/amd64` 和 `linux/arm64`。
+- `ghcr.io/wodenwang/bpmt-lite-api:1.7.1` 已推送，manifest digest 为 `sha256:02ed7e782f1ad027d6500caa065059011971cad06e12e495ae5a455f94790fdc`，包含 `linux/amd64` 和 `linux/arm64`。
+- 两个 `latest` tag 已同步到 `1.7.1` manifest digest。
+- 临时 compose 使用 `bpmt_min` 和 `1.7.1` Web/API 镜像验证 `/`、`/ueditor/`、`/api/docs/`、`/api/openapi.json` 均返回 200。
+- `scripts/smoke-api.sh` 通过 `http://127.0.0.1:18081/api` 签名 smoke。
+
+已验收能力：
+
+- 报表视图 API 支持 validate、dry-run、导出、创建、整体替换、分区 patch 和带确认删除。
+- 删除视图配置不会删除业务数据、菜单、首页卡片或外部入口。
+- API 只管理 `/{viewKey}.view` 对应的 `rep_list` 视图配置；菜单、首页卡片和外部入口不属于 v1.7.1 范围。
+- 报表主 SQL、查询 SQL、约束 SQL、按钮动作、客户端脚本和外部 `dbKey` 会进入脚本风险提示，但 API 不执行这些 SQL 或脚本。
+
+v1.7.1 文档见：
+
+- `docs/superpowers/specs/2026-05-15-bpmt-lite-v1.7.1-report-view-api-design.md`
+- `docs/superpowers/plans/2026-05-15-bpmt-lite-v1.7.1-report-view-api.md`
+- `docs/v1.7.1/api-reference.md`
+- `docs/v1.7.1/openapi.json`
+- `docs/release-v1.7.1.md`
+
 ## 线上测试环境交接
 
 线上测试环境的非敏感入口、Docker 部署结构、OAuth demo 配置线索和 2026-05-05 微信 OAuth 登录问题结论已记录在：

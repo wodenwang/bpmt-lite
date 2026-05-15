@@ -18,7 +18,7 @@
 
 报表视图 API 不执行 SQL 或脚本，只管理配置元数据。API 会对主 SQL、查询 SQL、约束 SQL、PK SQL、按钮动作、客户端脚本和外部 `dbKey` 返回风险提示，但不会验证 SQL 语义、结果列、权限过滤或运行性能。
 
-发布验收必须覆盖 API 文档、OpenAPI JSON、Java 8 编译和 API 单测。
+发布验收已覆盖 API 文档、OpenAPI JSON、Java 8 编译、API 单测、multi-arch 镜像发布和临时 compose API smoke。
 
 ## 文档归档
 
@@ -29,15 +29,23 @@
 
 ## 验证清单
 
-当前文件用于预发布实现分支记录，不表示镜像、Git tag 或 GitHub Release 已发布。
+- [x] `python3 -m json.tool docs/v1.7.1/openapi.json >/tmp/bpmt-v171-openapi.json`
+- [x] `cmp -s api/src/main/webapp/openapi.json docs/v1.7.1/openapi.json`
+- [x] `git diff --check`
+- [x] `mvn -s settings.local.xml -pl api test`
+- [x] `mvn -s settings.local.xml -pl api -am -DskipTests install`
+- [x] `scripts/verify-repo.sh`
+- [x] `scripts/build-multiarch-images.sh`
+- [x] 临时 compose 使用 `bpmt_min` 验证 `/`、`/ueditor/`、`/api/docs/`、`/api/openapi.json` 均返回 200。
+- [x] `scripts/smoke-api.sh` 通过 `http://127.0.0.1:18081/api` 签名 smoke。
 
-- [ ] `python3 -m json.tool docs/v1.7.1/openapi.json >/tmp/bpmt-v171-openapi.json`
-- [ ] `cmp -s api/src/main/webapp/openapi.json docs/v1.7.1/openapi.json`
-- [ ] `git diff --check`
-- [ ] `mvn -s settings.local.xml -pl api -Dtest='*ReportView*Test' test`
-- [ ] `mvn -s settings.local.xml -pl api -am -DskipTests compile`
-- [ ] `scripts/verify-repo.sh`
-- [ ] Docker/API smoke 覆盖 `/api/docs/`、`/api/openapi.json`、validate、dry-run、创建、导出、替换预检、分区 patch 和删除确认。
+## 发布结果
+
+- Maven 项目版本已切到 `1.7.1`。
+- 默认 Web/API 镜像 tag、安装脚本默认 release tag 和 README 当前版本已切到 `1.7.1`。
+- `ghcr.io/wodenwang/bpmt-lite:1.7.1` 已推送，manifest digest 为 `sha256:8c82eabc4e87193d02c024f62e1d64a42570520cb41de9e3de3e481a88c34009`，包含 `linux/amd64` 和 `linux/arm64`。
+- `ghcr.io/wodenwang/bpmt-lite-api:1.7.1` 已推送，manifest digest 为 `sha256:02ed7e782f1ad027d6500caa065059011971cad06e12e495ae5a455f94790fdc`，包含 `linux/amd64` 和 `linux/arm64`。
+- 两个 `latest` tag 已同步到 `1.7.1` manifest digest。
 
 ## 发布边界
 
@@ -45,4 +53,3 @@
 - 不改变 compose 中第三方容器版本策略。
 - 不改变现有 OAuth、HTTPS、H5、数据库操作 API 或动态表视图 API 行为。
 - 不把安装或升级状态写入业务数据库。
-- 不声明 `v1.7.1` 镜像、tag 或 GitHub Release 已发布，直到发布收口任务完成。
