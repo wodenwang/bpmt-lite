@@ -167,4 +167,3 @@ PATCH /api/v1/report-views/{viewKey}/{section}?dryRun=true
 - 版本归档 OpenAPI：[docs/v1.7.1/openapi.json](openapi.json)
 - 运行态 Web 文档：`http://127.0.0.1/api/docs/`
 - 运行态 OpenAPI：`http://127.0.0.1/api/openapi.json`
-
