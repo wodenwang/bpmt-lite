@@ -182,7 +182,7 @@ public class ReportViewValidator {
         List<ReportViewSnapshot.Query> queries = snapshot.getQueries();
         for (int i = 0; i < queries.size(); i++) {
             ReportViewSnapshot.Query query = queries.get(i);
-            if (query != null && query.getPermissions() != null) {
+            if (query != null && hasPermissionValues(query.getPermissions())) {
                 addUnsupportedPermissionError("queries[" + i + "].permissions", result);
             }
         }
@@ -192,10 +192,14 @@ public class ReportViewValidator {
         }
         for (int i = 0; i < variables.getPrepared().size(); i++) {
             ReportViewSnapshot.PreparedVariable variable = variables.getPrepared().get(i);
-            if (variable != null && variable.getPermissions() != null) {
+            if (variable != null && hasPermissionValues(variable.getPermissions())) {
                 addUnsupportedPermissionError("variables.prepared[" + i + "].permissions", result);
             }
         }
+    }
+
+    private boolean hasPermissionValues(ReportViewSnapshot.PermissionSet permissions) {
+        return permissions != null && permissions.getView() != null && !permissions.getView().isEmpty();
     }
 
     private void addUnsupportedPermissionError(String path, ReportViewValidationResult result) {

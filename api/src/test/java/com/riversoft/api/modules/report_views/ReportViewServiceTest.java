@@ -74,6 +74,20 @@ public class ReportViewServiceTest {
     }
 
     @Test
+    public void exportedSnapshotCanBeUsedForFullReplace() {
+        RecordingRepository repository = new RecordingRepository();
+        repository.seedReport(reportSnapshotWithQueryAndPreparedVariable("SALES_REPORT"));
+        ReportViewService service = new ReportViewService(repository);
+
+        ReportViewSnapshot exported = (ReportViewSnapshot) service.export("SALES_REPORT").get("snapshot");
+        service.replace("SALES_REPORT", exported, false);
+
+        assertEquals(1, repository.replaceAttempts);
+        assertEquals("SALES_REPORT", repository.replacedUrl.getViewKey());
+        assertTrue(repository.replacedReports.containsKey("SALES_REPORT"));
+    }
+
+    @Test
     public void validateInvalidReturnsValidFalseWithoutRepositoryWrite() {
         RecordingRepository repository = new RecordingRepository();
         ReportViewService service = new ReportViewService(repository);
@@ -193,6 +207,21 @@ public class ReportViewServiceTest {
         snapshot.getBase().getPagination().setEnabled(Boolean.TRUE);
         snapshot.getBase().getPagination().setPageLimit(Integer.valueOf(20));
         snapshot.getBase().setSummaryEnabled(Boolean.FALSE);
+        return snapshot;
+    }
+
+    private static ReportViewSnapshot reportSnapshotWithQueryAndPreparedVariable(String viewKey) {
+        ReportViewSnapshot snapshot = reportSnapshot(viewKey);
+        ReportViewSnapshot.Query query = new ReportViewSnapshot.Query();
+        query.setName("customerName");
+        query.setDisplayName("客户名称");
+        query.setWidget("text");
+        query.setSql(script("and CUSTOMER_NAME = :customerName"));
+        snapshot.getQueries().add(query);
+        ReportViewSnapshot.PreparedVariable variable = new ReportViewSnapshot.PreparedVariable();
+        variable.setVar("currentUser");
+        variable.setExec(script("return SessionManager.getUser().getUid();"));
+        snapshot.getVariables().getPrepared().add(variable);
         return snapshot;
     }
 

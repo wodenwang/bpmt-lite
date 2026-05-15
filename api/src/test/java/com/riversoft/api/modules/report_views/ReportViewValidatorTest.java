@@ -2,6 +2,8 @@ package com.riversoft.api.modules.report_views;
 
 import org.junit.Test;
 
+import java.util.Collections;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -27,12 +29,34 @@ public class ReportViewValidatorTest {
         query.setWidget("text");
         query.setSql(Fixtures.script("and CUSTOMER_NAME = :customerName"));
         query.setPermissions(new ReportViewSnapshot.PermissionSet());
+        query.getPermissions().setView(Collections.singletonList("report.SALES_REPORT.query.customerName.view"));
         snapshot.getQueries().add(query);
 
         ReportViewValidationResult result = new ReportViewValidator().validate(snapshot);
 
         assertFalse(result.isValid());
         assertEquals("REPORT_VIEW_UNSUPPORTED_PERMISSION", result.getErrors().get(0).getCode());
+    }
+
+    @Test
+    public void acceptsEmptyPermissionsOnQueryAndPreparedVariable() {
+        ReportViewSnapshot snapshot = Fixtures.reportSnapshot("SALES_REPORT");
+        ReportViewSnapshot.Query query = new ReportViewSnapshot.Query();
+        query.setName("customerName");
+        query.setDisplayName("客户名称");
+        query.setWidget("text");
+        query.setSql(Fixtures.script("and CUSTOMER_NAME = :customerName"));
+        query.setPermissions(new ReportViewSnapshot.PermissionSet());
+        snapshot.getQueries().add(query);
+        ReportViewSnapshot.PreparedVariable variable = new ReportViewSnapshot.PreparedVariable();
+        variable.setVar("currentUser");
+        variable.setExec(Fixtures.script("return SessionManager.getUser().getUid();"));
+        variable.setPermissions(new ReportViewSnapshot.PermissionSet());
+        snapshot.getVariables().getPrepared().add(variable);
+
+        ReportViewValidationResult result = new ReportViewValidator().validate(snapshot);
+
+        assertTrue(result.isValid());
     }
 
     @Test
