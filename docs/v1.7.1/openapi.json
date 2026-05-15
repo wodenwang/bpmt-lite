@@ -1,0 +1,3648 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "BPMT Lite v1.7.1 API",
+    "version": "1.7.1",
+    "description": "BPMT Lite v1.7.1 API. Includes dynamic table structure APIs, dyn dynamic table view APIs, database operation APIs, and rep_list 报表视图 API under /api/v1/report-views. Report view APIs manage VW_URL and VW_REPORT* metadata only; API 不执行 SQL, button actions, or client scripts. Signature PATH must use the public request URI such as /api/v1/report-views."
+  },
+  "servers": [
+    {
+      "url": "/api",
+      "description": "API context path in the Docker compose deployment"
+    }
+  ],
+  "security": [
+    {
+      "appKeyHeader": [],
+      "timestampHeader": [],
+      "nonceHeader": [],
+      "signatureHeader": []
+    }
+  ],
+  "paths": {
+    "/v1/dynamic-tables": {
+      "get": {
+        "summary": "List dynamic table structures",
+        "description": "Returns dynamic table metadata from tb_table/tb_column. Business rows inside dynamic tables are outside this API scope.",
+        "operationId": "listDynamicTables",
+        "x-bpmt-writes-metadata": false,
+        "x-bpmt-executes-ddl": false,
+        "x-bpmt-risk-level": "read",
+        "parameters": [
+          {
+            "name": "start",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "排序字段。默认 createDate，让新创建的动态表优先出现在列表前部。",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "name",
+                "description",
+                "createDate",
+                "updateDate",
+                "cacheFlag"
+              ],
+              "default": "createDate"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "description": "排序方向。未传时，createDate 默认 desc，其它排序字段默认 asc。",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dynamic table list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DynamicTableListEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a dynamic table structure",
+        "description": "Creates physical DDL and corresponding tb_table/tb_column metadata. The request must include at least one primary key column.",
+        "operationId": "createDynamicTable",
+        "x-bpmt-writes-metadata": true,
+        "x-bpmt-executes-ddl": true,
+        "x-bpmt-risk-level": "high",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DynamicTableRequest"
+              },
+              "example": {
+                "name": "RV_API_CUSTOMER",
+                "description": "API customer structure",
+                "cacheFlag": 0,
+                "columns": [
+                  {
+                    "name": "ID",
+                    "description": "Primary key",
+                    "type": "String",
+                    "totalSize": 64,
+                    "primaryKey": true,
+                    "required": true
+                  },
+                  {
+                    "name": "NAME",
+                    "description": "Name",
+                    "type": "String",
+                    "totalSize": 128,
+                    "required": true
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Created dynamic table",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DynamicTableEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "409": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "422": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/v1/dynamic-tables/{name}": {
+      "get": {
+        "summary": "Get a dynamic table structure",
+        "operationId": "getDynamicTable",
+        "x-bpmt-writes-metadata": false,
+        "x-bpmt-executes-ddl": false,
+        "x-bpmt-risk-level": "read",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/DynamicTableName"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dynamic table detail",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DynamicTableEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a dynamic table structure",
+        "description": "Updates metadata and runs table alter DDL through the existing TableService safe DDL path. The path name is authoritative. Missing metadata returns 404 before any DDL execution.",
+        "operationId": "updateDynamicTable",
+        "x-bpmt-writes-metadata": true,
+        "x-bpmt-executes-ddl": true,
+        "x-bpmt-risk-level": "high",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/DynamicTableName"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DynamicTableRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated dynamic table",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DynamicTableEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "422": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/v1/dynamic-tables/{name}/ddl:sync": {
+      "post": {
+        "summary": "Synchronize dynamic table DDL",
+        "description": "Runs the existing DDL synchronization for a dynamic table after confirming the metadata exists.",
+        "operationId": "syncDynamicTableDdl",
+        "x-bpmt-writes-metadata": false,
+        "x-bpmt-executes-ddl": true,
+        "x-bpmt-risk-level": "high",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/DynamicTableName"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "DDL sync result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncDdlEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/v1/dynamic-tables/templates": {
+      "get": {
+        "summary": "List dynamic table templates",
+        "operationId": "listDynamicTableTemplates",
+        "x-bpmt-writes-metadata": false,
+        "x-bpmt-executes-ddl": false,
+        "x-bpmt-risk-level": "read",
+        "responses": {
+          "200": {
+            "description": "Template names",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TemplateListEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/v1/dynamic-tables/templates/{templateCode}": {
+      "get": {
+        "summary": "Get dynamic table template details",
+        "operationId": "getDynamicTableTemplate",
+        "x-bpmt-writes-metadata": false,
+        "x-bpmt-executes-ddl": false,
+        "x-bpmt-risk-level": "read",
+        "parameters": [
+          {
+            "name": "templateCode",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Template detail",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TemplateDetailEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/v1/dynamic-tables/templates/{templateCode}:create-table": {
+      "post": {
+        "summary": "Create dynamic table from template",
+        "operationId": "createDynamicTableFromTemplate",
+        "x-bpmt-writes-metadata": true,
+        "x-bpmt-executes-ddl": true,
+        "x-bpmt-risk-level": "high",
+        "parameters": [
+          {
+            "name": "templateCode",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DynamicTableRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Created table from template",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TemplateCreateTableEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "409": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "422": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/v1/database-operations/query": {
+      "post": {
+        "summary": "Run SQL query (SELECT)",
+        "operationId": "dbopsQuery",
+        "x-bpmt-writes-metadata": false,
+        "x-bpmt-executes-ddl": false,
+        "x-bpmt-risk-level": "read",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DatabaseOperationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Execution result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "403": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "422": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/v1/database-operations/find": {
+      "post": {
+        "summary": "Run SQL find (SELECT one)",
+        "operationId": "dbopsFind",
+        "x-bpmt-writes-metadata": false,
+        "x-bpmt-executes-ddl": false,
+        "x-bpmt-risk-level": "read",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DatabaseOperationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Execution result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "403": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "422": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/v1/database-operations/save": {
+      "post": {
+        "summary": "Run SQL save (INSERT)",
+        "operationId": "dbopsSave",
+        "x-bpmt-writes-metadata": true,
+        "x-bpmt-executes-ddl": false,
+        "x-bpmt-risk-level": "high",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DatabaseOperationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Execution result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "403": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "422": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/v1/database-operations/exec": {
+      "post": {
+        "summary": "Run SQL exec (UPDATE/DELETE)",
+        "operationId": "dbopsExec",
+        "x-bpmt-writes-metadata": true,
+        "x-bpmt-executes-ddl": false,
+        "x-bpmt-risk-level": "high",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DatabaseOperationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Execution result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "403": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "422": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/v1/dynamic-table-views": {
+      "get": {
+        "tags": [
+          "Dynamic Table Views"
+        ],
+        "summary": "List dyn dynamic table views",
+        "description": "列出 dyn 动态表视图。只管理 dyn 动态表视图，只维护 /{viewKey}.view 对应视图配置；菜单、首页、按钮入口不在本 API 范围内。",
+        "operationId": "listDynamicTableViews",
+        "x-bpmt-writes-metadata": false,
+        "x-bpmt-executes-ddl": false,
+        "x-bpmt-risk-level": "read",
+        "parameters": [
+          {
+            "name": "start",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dynamic table view list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DynamicTableViewListEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Dynamic Table Views"
+        ],
+        "summary": "Create a dyn dynamic table view",
+        "description": "创建 dyn 动态表视图配置。dryRun 通过 query 参数传入；dryRun=true 时只校验并返回写入计划，不写入 VW_URL/VW_DYN_TABLE。不会创建菜单、首页卡片或外部按钮入口。",
+        "operationId": "createDynamicTableView",
+        "x-bpmt-writes-metadata": true,
+        "x-bpmt-executes-ddl": false,
+        "x-bpmt-risk-level": "high",
+        "parameters": [
+          {
+            "name": "dryRun",
+            "in": "query",
+            "required": false,
+            "description": "true 或 1 表示仅校验和返回写入计划，不落库。",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DynamicTableViewSnapshot"
+              },
+              "example": {
+                "viewKey": "CRM_CUSTOMER_VIEW",
+                "description": "客户视图",
+                "loginRequired": true,
+                "base": {
+                  "tableName": "CRM_CUSTOMER",
+                  "displayName": "客户",
+                  "layoutColumns": 2,
+                  "initQuery": true,
+                  "pageLimit": 20
+                },
+                "fields": {
+                  "systemFields": [
+                    {
+                      "key": "CUSTOMER_ID",
+                      "name": "CUSTOMER_ID",
+                      "displayName": "客户ID",
+                      "permissions": {
+                        "view": "dyn.CRM_CUSTOMER_VIEW.field.CUSTOMER_ID.view"
+                      }
+                    }
+                  ],
+                  "computedFields": [],
+                  "formFields": [],
+                  "sectionLines": [],
+                  "listOrder": [
+                    "CUSTOMER_ID"
+                  ]
+                },
+                "queries": {
+                  "normal": [],
+                  "advanced": []
+                },
+                "limits": [],
+                "variables": {
+                  "prepared": [],
+                  "parents": []
+                },
+                "processors": {
+                  "before": [],
+                  "after": []
+                },
+                "subviews": {
+                  "systemTabs": [],
+                  "viewTabs": []
+                },
+                "buttons": {
+                  "system": [],
+                  "item": [],
+                  "summary": []
+                },
+                "scripts": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Created or planned dynamic table view",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DynamicTableViewWriteEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "409": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "422": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/v1/dynamic-table-views:validate": {
+      "post": {
+        "tags": [
+          "Dynamic Table Views"
+        ],
+        "summary": "Validate a dyn dynamic table view snapshot",
+        "description": "校验并规范化动态表视图快照，不写入元数据。validate 会检查字段引用、section 内容、脚本风险和 permissions 限制。查询、变量、处理器 permissions 会被校验拒绝。",
+        "operationId": "validateDynamicTableView",
+        "x-bpmt-writes-metadata": false,
+        "x-bpmt-executes-ddl": false,
+        "x-bpmt-risk-level": "read",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DynamicTableViewSnapshot"
+              },
+              "example": {
+                "viewKey": "CRM_CUSTOMER_VIEW",
+                "description": "客户视图",
+                "loginRequired": true,
+                "base": {
+                  "tableName": "CRM_CUSTOMER",
+                  "displayName": "客户",
+                  "layoutColumns": 2,
+                  "initQuery": true,
+                  "pageLimit": 20
+                },
+                "fields": {
+                  "systemFields": [
+                    {
+                      "key": "CUSTOMER_ID",
+                      "name": "CUSTOMER_ID",
+                      "displayName": "客户ID",
+                      "permissions": {
+                        "view": "dyn.CRM_CUSTOMER_VIEW.field.CUSTOMER_ID.view"
+                      }
+                    }
+                  ],
+                  "computedFields": [],
+                  "formFields": [],
+                  "sectionLines": [],
+                  "listOrder": [
+                    "CUSTOMER_ID"
+                  ]
+                },
+                "queries": {
+                  "normal": [],
+                  "advanced": []
+                },
+                "limits": [],
+                "variables": {
+                  "prepared": [],
+                  "parents": []
+                },
+                "processors": {
+                  "before": [],
+                  "after": []
+                },
+                "subviews": {
+                  "systemTabs": [],
+                  "viewTabs": []
+                },
+                "buttons": {
+                  "system": [],
+                  "item": [],
+                  "summary": []
+                },
+                "scripts": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Validation result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DynamicTableViewValidationEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "422": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/v1/dynamic-table-views/{viewKey}": {
+      "get": {
+        "tags": [
+          "Dynamic Table Views"
+        ],
+        "summary": "Export a dyn dynamic table view snapshot",
+        "description": "导出 /{viewKey}.view 对应完整快照。该 GET 返回的 snapshot 可以作为 PUT 替换基线。仅支持 dyn 视图，非 dyn 返回 DYNAMIC_TABLE_VIEW_NOT_DYN。",
+        "operationId": "exportDynamicTableView",
+        "x-bpmt-writes-metadata": false,
+        "x-bpmt-executes-ddl": false,
+        "x-bpmt-risk-level": "read",
+        "parameters": [
+          {
+            "name": "viewKey",
+            "in": "path",
+            "required": true,
+            "description": "动态表视图 key，对应 /{viewKey}.view。",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dynamic table view snapshot",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DynamicTableViewEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "409": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Dynamic Table Views"
+        ],
+        "summary": "Replace a dyn dynamic table view snapshot",
+        "description": "以完整 snapshot 替换 /{viewKey}.view 对应视图配置。dryRun 是 query 参数。只写视图配置和权限资源，不执行 DDL，不修改动态表结构或业务数据。",
+        "operationId": "replaceDynamicTableView",
+        "x-bpmt-writes-metadata": true,
+        "x-bpmt-executes-ddl": false,
+        "x-bpmt-risk-level": "high",
+        "parameters": [
+          {
+            "name": "viewKey",
+            "in": "path",
+            "required": true,
+            "description": "动态表视图 key，对应 /{viewKey}.view。",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dryRun",
+            "in": "query",
+            "required": false,
+            "description": "true 或 1 表示仅校验和返回写入计划，不落库。",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DynamicTableViewSnapshot"
+              },
+              "example": {
+                "viewKey": "CRM_CUSTOMER_VIEW",
+                "description": "客户视图",
+                "loginRequired": true,
+                "base": {
+                  "tableName": "CRM_CUSTOMER",
+                  "displayName": "客户",
+                  "layoutColumns": 2,
+                  "initQuery": true,
+                  "pageLimit": 20
+                },
+                "fields": {
+                  "systemFields": [
+                    {
+                      "key": "CUSTOMER_ID",
+                      "name": "CUSTOMER_ID",
+                      "displayName": "客户ID",
+                      "permissions": {
+                        "view": "dyn.CRM_CUSTOMER_VIEW.field.CUSTOMER_ID.view"
+                      }
+                    }
+                  ],
+                  "computedFields": [],
+                  "formFields": [],
+                  "sectionLines": [],
+                  "listOrder": [
+                    "CUSTOMER_ID"
+                  ]
+                },
+                "queries": {
+                  "normal": [],
+                  "advanced": []
+                },
+                "limits": [],
+                "variables": {
+                  "prepared": [],
+                  "parents": []
+                },
+                "processors": {
+                  "before": [],
+                  "after": []
+                },
+                "subviews": {
+                  "systemTabs": [],
+                  "viewTabs": []
+                },
+                "buttons": {
+                  "system": [],
+                  "item": [],
+                  "summary": []
+                },
+                "scripts": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Replaced or planned dynamic table view",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DynamicTableViewWriteEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "409": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "422": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Dynamic Table Views"
+        ],
+        "summary": "Delete a dyn dynamic table view configuration",
+        "description": "删除 dyn 动态表视图配置，不删除动态表结构、业务数据、日志表或日志数据。必须传入 confirmViewKey 且与 viewKey 一致，否则返回 DYNAMIC_TABLE_VIEW_CONFIRM_REQUIRED。",
+        "operationId": "deleteDynamicTableView",
+        "x-bpmt-writes-metadata": true,
+        "x-bpmt-executes-ddl": false,
+        "x-bpmt-risk-level": "high",
+        "parameters": [
+          {
+            "name": "viewKey",
+            "in": "path",
+            "required": true,
+            "description": "动态表视图 key，对应 /{viewKey}.view。",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "confirmViewKey",
+            "in": "query",
+            "required": true,
+            "description": "删除确认值，必须与 path 中的 viewKey 完全一致；不一致返回 DYNAMIC_TABLE_VIEW_CONFIRM_REQUIRED。",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted dynamic table view configuration only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DynamicTableViewDeleteEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "409": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/v1/dynamic-table-views/{viewKey}/{section}": {
+      "patch": {
+        "tags": [
+          "Dynamic Table Views"
+        ],
+        "summary": "Patch one dyn dynamic table view section",
+        "description": "局部替换 /{viewKey}.view 的一个 section。dryRun 是 query 参数。支持 section：base、fields、queries、limits、processors、variables、subviews、buttons、weixin、scripts。",
+        "operationId": "patchDynamicTableViewSection",
+        "x-bpmt-writes-metadata": true,
+        "x-bpmt-executes-ddl": false,
+        "x-bpmt-risk-level": "high",
+        "parameters": [
+          {
+            "name": "viewKey",
+            "in": "path",
+            "required": true,
+            "description": "动态表视图 key，对应 /{viewKey}.view。",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "section",
+            "in": "path",
+            "required": true,
+            "description": "要局部替换的视图区块。",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "base",
+                "fields",
+                "queries",
+                "limits",
+                "processors",
+                "variables",
+                "subviews",
+                "buttons",
+                "weixin",
+                "scripts"
+              ]
+            }
+          },
+          {
+            "name": "dryRun",
+            "in": "query",
+            "required": false,
+            "description": "true 或 1 表示仅校验和返回写入计划，不落库。",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/DynamicTableViewBase"
+                  },
+                  {
+                    "$ref": "#/components/schemas/DynamicTableViewFields"
+                  },
+                  {
+                    "$ref": "#/components/schemas/DynamicTableViewQueries"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/DynamicTableViewLimit"
+                    }
+                  },
+                  {
+                    "$ref": "#/components/schemas/DynamicTableViewVariables"
+                  },
+                  {
+                    "$ref": "#/components/schemas/DynamicTableViewProcessors"
+                  },
+                  {
+                    "$ref": "#/components/schemas/DynamicTableViewSubviews"
+                  },
+                  {
+                    "$ref": "#/components/schemas/DynamicTableViewButtons"
+                  },
+                  {
+                    "$ref": "#/components/schemas/DynamicTableViewWeixin"
+                  },
+                  {
+                    "$ref": "#/components/schemas/DynamicTableViewScripts"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Patched or planned section update",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DynamicTableViewWriteEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "409": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "422": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/v1/report-views": {
+      "get": {
+        "tags": [
+          "Report Views"
+        ],
+        "summary": "List rep_list report views",
+        "description": "分页列出 rep_list 报表视图摘要。只管理报表视图配置，不读取或执行报表 SQL。",
+        "operationId": "listReportViews",
+        "x-bpmt-writes-metadata": false,
+        "x-bpmt-executes-ddl": false,
+        "x-bpmt-risk-level": "read",
+        "parameters": [
+          {
+            "name": "start",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Report view list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportViewListEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Report Views"
+        ],
+        "summary": "Create a rep_list report view",
+        "description": "创建 rep_list 报表视图配置。dryRun 是 query 参数；dryRun=true 时只校验并返回写入计划，不写入 VW_URL/VW_REPORT*。API 不执行 mainSql、查询 SQL、约束 SQL、按钮动作或客户端脚本。",
+        "operationId": "createReportView",
+        "x-bpmt-writes-metadata": true,
+        "x-bpmt-executes-ddl": false,
+        "x-bpmt-risk-level": "high",
+        "parameters": [
+          {
+            "name": "dryRun",
+            "in": "query",
+            "required": false,
+            "description": "true 或 1 表示仅校验和返回写入计划，不落库。",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportViewSnapshot"
+              },
+              "example": {
+                "viewKey": "SALES_REPORT",
+                "description": "销售报表",
+                "loginRequired": true,
+                "base": {
+                  "displayName": "销售报表",
+                  "dbKey": null,
+                  "mainSql": {
+                    "type": 1,
+                    "script": "select ID, ORDER_NO, CUSTOMER_NAME, AMOUNT from SALES_ORDER where 1=1"
+                  },
+                  "primaryKey": {
+                    "value": {
+                      "type": 1,
+                      "script": "return vo.ID;"
+                    }
+                  },
+                  "layoutColumns": 2,
+                  "initQuery": true,
+                  "pagination": {
+                    "enabled": true,
+                    "pageLimit": 20
+                  }
+                },
+                "columns": {
+                  "show": [
+                    {
+                      "stableKey": "ORDER_NO",
+                      "displayName": "订单号",
+                      "content": {
+                        "type": 1,
+                        "script": "return vo.ORDER_NO;"
+                      }
+                    }
+                  ],
+                  "lines": [],
+                  "listOrder": [
+                    "ORDER_NO"
+                  ]
+                },
+                "queries": [
+                  {
+                    "name": "customerName",
+                    "displayName": "客户名称",
+                    "widget": "text",
+                    "sql": {
+                      "type": 1,
+                      "script": "and CUSTOMER_NAME like concat('%', :customerName, '%')"
+                    }
+                  }
+                ],
+                "limits": [],
+                "variables": {
+                  "prepared": []
+                },
+                "subviews": {
+                  "viewTabs": []
+                },
+                "buttons": {
+                  "system": [],
+                  "item": [],
+                  "summary": []
+                },
+                "scripts": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Created or planned report view",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportViewWriteEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "409": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "422": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/v1/report-views:validate": {
+      "post": {
+        "tags": [
+          "Report Views"
+        ],
+        "summary": "Validate a rep_list report view snapshot",
+        "description": "校验并规范化报表视图快照，不写入元数据。validate 会检查结构、section 内容、脚本风险和 permissions 限制。查询、变量、SQL 本体 permissions 会被校验拒绝。API 不执行 SQL，因此不能保证 SQL 语义、结果列、权限过滤或运行性能正确。",
+        "operationId": "validateReportView",
+        "x-bpmt-writes-metadata": false,
+        "x-bpmt-executes-ddl": false,
+        "x-bpmt-risk-level": "read",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportViewSnapshot"
+              },
+              "example": {
+                "viewKey": "SALES_REPORT",
+                "description": "销售报表",
+                "loginRequired": true,
+                "base": {
+                  "displayName": "销售报表",
+                  "dbKey": null,
+                  "mainSql": {
+                    "type": 1,
+                    "script": "select ID, ORDER_NO, CUSTOMER_NAME, AMOUNT from SALES_ORDER where 1=1"
+                  },
+                  "primaryKey": {
+                    "value": {
+                      "type": 1,
+                      "script": "return vo.ID;"
+                    }
+                  },
+                  "layoutColumns": 2,
+                  "initQuery": true,
+                  "pagination": {
+                    "enabled": true,
+                    "pageLimit": 20
+                  }
+                },
+                "columns": {
+                  "show": [
+                    {
+                      "stableKey": "ORDER_NO",
+                      "displayName": "订单号",
+                      "content": {
+                        "type": 1,
+                        "script": "return vo.ORDER_NO;"
+                      }
+                    }
+                  ],
+                  "lines": [],
+                  "listOrder": [
+                    "ORDER_NO"
+                  ]
+                },
+                "queries": [
+                  {
+                    "name": "customerName",
+                    "displayName": "客户名称",
+                    "widget": "text",
+                    "sql": {
+                      "type": 1,
+                      "script": "and CUSTOMER_NAME like concat('%', :customerName, '%')"
+                    }
+                  }
+                ],
+                "limits": [],
+                "variables": {
+                  "prepared": []
+                },
+                "subviews": {
+                  "viewTabs": []
+                },
+                "buttons": {
+                  "system": [],
+                  "item": [],
+                  "summary": []
+                },
+                "scripts": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Validation result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportViewValidationEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "422": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/v1/report-views/{viewKey}": {
+      "get": {
+        "tags": [
+          "Report Views"
+        ],
+        "summary": "Export a rep_list report view snapshot",
+        "description": "导出 /{viewKey}.view 对应完整报表视图快照。GET 返回的 snapshot 可以作为 PUT 替换基线。仅支持 rep_list 视图，非 rep_list 返回 REPORT_VIEW_NOT_REP_LIST。",
+        "operationId": "exportReportView",
+        "x-bpmt-writes-metadata": false,
+        "x-bpmt-executes-ddl": false,
+        "x-bpmt-risk-level": "read",
+        "parameters": [
+          {
+            "name": "viewKey",
+            "in": "path",
+            "required": true,
+            "description": "报表视图 key，对应 /{viewKey}.view。",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Report view snapshot",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportViewEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "409": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Report Views"
+        ],
+        "summary": "Replace a rep_list report view snapshot",
+        "description": "以完整 snapshot 替换 /{viewKey}.view 对应报表视图配置。dryRun 是 query 参数。只写 VW_URL/VW_REPORT* 和权限资源，不执行 SQL，不修改业务数据。",
+        "operationId": "replaceReportView",
+        "x-bpmt-writes-metadata": true,
+        "x-bpmt-executes-ddl": false,
+        "x-bpmt-risk-level": "high",
+        "parameters": [
+          {
+            "name": "viewKey",
+            "in": "path",
+            "required": true,
+            "description": "报表视图 key，对应 /{viewKey}.view。",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dryRun",
+            "in": "query",
+            "required": false,
+            "description": "true 或 1 表示仅校验和返回写入计划，不落库。",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportViewSnapshot"
+              },
+              "example": {
+                "viewKey": "SALES_REPORT",
+                "description": "销售报表",
+                "loginRequired": true,
+                "base": {
+                  "displayName": "销售报表",
+                  "dbKey": null,
+                  "mainSql": {
+                    "type": 1,
+                    "script": "select ID, ORDER_NO, CUSTOMER_NAME, AMOUNT from SALES_ORDER where 1=1"
+                  },
+                  "primaryKey": {
+                    "value": {
+                      "type": 1,
+                      "script": "return vo.ID;"
+                    }
+                  },
+                  "layoutColumns": 2,
+                  "initQuery": true,
+                  "pagination": {
+                    "enabled": true,
+                    "pageLimit": 20
+                  }
+                },
+                "columns": {
+                  "show": [
+                    {
+                      "stableKey": "ORDER_NO",
+                      "displayName": "订单号",
+                      "content": {
+                        "type": 1,
+                        "script": "return vo.ORDER_NO;"
+                      }
+                    }
+                  ],
+                  "lines": [],
+                  "listOrder": [
+                    "ORDER_NO"
+                  ]
+                },
+                "queries": [
+                  {
+                    "name": "customerName",
+                    "displayName": "客户名称",
+                    "widget": "text",
+                    "sql": {
+                      "type": 1,
+                      "script": "and CUSTOMER_NAME like concat('%', :customerName, '%')"
+                    }
+                  }
+                ],
+                "limits": [],
+                "variables": {
+                  "prepared": []
+                },
+                "subviews": {
+                  "viewTabs": []
+                },
+                "buttons": {
+                  "system": [],
+                  "item": [],
+                  "summary": []
+                },
+                "scripts": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Replaced or planned report view",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportViewWriteEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "409": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "422": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Report Views"
+        ],
+        "summary": "Delete a rep_list report view configuration",
+        "description": "删除 rep_list 报表视图配置，不删除菜单、首页卡片、外部入口、业务表或业务数据。必须传入 confirmViewKey 且与 viewKey 一致，否则返回 REPORT_VIEW_CONFIRM_REQUIRED。",
+        "operationId": "deleteReportView",
+        "x-bpmt-writes-metadata": true,
+        "x-bpmt-executes-ddl": false,
+        "x-bpmt-risk-level": "high",
+        "parameters": [
+          {
+            "name": "viewKey",
+            "in": "path",
+            "required": true,
+            "description": "报表视图 key，对应 /{viewKey}.view。",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "confirmViewKey",
+            "in": "query",
+            "required": true,
+            "description": "删除确认值，必须与 path 中的 viewKey 完全一致。",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted report view configuration only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportViewDeleteEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "409": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/v1/report-views/{viewKey}/{section}": {
+      "patch": {
+        "tags": [
+          "Report Views"
+        ],
+        "summary": "Patch one rep_list report view section",
+        "description": "局部替换 /{viewKey}.view 的一个 section。dryRun 是 query 参数。支持 section：base、columns、queries、limits、variables、subviews、buttons、weixin、scripts。API 不执行 SQL 或脚本；SQL 语义需要调用方另行验收。",
+        "operationId": "patchReportViewSection",
+        "x-bpmt-writes-metadata": true,
+        "x-bpmt-executes-ddl": false,
+        "x-bpmt-risk-level": "high",
+        "parameters": [
+          {
+            "name": "viewKey",
+            "in": "path",
+            "required": true,
+            "description": "报表视图 key，对应 /{viewKey}.view。",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "section",
+            "in": "path",
+            "required": true,
+            "description": "要局部替换的报表视图区块。",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "base",
+                "columns",
+                "queries",
+                "limits",
+                "variables",
+                "subviews",
+                "buttons",
+                "weixin",
+                "scripts"
+              ]
+            }
+          },
+          {
+            "name": "dryRun",
+            "in": "query",
+            "required": false,
+            "description": "true 或 1 表示仅校验和返回写入计划，不落库。",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ReportViewBase"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ReportViewColumns"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ReportViewQuery"
+                    }
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ReportViewLimit"
+                    }
+                  },
+                  {
+                    "$ref": "#/components/schemas/ReportViewVariables"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ReportViewSubviews"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ReportViewButtons"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ReportViewWeixin"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ReportViewScripts"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Patched or planned report view section",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportViewWriteEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "409": {
+            "$ref": "#/components/responses/ErrorResponse"
+          },
+          "422": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "appKeyHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-BPMT-App-Key",
+        "description": "Configured appKey."
+      },
+      "timestampHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-BPMT-Timestamp",
+        "description": "Unix timestamp in seconds. The server allows 300 seconds of clock skew."
+      },
+      "nonceHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-BPMT-Nonce",
+        "description": "Per-request nonce supplied by the caller."
+      },
+      "signatureHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-BPMT-Signature",
+        "description": "Lowercase hex HMAC-SHA256 signature using appSecret."
+      }
+    },
+    "parameters": {
+      "DynamicTableName": {
+        "name": "name",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+        },
+        "description": "Dynamic table name. System prefixes CM_, DEV_, VW_, WDG_, ACT_GE_, ACT_RE_, US_, WF_, TB_, TPL_, WX_ are rejected for write operations."
+      }
+    },
+    "responses": {
+      "ErrorResponse": {
+        "description": "Stable JSON error envelope",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorEnvelope"
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "DynamicTableRequest": {
+        "type": "object",
+        "required": [
+          "name",
+          "columns"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+          },
+          "description": {
+            "type": "string"
+          },
+          "cacheFlag": {
+            "type": "integer",
+            "description": "0 disables table metadata cache for this structure; 1 enables it when the platform supports it."
+          },
+          "columns": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/components/schemas/DynamicTableColumn"
+            }
+          },
+          "indexes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DynamicTableIndex"
+            }
+          }
+        }
+      },
+      "DynamicTableColumn": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+          },
+          "description": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "default": "String",
+            "enum": [
+              "String",
+              "Integer",
+              "BigDecimal",
+              "Date",
+              "Long",
+              "Clob",
+              "Blob"
+            ]
+          },
+          "totalSize": {
+            "type": "integer",
+            "default": 100
+          },
+          "scale": {
+            "type": "integer",
+            "default": 0
+          },
+          "primaryKey": {
+            "type": "boolean",
+            "default": false
+          },
+          "autoIncrement": {
+            "type": "boolean",
+            "default": false
+          },
+          "required": {
+            "type": "boolean",
+            "default": false
+          },
+          "defaultValue": {
+            "type": "string"
+          },
+          "memo": {
+            "type": "string"
+          }
+        }
+      },
+      "DynamicTableIndex": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "columns": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "DynamicTableResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/DynamicTableRequest"
+          }
+        ]
+      },
+      "DynamicTableEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/DynamicTableResponse"
+          },
+          "error": {
+            "nullable": true
+          }
+        }
+      },
+      "DynamicTableListEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "start": {
+                "type": "integer"
+              },
+              "limit": {
+                "type": "integer"
+              },
+              "sort": {
+                "type": "string",
+                "example": "createDate"
+              },
+              "order": {
+                "type": "string",
+                "example": "desc"
+              },
+              "totalRecord": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "items": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/DynamicTableResponse"
+                }
+              }
+            }
+          },
+          "error": {
+            "nullable": true
+          }
+        }
+      },
+      "SyncDdlEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "synced": {
+                "type": "boolean"
+              }
+            }
+          },
+          "error": {
+            "nullable": true
+          }
+        }
+      },
+      "TemplateListEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "error": {
+            "nullable": true
+          }
+        }
+      },
+      "ErrorEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "data": {
+            "nullable": true
+          },
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "example": "INVALID_SIGNATURE"
+              },
+              "message": {
+                "type": "string"
+              },
+              "details": {
+                "type": "object"
+              },
+              "requestId": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "DatabaseOperationRequest": {
+        "type": "object",
+        "required": [
+          "sql"
+        ],
+        "properties": {
+          "sql": {
+            "type": "string"
+          },
+          "args": {
+            "type": "array",
+            "items": {}
+          }
+        }
+      },
+      "GenericEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object"
+          },
+          "error": {
+            "type": "object",
+            "nullable": true
+          }
+        }
+      },
+      "TemplateDetailEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "templateCode": {
+                "type": "string"
+              }
+            }
+          },
+          "error": {
+            "type": "object",
+            "nullable": true
+          }
+        }
+      },
+      "TemplateCreateTableEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "templateCode": {
+                "type": "string"
+              },
+              "table": {
+                "$ref": "#/components/schemas/DynamicTableResponse"
+              }
+            }
+          },
+          "error": {
+            "type": "object",
+            "nullable": true
+          }
+        }
+      },
+      "ReportViewListEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/ReportViewListResult"
+          },
+          "error": {
+            "nullable": true
+          }
+        }
+      },
+      "ReportViewEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/ReportViewExportResult"
+          },
+          "error": {
+            "nullable": true
+          }
+        }
+      },
+      "ReportViewWriteEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/ReportViewWriteResult"
+          },
+          "error": {
+            "nullable": true
+          }
+        }
+      },
+      "ReportViewValidationEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/ReportViewValidationResult"
+          },
+          "error": {
+            "nullable": true
+          }
+        }
+      },
+      "ReportViewDeleteEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/ReportViewDeleteResult"
+          },
+          "error": {
+            "nullable": true
+          }
+        }
+      },
+      "ReportViewListResult": {
+        "type": "object",
+        "properties": {
+          "start": {
+            "type": "integer",
+            "example": 0
+          },
+          "limit": {
+            "type": "integer",
+            "example": 20
+          },
+          "totalRecord": {
+            "type": "integer",
+            "example": 1
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "viewKey": {
+                  "type": "string",
+                  "example": "SALES_REPORT"
+                },
+                "description": {
+                  "type": "string",
+                  "example": "销售报表"
+                },
+                "url": {
+                  "type": "string",
+                  "example": "/SALES_REPORT.view"
+                },
+                "loginRequired": {
+                  "type": "boolean",
+                  "example": true
+                }
+              }
+            }
+          }
+        }
+      },
+      "ReportViewExportResult": {
+        "type": "object",
+        "properties": {
+          "snapshot": {
+            "$ref": "#/components/schemas/ReportViewSnapshot"
+          }
+        }
+      },
+      "ReportViewWriteResult": {
+        "type": "object",
+        "properties": {
+          "snapshot": {
+            "$ref": "#/components/schemas/ReportViewSnapshot"
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReportViewWarning"
+            }
+          },
+          "plan": {
+            "$ref": "#/components/schemas/ReportViewWritePlan"
+          }
+        }
+      },
+      "ReportViewValidationResult": {
+        "type": "object",
+        "properties": {
+          "valid": {
+            "type": "boolean",
+            "example": true
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReportViewWarning"
+            }
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReportViewValidationError"
+            }
+          },
+          "normalizedSnapshot": {
+            "$ref": "#/components/schemas/ReportViewSnapshot"
+          }
+        }
+      },
+      "ReportViewWarningCode": {
+        "type": "string",
+        "enum": [
+          "SQL_SCRIPT_PRESENT",
+          "CLIENT_SCRIPT_PRESENT",
+          "BUTTON_ACTION_PRESENT",
+          "EXTERNAL_DB_KEY_PRESENT",
+          "UNEXECUTED_SQL_SEMANTICS"
+        ],
+        "description": "报表视图 API 风险提示码。API 不执行 SQL 或脚本，只提示存在风险配置。"
+      },
+      "ReportViewWarning": {
+        "type": "object",
+        "properties": {
+          "level": {
+            "type": "string",
+            "enum": [
+              "info",
+              "warn",
+              "high"
+            ],
+            "example": "warn"
+          },
+          "path": {
+            "type": "string",
+            "example": "base.mainSql.script"
+          },
+          "code": {
+            "$ref": "#/components/schemas/ReportViewWarningCode"
+          },
+          "message": {
+            "type": "string",
+            "example": "API 不执行 SQL，不能保证 SQL 语义、结果列或运行性能正确。"
+          }
+        }
+      },
+      "ReportViewValidationError": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "example": "queries[0].permissions"
+          },
+          "code": {
+            "$ref": "#/components/schemas/ReportViewErrorCode"
+          },
+          "message": {
+            "type": "string",
+            "example": "查询条件不支持 permissions。"
+          }
+        }
+      },
+      "ReportViewWritePlan": {
+        "type": "object",
+        "description": "写入计划列出将要写入、更新、删除的 VW_URL/VW_REPORT* 配置和权限资源；dryRun=true 时不会落库。",
+        "properties": {
+          "dryRun": {
+            "type": "boolean",
+            "example": true
+          },
+          "creates": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "updates": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "deletes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "updatedSections": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "permissionDeletes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ReportViewDeleteResult": {
+        "type": "object",
+        "properties": {
+          "viewKey": {
+            "type": "string",
+            "example": "SALES_REPORT"
+          },
+          "deleted": {
+            "type": "boolean",
+            "example": true
+          },
+          "businessDataDeleted": {
+            "type": "boolean",
+            "example": false
+          }
+        }
+      },
+      "ReportViewSnapshot": {
+        "type": "object",
+        "required": [
+          "base"
+        ],
+        "description": "完整 rep_list 报表视图快照。管理 VW_URL 与 VW_REPORT* 配置，不执行 SQL、按钮动作或客户端脚本。viewKey 是可选稳定 key；创建时可省略，由服务端生成，validate 按上下文做条件校验。导出的 GET 快照可作为 PUT baseline。",
+        "properties": {
+          "viewKey": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_-]*$",
+            "example": "SALES_REPORT",
+            "description": "可选稳定 key，对应 /{viewKey}.view。创建时可省略，由服务端生成；替换、局部替换、删除仍以 path 中的 viewKey 为准。"
+          },
+          "description": {
+            "type": "string",
+            "example": "销售报表"
+          },
+          "loginRequired": {
+            "type": "boolean",
+            "default": true
+          },
+          "base": {
+            "$ref": "#/components/schemas/ReportViewBase"
+          },
+          "columns": {
+            "$ref": "#/components/schemas/ReportViewColumns"
+          },
+          "queries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReportViewQuery"
+            }
+          },
+          "limits": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReportViewLimit"
+            }
+          },
+          "variables": {
+            "$ref": "#/components/schemas/ReportViewVariables"
+          },
+          "subviews": {
+            "$ref": "#/components/schemas/ReportViewSubviews"
+          },
+          "buttons": {
+            "$ref": "#/components/schemas/ReportViewButtons"
+          },
+          "weixin": {
+            "$ref": "#/components/schemas/ReportViewWeixin"
+          },
+          "scripts": {
+            "$ref": "#/components/schemas/ReportViewScripts"
+          },
+          "permissions": {
+            "type": "object",
+            "description": "仅底层支持 CmPri 的对象可配置 permissions。查询、变量和 SQL 本体中的 permissions 会被 REPORT_VIEW_UNSUPPORTED_PERMISSION 拒绝。",
+            "properties": {
+              "view": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "example": [
+                  "report.SALES_REPORT.column.ORDER_NO.view"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "ReportViewBase": {
+        "type": "object",
+        "description": "报表基础配置。mainSql/primaryKey/orderBySql 只做结构校验和风险提示，API 不执行 SQL。",
+        "properties": {
+          "displayName": {
+            "type": "string",
+            "example": "销售报表"
+          },
+          "dbKey": {
+            "type": "string",
+            "nullable": true,
+            "description": "非默认 dbKey 会产生 EXTERNAL_DB_KEY_PRESENT warning。"
+          },
+          "mainSql": {
+            "type": "object",
+            "description": "报表主 SQL 配置。只做结构校验和风险提示，API 不执行 SQL，也不验证 SQL 语义、结果列、权限过滤或运行性能。",
+            "properties": {
+              "type": {
+                "type": "integer",
+                "example": 1
+              },
+              "script": {
+                "type": "string",
+                "example": "select * from SALE_ORDER where 1=1"
+              }
+            }
+          },
+          "primaryKey": {
+            "type": "object",
+            "properties": {
+              "value": {
+                "type": "object",
+                "description": "脚本配置只做结构校验和风险提示，API 不执行脚本。",
+                "properties": {
+                  "type": {
+                    "type": "integer",
+                    "example": 1
+                  },
+                  "script": {
+                    "type": "string",
+                    "example": "return vo.ORDER_NO;"
+                  }
+                }
+              },
+              "sql": {
+                "type": "object",
+                "description": "按主键加载明细的 SQL 配置。只做结构校验和风险提示，API 不执行 SQL。",
+                "properties": {
+                  "type": {
+                    "type": "integer",
+                    "example": 1
+                  },
+                  "script": {
+                    "type": "string",
+                    "example": "select * from SALE_ORDER where ID = ?"
+                  }
+                }
+              }
+            }
+          },
+          "layoutColumns": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5,
+            "example": 2
+          },
+          "initQuery": {
+            "type": "boolean",
+            "example": true
+          },
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "type": "boolean",
+                "example": true
+              },
+              "pageLimit": {
+                "type": "integer",
+                "minimum": 1,
+                "example": 20
+              }
+            }
+          },
+          "summaryEnabled": {
+            "type": "boolean"
+          },
+          "orderBySql": {
+            "type": "string",
+            "description": "只保存配置，不执行语义校验。"
+          }
+        }
+      },
+      "ReportViewPermissionSet": {
+        "type": "object",
+        "description": "仅底层支持 CmPri 的对象可配置 permissions。查询、变量和 SQL 本体中的 permissions 会被 REPORT_VIEW_UNSUPPORTED_PERMISSION 拒绝。",
+        "properties": {
+          "view": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "report.SALES_REPORT.column.ORDER_NO.view"
+            ]
+          }
+        }
+      },
+      "ReportViewScriptValue": {
+        "type": "object",
+        "description": "客户端脚本或表达式配置只做结构校验和风险提示，API 不执行脚本。",
+        "properties": {
+          "type": {
+            "type": "integer",
+            "example": 1
+          },
+          "script": {
+            "type": "string",
+            "example": "return vo.ORDER_NO;"
+          }
+        }
+      },
+      "ReportViewColumns": {
+        "type": "object",
+        "properties": {
+          "show": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "展示列，支持 permissions，content/summaryContent 会触发脚本风险提示。",
+              "additionalProperties": true
+            }
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "分割线，支持 permissions，tip 会触发脚本风险提示。",
+              "additionalProperties": true
+            }
+          },
+          "listOrder": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ReportViewQuery": {
+        "type": "object",
+        "description": "查询条件不支持 permissions，传入非空 permissions 会被校验拒绝并返回 REPORT_VIEW_UNSUPPORTED_PERMISSION。sql 只做结构校验，API 不执行 SQL。",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "customerName"
+          },
+          "displayName": {
+            "type": "string",
+            "example": "客户名称"
+          },
+          "widget": {
+            "type": "string",
+            "example": "text"
+          },
+          "widgetParam": {
+            "type": "object",
+            "description": "脚本配置只做结构校验和风险提示，API 不执行脚本。",
+            "properties": {
+              "type": {
+                "type": "integer",
+                "example": 1
+              },
+              "script": {
+                "type": "string",
+                "example": "return vo.ORDER_NO;"
+              }
+            }
+          },
+          "defaultValue": {
+            "type": "string",
+            "nullable": true
+          },
+          "sql": {
+            "type": "object",
+            "description": "查询条件 SQL 片段。只做结构校验和风险提示，API 不执行 SQL。",
+            "properties": {
+              "type": {
+                "type": "integer",
+                "example": 1
+              },
+              "script": {
+                "type": "string",
+                "example": "and CUSTOMER_NAME like concat('%', :customerName, '%')"
+              }
+            }
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "permissions": {
+            "type": "object",
+            "description": "仅底层支持 CmPri 的对象可配置 permissions。查询、变量和 SQL 本体中的 permissions 会被 REPORT_VIEW_UNSUPPORTED_PERMISSION 拒绝。",
+            "properties": {
+              "view": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "example": [
+                  "report.SALES_REPORT.column.ORDER_NO.view"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "ReportViewLimit": {
+        "type": "object",
+        "description": "报表约束，支持 permissions；sql 只做结构校验，API 不执行 SQL。",
+        "properties": {
+          "stableKey": {
+            "type": "string",
+            "example": "SELF_DEPARTMENT"
+          },
+          "description": {
+            "type": "string"
+          },
+          "sql": {
+            "type": "object",
+            "description": "报表约束 SQL 片段。只做结构校验和风险提示，API 不执行 SQL。",
+            "properties": {
+              "type": {
+                "type": "integer",
+                "example": 1
+              },
+              "script": {
+                "type": "string",
+                "example": "and DEPT_ID = session.user.deptId"
+              }
+            }
+          },
+          "permissions": {
+            "type": "object",
+            "description": "仅底层支持 CmPri 的对象可配置 permissions。查询、变量和 SQL 本体中的 permissions 会被 REPORT_VIEW_UNSUPPORTED_PERMISSION 拒绝。",
+            "properties": {
+              "view": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "example": [
+                  "report.SALES_REPORT.column.ORDER_NO.view"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "ReportViewVariables": {
+        "type": "object",
+        "description": "变量区块不支持 permissions，传入 permissions 会被校验拒绝并返回 REPORT_VIEW_UNSUPPORTED_PERMISSION。",
+        "properties": {
+          "prepared": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "预置变量不支持 permissions，exec 会触发脚本风险提示。",
+              "additionalProperties": true
+            }
+          }
+        }
+      },
+      "ReportViewSubviews": {
+        "type": "object",
+        "properties": {
+          "viewTabs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "子视图页签，支持 permissions，param 会触发脚本风险提示。",
+              "additionalProperties": true
+            }
+          }
+        }
+      },
+      "ReportViewButtons": {
+        "type": "object",
+        "properties": {
+          "system": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "系统按钮，支持 permissions。",
+              "additionalProperties": true
+            }
+          },
+          "item": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "行按钮，支持 permissions；action 会产生 BUTTON_ACTION_PRESENT warning。",
+              "additionalProperties": true
+            }
+          },
+          "summary": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "汇总按钮，支持 permissions；action 会产生 BUTTON_ACTION_PRESENT warning。",
+              "additionalProperties": true
+            }
+          }
+        }
+      },
+      "ReportViewWeixin": {
+        "type": "object",
+        "description": "微信配置支持 permissions。",
+        "properties": {
+          "listMode": {
+            "type": "integer"
+          },
+          "urlMode": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "object",
+            "description": "脚本配置只做结构校验和风险提示，API 不执行脚本。",
+            "properties": {
+              "type": {
+                "type": "integer",
+                "example": 1
+              },
+              "script": {
+                "type": "string",
+                "example": "return vo.ORDER_NO;"
+              }
+            }
+          },
+          "image": {
+            "type": "object",
+            "description": "脚本配置只做结构校验和风险提示，API 不执行脚本。",
+            "properties": {
+              "type": {
+                "type": "integer",
+                "example": 1
+              },
+              "script": {
+                "type": "string",
+                "example": "return vo.ORDER_NO;"
+              }
+            }
+          },
+          "description": {
+            "type": "object",
+            "description": "脚本配置只做结构校验和风险提示，API 不执行脚本。",
+            "properties": {
+              "type": {
+                "type": "integer",
+                "example": 1
+              },
+              "script": {
+                "type": "string",
+                "example": "return vo.ORDER_NO;"
+              }
+            }
+          },
+          "date": {
+            "type": "object",
+            "description": "脚本配置只做结构校验和风险提示，API 不执行脚本。",
+            "properties": {
+              "type": {
+                "type": "integer",
+                "example": 1
+              },
+              "script": {
+                "type": "string",
+                "example": "return vo.ORDER_NO;"
+              }
+            }
+          },
+          "permissions": {
+            "type": "object",
+            "description": "仅底层支持 CmPri 的对象可配置 permissions。查询、变量和 SQL 本体中的 permissions 会被 REPORT_VIEW_UNSUPPORTED_PERMISSION 拒绝。",
+            "properties": {
+              "view": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "example": [
+                  "report.SALES_REPORT.column.ORDER_NO.view"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "ReportViewScripts": {
+        "type": "object",
+        "description": "客户端列表脚本只做结构校验和风险提示，API 不执行脚本。",
+        "properties": {
+          "list": {
+            "type": "object",
+            "description": "脚本配置只做结构校验和风险提示，API 不执行脚本。",
+            "properties": {
+              "type": {
+                "type": "integer",
+                "example": 1
+              },
+              "script": {
+                "type": "string",
+                "example": "return vo.ORDER_NO;"
+              }
+            }
+          }
+        }
+      },
+      "ReportViewErrorCode": {
+        "type": "string",
+        "enum": [
+          "REPORT_VIEW_NOT_FOUND",
+          "REPORT_VIEW_NOT_REP_LIST",
+          "REPORT_VIEW_ALREADY_EXISTS",
+          "REPORT_VIEW_INVALID_SNAPSHOT",
+          "REPORT_VIEW_CONFIRM_REQUIRED",
+          "REPORT_VIEW_UNSUPPORTED_PERMISSION",
+          "REPORT_VIEW_UNSUPPORTED_SECTION",
+          "REPORT_VIEW_INVALID_SQL_CONFIG",
+          "REPORT_VIEW_INVALID_SCRIPT_CONFIG"
+        ],
+        "description": "报表视图 API 可能返回的稳定错误码。"
+      },
+      "DynamicTableViewListEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/DynamicTableViewListResult"
+          },
+          "error": {
+            "nullable": true
+          }
+        }
+      },
+      "DynamicTableViewEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/DynamicTableViewExportResult"
+          },
+          "error": {
+            "nullable": true
+          }
+        }
+      },
+      "DynamicTableViewWriteEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/DynamicTableViewWriteResult"
+          },
+          "error": {
+            "nullable": true
+          }
+        }
+      },
+      "DynamicTableViewValidationEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/DynamicTableViewValidationResult"
+          },
+          "error": {
+            "nullable": true
+          }
+        }
+      },
+      "DynamicTableViewDeleteEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/DynamicTableViewDeleteResult"
+          },
+          "error": {
+            "nullable": true
+          }
+        }
+      },
+      "DynamicTableViewListResult": {
+        "type": "object",
+        "properties": {
+          "start": {
+            "type": "integer",
+            "example": 0
+          },
+          "limit": {
+            "type": "integer",
+            "example": 20
+          },
+          "totalRecord": {
+            "type": "integer",
+            "example": 1
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "viewKey": {
+                  "type": "string",
+                  "example": "CRM_CUSTOMER_VIEW"
+                },
+                "description": {
+                  "type": "string",
+                  "example": "客户视图"
+                },
+                "url": {
+                  "type": "string",
+                  "example": "/CRM_CUSTOMER_VIEW.view"
+                },
+                "loginRequired": {
+                  "type": "boolean",
+                  "example": true
+                }
+              }
+            }
+          }
+        }
+      },
+      "DynamicTableViewExportResult": {
+        "type": "object",
+        "properties": {
+          "snapshot": {
+            "$ref": "#/components/schemas/DynamicTableViewSnapshot"
+          }
+        }
+      },
+      "DynamicTableViewWriteResult": {
+        "type": "object",
+        "properties": {
+          "snapshot": {
+            "$ref": "#/components/schemas/DynamicTableViewSnapshot"
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DynamicTableViewWarning"
+            }
+          },
+          "plan": {
+            "$ref": "#/components/schemas/DynamicTableViewWritePlan"
+          }
+        }
+      },
+      "DynamicTableViewValidationResult": {
+        "type": "object",
+        "properties": {
+          "valid": {
+            "type": "boolean",
+            "example": true
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DynamicTableViewWarning"
+            }
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DynamicTableViewValidationError"
+            }
+          },
+          "normalizedSnapshot": {
+            "$ref": "#/components/schemas/DynamicTableViewSnapshot"
+          }
+        }
+      },
+      "DynamicTableViewWarning": {
+        "type": "object",
+        "properties": {
+          "level": {
+            "type": "string",
+            "enum": [
+              "info",
+              "warn",
+              "high"
+            ],
+            "example": "warn"
+          },
+          "path": {
+            "type": "string",
+            "example": "scripts.list.script"
+          },
+          "code": {
+            "type": "string",
+            "example": "SCRIPT_RISK"
+          },
+          "message": {
+            "type": "string",
+            "example": "脚本包含高风险调用，请人工复核。"
+          }
+        }
+      },
+      "DynamicTableViewValidationError": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "example": "queries.normal[0].permissions"
+          },
+          "code": {
+            "type": "string",
+            "example": "UNSUPPORTED_PERMISSION"
+          },
+          "message": {
+            "type": "string",
+            "example": "查询、变量和处理器区块不支持 permissions。"
+          }
+        }
+      },
+      "DynamicTableViewWritePlan": {
+        "type": "object",
+        "properties": {
+          "dryRun": {
+            "type": "boolean",
+            "example": true
+          },
+          "creates": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "VW_URL",
+              "VW_DYN_TABLE"
+            ]
+          },
+          "updates": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "VW_DYN_TABLE_FIELDS"
+            ]
+          },
+          "deletes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "VW_DYN_TABLE_CHILDREN"
+            ]
+          },
+          "permissionCreates": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "permissionKeeps": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "permissionDeletes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "updatedSections": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "fields"
+            ]
+          }
+        }
+      },
+      "DynamicTableViewDeleteResult": {
+        "type": "object",
+        "properties": {
+          "viewKey": {
+            "type": "string",
+            "example": "CRM_CUSTOMER_VIEW"
+          },
+          "deleted": {
+            "type": "boolean",
+            "example": true
+          },
+          "businessTableDeleted": {
+            "type": "boolean",
+            "example": false
+          },
+          "businessDataDeleted": {
+            "type": "boolean",
+            "example": false
+          }
+        }
+      },
+      "DynamicTableViewSnapshot": {
+        "type": "object",
+        "required": [
+          "viewKey",
+          "base"
+        ],
+        "description": "完整 dyn 动态表视图快照。只维护 /{viewKey}.view 对应视图配置，不纳入菜单、首页、按钮入口等导航配置。导出的 GET 快照可作为 PUT baseline。",
+        "properties": {
+          "viewKey": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_-]*$",
+            "example": "CRM_CUSTOMER_VIEW"
+          },
+          "description": {
+            "type": "string",
+            "example": "客户视图"
+          },
+          "loginRequired": {
+            "type": "boolean",
+            "default": true
+          },
+          "base": {
+            "$ref": "#/components/schemas/DynamicTableViewBase"
+          },
+          "fields": {
+            "$ref": "#/components/schemas/DynamicTableViewFields"
+          },
+          "queries": {
+            "$ref": "#/components/schemas/DynamicTableViewQueries"
+          },
+          "limits": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DynamicTableViewLimit"
+            }
+          },
+          "variables": {
+            "$ref": "#/components/schemas/DynamicTableViewVariables"
+          },
+          "processors": {
+            "$ref": "#/components/schemas/DynamicTableViewProcessors"
+          },
+          "subviews": {
+            "$ref": "#/components/schemas/DynamicTableViewSubviews"
+          },
+          "buttons": {
+            "$ref": "#/components/schemas/DynamicTableViewButtons"
+          },
+          "weixin": {
+            "$ref": "#/components/schemas/DynamicTableViewWeixin"
+          },
+          "scripts": {
+            "$ref": "#/components/schemas/DynamicTableViewScripts"
+          }
+        }
+      },
+      "DynamicTableViewBase": {
+        "type": "object",
+        "required": [
+          "tableName"
+        ],
+        "properties": {
+          "tableName": {
+            "type": "string",
+            "example": "CRM_CUSTOMER"
+          },
+          "displayName": {
+            "type": "string",
+            "example": "客户"
+          },
+          "logTableName": {
+            "type": "string",
+            "example": "CRM_CUSTOMER_LOG"
+          },
+          "layoutColumns": {
+            "type": "integer",
+            "example": 2
+          },
+          "initQuery": {
+            "type": "boolean",
+            "example": true
+          },
+          "pageLimit": {
+            "type": "integer",
+            "example": 20
+          },
+          "defaultSort": {
+            "type": "object",
+            "properties": {
+              "field": {
+                "type": "string",
+                "example": "CREATE_DATE"
+              },
+              "direction": {
+                "type": "string",
+                "enum": [
+                  "asc",
+                  "desc"
+                ],
+                "example": "desc"
+              }
+            }
+          }
+        }
+      },
+      "DynamicTableViewPermissionSet": {
+        "type": "object",
+        "description": "只有底层 dyn HBM 有 PRI 的字段、分割线、限制、子视图、按钮和微信配置支持 permissions。查询、变量、处理器中的 permissions 会被校验拒绝。",
+        "properties": {
+          "view": {
+            "type": "string",
+            "nullable": true,
+            "example": "dyn.CRM_CUSTOMER_VIEW.field.CUSTOMER_ID.view"
+          },
+          "create": {
+            "type": "string",
+            "nullable": true,
+            "example": "dyn.CRM_CUSTOMER_VIEW.field.CUSTOMER_ID.create"
+          },
+          "update": {
+            "type": "string",
+            "nullable": true,
+            "example": "dyn.CRM_CUSTOMER_VIEW.field.CUSTOMER_ID.update"
+          }
+        }
+      },
+      "DynamicTableViewScriptValue": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "integer",
+            "description": "脚本类型，沿用 BPMT 动态视图内部编码。",
+            "example": 1
+          },
+          "script": {
+            "type": "string",
+            "example": "return vo.CUSTOMER_ID;"
+          }
+        }
+      },
+      "DynamicTableViewFields": {
+        "type": "object",
+        "properties": {
+          "systemFields": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "系统字段，支持 permissions。",
+              "additionalProperties": true
+            }
+          },
+          "computedFields": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "计算字段，支持 permissions。",
+              "additionalProperties": true
+            }
+          },
+          "formFields": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "表单字段，支持 permissions。",
+              "additionalProperties": true
+            }
+          },
+          "sectionLines": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "分割线，支持 permissions。",
+              "additionalProperties": true
+            }
+          },
+          "listOrder": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": true
+      },
+      "DynamicTableViewQueries": {
+        "type": "object",
+        "description": "查询区块不支持 permissions，传入 permissions 会被校验拒绝并返回 UNSUPPORTED_PERMISSION。",
+        "properties": {
+          "normal": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "普通查询条件",
+              "additionalProperties": true
+            }
+          },
+          "advanced": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "高级查询条件",
+              "additionalProperties": true
+            }
+          }
+        },
+        "additionalProperties": true
+      },
+      "DynamicTableViewLimit": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "sql": {
+            "$ref": "#/components/schemas/DynamicTableViewScriptValue"
+          },
+          "permissions": {
+            "$ref": "#/components/schemas/DynamicTableViewPermissionSet"
+          }
+        },
+        "additionalProperties": true
+      },
+      "DynamicTableViewVariables": {
+        "type": "object",
+        "description": "变量区块不支持 permissions，传入 permissions 会被校验拒绝并返回 UNSUPPORTED_PERMISSION。",
+        "properties": {
+          "prepared": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "预置变量",
+              "additionalProperties": true
+            }
+          },
+          "parents": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "父表变量",
+              "additionalProperties": true
+            }
+          }
+        },
+        "additionalProperties": true
+      },
+      "DynamicTableViewProcessors": {
+        "type": "object",
+        "description": "处理器区块不支持 permissions，传入 permissions 会被校验拒绝并返回 UNSUPPORTED_PERMISSION。",
+        "properties": {
+          "before": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "前置处理器",
+              "additionalProperties": true
+            }
+          },
+          "after": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "后置处理器",
+              "additionalProperties": true
+            }
+          }
+        },
+        "additionalProperties": true
+      },
+      "DynamicTableViewSubviews": {
+        "type": "object",
+        "properties": {
+          "systemTabs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "系统页签，支持 permissions。",
+              "additionalProperties": true
+            }
+          },
+          "viewTabs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "视图页签，支持 permissions。",
+              "additionalProperties": true
+            }
+          }
+        },
+        "additionalProperties": true
+      },
+      "DynamicTableViewButtons": {
+        "type": "object",
+        "properties": {
+          "system": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "系统按钮，支持 permissions。",
+              "additionalProperties": true
+            }
+          },
+          "item": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "行按钮，支持 permissions。",
+              "additionalProperties": true
+            }
+          },
+          "summary": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "汇总按钮，支持 permissions。",
+              "additionalProperties": true
+            }
+          }
+        },
+        "additionalProperties": true
+      },
+      "DynamicTableViewWeixin": {
+        "type": "object",
+        "description": "微信配置支持 permissions。",
+        "properties": {
+          "listMode": {
+            "type": "integer"
+          },
+          "urlMode": {
+            "type": "integer"
+          },
+          "title": {
+            "$ref": "#/components/schemas/DynamicTableViewScriptValue"
+          },
+          "image": {
+            "$ref": "#/components/schemas/DynamicTableViewScriptValue"
+          },
+          "description": {
+            "$ref": "#/components/schemas/DynamicTableViewScriptValue"
+          },
+          "date": {
+            "$ref": "#/components/schemas/DynamicTableViewScriptValue"
+          },
+          "permissions": {
+            "$ref": "#/components/schemas/DynamicTableViewPermissionSet"
+          }
+        },
+        "additionalProperties": true
+      },
+      "DynamicTableViewScripts": {
+        "type": "object",
+        "description": "列表和表单脚本会进入风险扫描；高风险脚本应先 validate 或 dryRun。",
+        "properties": {
+          "list": {
+            "$ref": "#/components/schemas/DynamicTableViewScriptValue"
+          },
+          "form": {
+            "$ref": "#/components/schemas/DynamicTableViewScriptValue"
+          }
+        }
+      },
+      "DynamicTableViewErrorCode": {
+        "type": "string",
+        "enum": [
+          "DYNAMIC_TABLE_VIEW_NOT_FOUND",
+          "DYNAMIC_TABLE_VIEW_NOT_DYN",
+          "DYNAMIC_TABLE_VIEW_INVALID_SNAPSHOT",
+          "DYNAMIC_TABLE_VIEW_ALREADY_EXISTS",
+          "DYNAMIC_TABLE_VIEW_CONFIRM_REQUIRED",
+          "UNSUPPORTED_PERMISSION"
+        ],
+        "description": "动态表视图 API 可能返回的稳定错误码。"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Dynamic Table Views",
+      "description": "Manage dyn dynamic table view configuration snapshots for /{viewKey}.view."
+    },
+    {
+      "name": "Report Views",
+      "description": "Manage rep_list report view configuration snapshots for /{viewKey}.view. API does not execute SQL or scripts."
+    }
+  ]
+}

@@ -29,6 +29,7 @@
 - `v1.6.1` 是基于 `v1.6.0` 增强微信生态第三方 OAuth 登录态传导的补丁版本。
 - `v1.6.2` 是修复第三方系统管理界面和 OAuth 无权限提示，并新增安装/升级脚本的补丁版本。
 - `v1.7.0` 是当前版本，新增动态表视图配置 API，开放 `/{viewKey}.view` 对应的 dyn 视图完整配置管理能力。
+- `v1.7.1` 是基于 `v1.7.0` 新增报表视图配置 API 的补丁版本，开放 `rep_list` 对应的 `/{viewKey}.view` 配置管理能力。
 - 默认 Web 镜像：`ghcr.io/wodenwang/bpmt-lite:1.7.0`
 - 默认 API 镜像：`ghcr.io/wodenwang/bpmt-lite-api:1.7.0`
 - 同步镜像 tag：发布后同步到 `ghcr.io/wodenwang/bpmt-lite:latest` 和 `ghcr.io/wodenwang/bpmt-lite-api:latest`
@@ -59,6 +60,7 @@
 - v1.6.1 开发和验收期间的 source-of-truth 顺序是：`AGENTS.md` -> `docs/superpowers/specs/2026-05-05-bpmt-lite-v1.6.1-wechat-oauth-thirdpart-design.md` -> `docs/superpowers/plans/2026-05-05-bpmt-lite-v1.6.1-wechat-oauth-thirdpart.md` -> `docs/v1.6.1/*` -> `README.md` -> implementation。
 - v1.6.2 开发和验收期间的 source-of-truth 顺序是：`AGENTS.md` -> `docs/superpowers/specs/2026-05-06-bpmt-lite-v1.6.2-install-upgrade-readme-issues-design.md` -> `docs/superpowers/plans/2026-05-06-bpmt-lite-v1.6.2-install-upgrade-readme-issues.md` -> `docs/release-v1.6.2.md` -> `README.md` -> implementation。
 - v1.7.0 动态表视图 API 开发和验收期间的 source-of-truth 顺序是：`AGENTS.md` -> `docs/superpowers/specs/2026-05-10-bpmt-lite-v1.7.0-dynamic-table-view-api-design.md` -> `docs/superpowers/plans/2026-05-10-bpmt-lite-v1.7.0-dynamic-table-view-api.md` -> `docs/v1.7.0/*` -> `docs/release-v1.7.0.md` -> `README.md` -> implementation。
+- v1.7.1 报表视图 API 开发和验收期间的 source-of-truth 顺序是：`AGENTS.md` -> `docs/superpowers/specs/2026-05-15-bpmt-lite-v1.7.1-report-view-api-design.md` -> `docs/superpowers/plans/2026-05-15-bpmt-lite-v1.7.1-report-view-api.md` -> `docs/v1.7.1/*` -> `docs/release-v1.7.1.md` -> `README.md` -> implementation。
 
 ## 已验证的本地编译基线
 
@@ -234,6 +236,13 @@ docker compose up -d
 - 动态表视图快照必须覆盖基础信息、字段、分组、页签、区块、系统按钮、自定义按钮、查询区、前后置处理器、预置变量、父页面变量、权限和脚本风险提示。
 - v1.7.0 不支持在查询区、变量和处理器上写入权限；请求中这些位置的非空 `permissions` 必须按 `UNSUPPORTED_PERMISSION` 拒绝。
 - 每次调整动态表视图 API 都必须同步更新 `api/src/main/webapp/openapi.json`、`api/src/main/webapp/docs/index.html`、`docs/v1.7.0/api-reference.md` 和 `docs/v1.7.0/openapi.json`。
+- v1.7.1 报表视图 API 只管理 `rep_list` 视图配置，不管理菜单、首页卡片、外部入口或报表业务数据。
+- 报表视图 API 固定路径为 `/api/v1/report-views`、`/api/v1/report-views:validate`、`/api/v1/report-views/{viewKey}`、`/api/v1/report-views/{viewKey}/{section}`；`dryRun` 是 query 参数。
+- 报表视图 API 写接口支持 `validate`、`dryRun`、创建、整体替换、分区 patch 和带 `confirmViewKey` 的删除；删除视图不得删除菜单、首页卡片、外部入口、业务表或业务数据。
+- 报表视图 API 不执行 `mainSql`、查询 SQL、约束 SQL、PK SQL、按钮动作或客户端脚本；文档和响应必须保留风险提示。
+- 报表视图 API 的风险提示至少覆盖 `SQL_SCRIPT_PRESENT`、`CLIENT_SCRIPT_PRESENT`、`BUTTON_ACTION_PRESENT`、`EXTERNAL_DB_KEY_PRESENT` 和 `UNEXECUTED_SQL_SEMANTICS`。
+- v1.7.1 报表视图 API 只支持 `base`、`columns`、`queries`、`limits`、`variables`、`subviews`、`buttons`、`weixin`、`scripts` 这几类 section patch，不新增 `/sections/{section}` 或单项级 patch 路径。
+- 每次调整报表视图 API 都必须同步更新 `api/src/main/webapp/openapi.json`、`api/src/main/webapp/docs/index.html`、`docs/v1.7.1/api-reference.md` 和 `docs/v1.7.1/openapi.json`。
 
 ## v1.5.0 OAuth 开发规则
 
