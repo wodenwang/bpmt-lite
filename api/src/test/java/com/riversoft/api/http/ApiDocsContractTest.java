@@ -78,6 +78,10 @@ public class ApiDocsContractTest {
     public void openApiJsonPublishesReportViewRouteMatrix() throws Exception {
         JsonNode root = new ObjectMapper().readTree(apiFile("src/main/webapp/openapi.json"));
 
+        assertTrue(root.path("info").path("title").asText().contains("v1.7.1"));
+        assertTrue(root.path("info").path("description").asText().contains("报表视图")
+                || root.path("info").path("description").asText().contains("report view"));
+
         assertOnlyMethods(root, "/v1/report-views", "get", "post");
         assertOnlyMethods(root, "/v1/report-views:validate", "post");
         assertOnlyMethods(root, "/v1/report-views/{viewKey}", "get", "put", "delete");
@@ -118,16 +122,32 @@ public class ApiDocsContractTest {
                 "viewKey");
         assertTrue(root.path("components").path("schemas").path("ReportViewSnapshot")
                 .path("properties").path("viewKey").path("description").asText().contains("可选"));
+
+        JsonNode base = root.path("components").path("schemas").path("ReportViewBase");
+        assertSqlDescription(base.path("properties").path("mainSql").path("description"), "SQL");
+        assertTrue(base.path("properties").path("mainSql").path("properties").path("script").path("example")
+                .asText().toLowerCase().contains("select"));
+        assertTrue(base.path("properties").path("primaryKey").path("properties").path("sql")
+                .path("properties").path("script").path("example").asText().toLowerCase().contains("where id"));
+        assertTrue(root.path("components").path("schemas").path("ReportViewQuery")
+                .path("properties").path("sql").path("properties").path("script").path("example")
+                .asText().contains("CUSTOMER_NAME"));
+        assertTrue(root.path("components").path("schemas").path("ReportViewLimit")
+                .path("properties").path("sql").path("properties").path("script").path("example")
+                .asText().contains("DEPT_ID"));
     }
 
     @Test
     public void docsIndexDescribesReportViewApi() throws Exception {
         String html = read(apiFile("src/main/webapp/docs/index.html"));
 
+        assertTrue(html.contains("v1.7.1"));
         assertTrue(html.contains("报表视图 API"));
+        assertTrue(html.indexOf("v1.7.1") < html.indexOf("报表视图 API"));
         assertTrue(html.contains("/api/v1/report-views"));
         assertTrue(html.contains("/api/v1/report-views:validate"));
         assertTrue(html.contains("/api/v1/report-views/SALES_REPORT/columns?dryRun=true"));
+        assertTrue(html.contains("sign_request \"POST\" \"/api/v1/report-views:validate\""));
         assertTrue(html.contains("REPORT_VIEW_NOT_REP_LIST"));
         assertTrue(html.contains("REPORT_VIEW_UNSUPPORTED_PERMISSION"));
         assertTrue(html.contains("API 不执行 SQL"));
@@ -234,6 +254,12 @@ public class ApiDocsContractTest {
         }
         assertTrue(text, text.contains("permissions"));
         assertTrue(text, text.contains("拒绝"));
+    }
+
+    private void assertSqlDescription(JsonNode description, String expected) {
+        String text = description.asText();
+        assertTrue(text, text.contains(expected));
+        assertFalse(text, text.contains("不执行脚本"));
     }
 
     private void assertArrayContains(JsonNode array, String value) {

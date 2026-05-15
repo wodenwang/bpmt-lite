@@ -1,9 +1,9 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "BPMT Lite v1.7.0 API",
+    "title": "BPMT Lite v1.7.1 API",
     "version": "1.7.1",
-    "description": "BPMT Lite v1.7.1 API. Adds rep_list report view configuration management under /api/v1/report-views. Report view APIs manage VW_URL and VW_REPORT* metadata only; API 不执行 SQL, button actions, or client scripts. Signature PATH must use the public request URI such as /api/v1/report-views."
+    "description": "BPMT Lite v1.7.1 API. Includes dynamic table structure APIs, dyn dynamic table view APIs, database operation APIs, and rep_list 报表视图 API under /api/v1/report-views. Report view APIs manage VW_URL and VW_REPORT* metadata only; API 不执行 SQL, button actions, or client scripts. Signature PATH must use the public request URI such as /api/v1/report-views."
   },
   "servers": [
     {
@@ -2546,7 +2546,7 @@
           },
           "mainSql": {
             "type": "object",
-            "description": "脚本配置只做结构校验和风险提示，API 不执行脚本。",
+            "description": "报表主 SQL 配置。只做结构校验和风险提示，API 不执行 SQL，也不验证 SQL 语义、结果列、权限过滤或运行性能。",
             "properties": {
               "type": {
                 "type": "integer",
@@ -2554,7 +2554,7 @@
               },
               "script": {
                 "type": "string",
-                "example": "return vo.ORDER_NO;"
+                "example": "select * from SALE_ORDER where 1=1"
               }
             }
           },
@@ -2577,7 +2577,7 @@
               },
               "sql": {
                 "type": "object",
-                "description": "脚本配置只做结构校验和风险提示，API 不执行脚本。",
+                "description": "按主键加载明细的 SQL 配置。只做结构校验和风险提示，API 不执行 SQL。",
                 "properties": {
                   "type": {
                     "type": "integer",
@@ -2585,7 +2585,7 @@
                   },
                   "script": {
                     "type": "string",
-                    "example": "return vo.ORDER_NO;"
+                    "example": "select * from SALE_ORDER where ID = ?"
                   }
                 }
               }
@@ -2641,7 +2641,7 @@
       },
       "ReportViewScriptValue": {
         "type": "object",
-        "description": "脚本配置只做结构校验和风险提示，API 不执行脚本。",
+        "description": "客户端脚本或表达式配置只做结构校验和风险提示，API 不执行脚本。",
         "properties": {
           "type": {
             "type": "integer",
@@ -2716,7 +2716,7 @@
           },
           "sql": {
             "type": "object",
-            "description": "脚本配置只做结构校验和风险提示，API 不执行脚本。",
+            "description": "查询条件 SQL 片段。只做结构校验和风险提示，API 不执行 SQL。",
             "properties": {
               "type": {
                 "type": "integer",
@@ -2724,7 +2724,7 @@
               },
               "script": {
                 "type": "string",
-                "example": "return vo.ORDER_NO;"
+                "example": "and CUSTOMER_NAME like concat('%', :customerName, '%')"
               }
             }
           },
@@ -2762,7 +2762,7 @@
           },
           "sql": {
             "type": "object",
-            "description": "脚本配置只做结构校验和风险提示，API 不执行脚本。",
+            "description": "报表约束 SQL 片段。只做结构校验和风险提示，API 不执行 SQL。",
             "properties": {
               "type": {
                 "type": "integer",
@@ -2770,7 +2770,7 @@
               },
               "script": {
                 "type": "string",
-                "example": "return vo.ORDER_NO;"
+                "example": "and DEPT_ID = session.user.deptId"
               }
             }
           },
