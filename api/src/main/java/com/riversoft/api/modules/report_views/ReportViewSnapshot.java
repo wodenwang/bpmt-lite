@@ -377,7 +377,7 @@ public class ReportViewSnapshot {
     public static class LineColumn {
         private String stableKey;
         private String displayName;
-        private String tip;
+        private ScriptValue tip;
         private Boolean expanded;
         private PermissionSet permissions;
 
@@ -397,11 +397,11 @@ public class ReportViewSnapshot {
             this.displayName = displayName;
         }
 
-        public String getTip() {
+        public ScriptValue getTip() {
             return tip;
         }
 
-        public void setTip(String tip) {
+        public void setTip(ScriptValue tip) {
             this.tip = tip;
         }
 
@@ -604,7 +604,7 @@ public class ReportViewSnapshot {
         private String displayName;
         private String style;
         private String action;
-        private String param;
+        private ScriptValue param;
         private PermissionSet permissions;
 
         public String getStableKey() {
@@ -639,11 +639,11 @@ public class ReportViewSnapshot {
             this.action = action;
         }
 
-        public String getParam() {
+        public ScriptValue getParam() {
             return param;
         }
 
-        public void setParam(String param) {
+        public void setParam(ScriptValue param) {
             this.param = param;
         }
 
@@ -759,7 +759,7 @@ public class ReportViewSnapshot {
         private String styleClass;
         private String action;
         private String openType;
-        private String param;
+        private ScriptValue param;
         private String confirmMessage;
         private String description;
         private PermissionSet permissions;
@@ -812,11 +812,11 @@ public class ReportViewSnapshot {
             this.openType = openType;
         }
 
-        public String getParam() {
+        public ScriptValue getParam() {
             return param;
         }
 
-        public void setParam(String param) {
+        public void setParam(ScriptValue param) {
             this.param = param;
         }
 

@@ -18,9 +18,11 @@ public class ReportViewScriptRiskScanner {
         }
         ReportViewSnapshot normalized = new ReportViewDefaults().normalize(snapshot);
         scanBase(normalized.getBase(), warnings, codes);
+        scanColumns(normalized.getColumns(), warnings, codes);
         scanQueries(normalized.getQueries(), warnings, codes);
         scanLimits(normalized.getLimits(), warnings, codes);
         scanVariables(normalized.getVariables(), warnings, codes);
+        scanSubviews(normalized.getSubviews(), warnings, codes);
         scanButtons(normalized.getButtons(), warnings, codes);
         scanScripts(normalized.getScripts(), warnings, codes);
         return warnings;
@@ -42,6 +44,28 @@ public class ReportViewScriptRiskScanner {
         }
         if (StringUtils.isNotBlank(base.getOrderBySql())) {
             add(warnings, codes, "base.orderBySql", "UNEXECUTED_SQL_SEMANTICS", "API 不执行 SQL，也不验证 SQL 语义或字段正确性。");
+        }
+    }
+
+    private void scanColumns(ReportViewSnapshot.Columns columns,
+                             List<ReportViewResponse.Warning> warnings,
+                             Set<String> codes) {
+        if (columns == null) {
+            return;
+        }
+        for (int i = 0; i < columns.getShow().size(); i++) {
+            ReportViewSnapshot.ShowColumn column = columns.getShow().get(i);
+            if (column == null) {
+                continue;
+            }
+            scanClientScript(column.getContent(), "columns.show[" + i + "].content", warnings, codes);
+            scanClientScript(column.getSummaryContent(), "columns.show[" + i + "].summaryContent", warnings, codes);
+        }
+        for (int i = 0; i < columns.getLines().size(); i++) {
+            ReportViewSnapshot.LineColumn line = columns.getLines().get(i);
+            if (line != null) {
+                scanClientScript(line.getTip(), "columns.lines[" + i + "].tip", warnings, codes);
+            }
         }
     }
 
@@ -81,6 +105,20 @@ public class ReportViewScriptRiskScanner {
         }
     }
 
+    private void scanSubviews(ReportViewSnapshot.Subviews subviews,
+                              List<ReportViewResponse.Warning> warnings,
+                              Set<String> codes) {
+        if (subviews == null) {
+            return;
+        }
+        for (int i = 0; i < subviews.getViewTabs().size(); i++) {
+            ReportViewSnapshot.ViewTab tab = subviews.getViewTabs().get(i);
+            if (tab != null) {
+                scanClientScript(tab.getParam(), "subviews.viewTabs[" + i + "].param", warnings, codes);
+            }
+        }
+    }
+
     private void scanButtons(ReportViewSnapshot.Buttons buttons,
                              List<ReportViewResponse.Warning> warnings,
                              Set<String> codes) {
@@ -100,6 +138,9 @@ public class ReportViewScriptRiskScanner {
             if (button != null && StringUtils.isNotBlank(button.getAction())) {
                 add(warnings, codes, path + "[" + i + "].action", "BUTTON_ACTION_PRESENT", "报表视图包含自定义按钮动作。");
             }
+            if (button != null) {
+                scanClientScript(button.getParam(), path + "[" + i + "].param", warnings, codes);
+            }
         }
     }
 
@@ -107,7 +148,7 @@ public class ReportViewScriptRiskScanner {
                              List<ReportViewResponse.Warning> warnings,
                              Set<String> codes) {
         if (scripts != null && hasScript(scripts.getList())) {
-            add(warnings, codes, "scripts.list", "CLIENT_SCRIPT_PRESENT", "报表视图包含客户端脚本。");
+            scanClientScript(scripts.getList(), "scripts.list", warnings, codes);
         }
     }
 
@@ -124,6 +165,15 @@ public class ReportViewScriptRiskScanner {
 
     private boolean hasScript(ReportViewSnapshot.ScriptValue value) {
         return value != null && StringUtils.isNotBlank(value.getScript());
+    }
+
+    private void scanClientScript(ReportViewSnapshot.ScriptValue value,
+                                  String path,
+                                  List<ReportViewResponse.Warning> warnings,
+                                  Set<String> codes) {
+        if (hasScript(value)) {
+            add(warnings, codes, path, "CLIENT_SCRIPT_PRESENT", "报表视图包含客户端脚本。");
+        }
     }
 
     private void add(List<ReportViewResponse.Warning> warnings,

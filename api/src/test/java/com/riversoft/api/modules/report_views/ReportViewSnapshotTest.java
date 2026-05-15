@@ -16,9 +16,14 @@ public class ReportViewSnapshotTest {
                 + "\"layoutColumns\":2,\"initQuery\":true,\"pagination\":{\"enabled\":true,\"pageLimit\":20},"
                 + "\"summaryEnabled\":false,\"orderBySql\":\"CREATE_DATE desc\"},"
                 + "\"columns\":{\"show\":[{\"stableKey\":\"ORDER_NO\",\"displayName\":\"订单号\","
-                + "\"content\":{\"type\":1,\"script\":\"return vo.ORDER_NO;\"}}],\"lines\":[],\"listOrder\":[\"ORDER_NO\"]},"
+                + "\"content\":{\"type\":1,\"script\":\"return vo.ORDER_NO;\"}}],"
+                + "\"lines\":[{\"stableKey\":\"line1\",\"displayName\":\"分组\",\"tip\":{\"type\":1,\"script\":\"return vo.TIP;\"}}],"
+                + "\"listOrder\":[\"ORDER_NO\"]},"
                 + "\"queries\":[],\"limits\":[],\"variables\":{\"prepared\":[]},"
-                + "\"subviews\":{\"viewTabs\":[]},\"buttons\":{\"system\":[],\"item\":[],\"summary\":[]},"
+                + "\"subviews\":{\"viewTabs\":[{\"stableKey\":\"detail\",\"displayName\":\"明细\","
+                + "\"param\":{\"type\":1,\"script\":\"return 'id=' + vo.ID;\"}}]},"
+                + "\"buttons\":{\"system\":[],\"item\":[{\"stableKey\":\"open\",\"displayName\":\"打开\","
+                + "\"param\":{\"type\":1,\"script\":\"return vo.ID;\"}}],\"summary\":[]},"
                 + "\"scripts\":{\"list\":{\"type\":1,\"script\":\"console.log('loaded');\"}}}";
 
         ReportViewSnapshot snapshot = ApiJson.fromJson(new ByteArrayInputStream(json.getBytes("UTF-8")),
@@ -29,6 +34,9 @@ public class ReportViewSnapshotTest {
         assertEquals("销售报表", snapshot.getBase().getDisplayName());
         assertEquals("CREATE_DATE desc", snapshot.getBase().getOrderBySql());
         assertEquals("ORDER_NO", snapshot.getColumns().getShow().get(0).getStableKey());
+        assertEquals("return vo.TIP;", snapshot.getColumns().getLines().get(0).getTip().getScript());
+        assertEquals("return 'id=' + vo.ID;", snapshot.getSubviews().getViewTabs().get(0).getParam().getScript());
+        assertEquals("return vo.ID;", snapshot.getButtons().getItem().get(0).getParam().getScript());
     }
 
     @Test
@@ -43,5 +51,18 @@ public class ReportViewSnapshotTest {
         assertEquals(Integer.valueOf(2), normalized.getBase().getLayoutColumns());
         assertTrue(normalized.getColumns().getShow().isEmpty());
         assertTrue(normalized.getVariables().getPrepared().isEmpty());
+    }
+
+    @Test
+    public void defaultsDoNotFillRequiredBaseScalars() {
+        ReportViewSnapshot snapshot = new ReportViewSnapshot();
+        snapshot.setBase(new ReportViewSnapshot.Base());
+
+        ReportViewSnapshot normalized = new ReportViewDefaults().normalizeForCreate(snapshot);
+
+        assertTrue(normalized.getViewKey().startsWith("REPORT_"));
+        assertEquals(null, normalized.getBase().getLayoutColumns());
+        assertEquals(null, normalized.getBase().getInitQuery());
+        assertEquals(null, normalized.getBase().getPagination().getEnabled());
     }
 }

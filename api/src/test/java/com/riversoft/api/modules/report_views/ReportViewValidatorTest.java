@@ -53,4 +53,46 @@ public class ReportViewValidatorTest {
         assertFalse(result.isValid());
         assertTrue(Fixtures.errorCodes(result).contains("REPORT_VIEW_INVALID_SNAPSHOT"));
     }
+
+    @Test
+    public void rejectsMissingRequiredBaseScalars() {
+        ReportViewSnapshot snapshot = Fixtures.reportSnapshot("SALES_REPORT");
+        snapshot.getBase().setLayoutColumns(null);
+        snapshot.getBase().setInitQuery(null);
+        snapshot.getBase().getPagination().setEnabled(null);
+
+        ReportViewValidationResult result = new ReportViewValidator().validate(snapshot);
+
+        assertFalse(result.isValid());
+        assertTrue(Fixtures.errorPaths(result).contains("base.layoutColumns"));
+        assertTrue(Fixtures.errorPaths(result).contains("base.initQuery"));
+        assertTrue(Fixtures.errorPaths(result).contains("base.pagination.enabled"));
+    }
+
+    @Test
+    public void rejectsMissingColumnContentScript() {
+        ReportViewSnapshot snapshot = Fixtures.reportSnapshot("SALES_REPORT");
+        snapshot.getColumns().getShow().get(0).setContent(null);
+
+        ReportViewValidationResult result = new ReportViewValidator().validate(snapshot);
+
+        assertFalse(result.isValid());
+        assertTrue(Fixtures.errorCodes(result).contains("REPORT_VIEW_INVALID_SCRIPT_CONFIG"));
+        assertTrue(Fixtures.errorPaths(result).contains("columns.show[0].content"));
+    }
+
+    @Test
+    public void rejectsInvalidOptionalClientScriptConfig() {
+        ReportViewSnapshot snapshot = Fixtures.reportSnapshot("SALES_REPORT");
+        ReportViewSnapshot.LineColumn line = new ReportViewSnapshot.LineColumn();
+        line.setStableKey("line1");
+        line.setTip(new ReportViewSnapshot.ScriptValue());
+        snapshot.getColumns().getLines().add(line);
+
+        ReportViewValidationResult result = new ReportViewValidator().validate(snapshot);
+
+        assertFalse(result.isValid());
+        assertTrue(Fixtures.errorCodes(result).contains("REPORT_VIEW_INVALID_SCRIPT_CONFIG"));
+        assertTrue(Fixtures.errorPaths(result).contains("columns.lines[0].tip"));
+    }
 }

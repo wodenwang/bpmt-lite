@@ -52,4 +52,12 @@ final class Fixtures {
         }
         return codes;
     }
+
+    static Set<String> errorPaths(ReportViewValidationResult result) {
+        Set<String> paths = new LinkedHashSet<String>();
+        for (ReportViewResponse.ValidationItem error : result.getErrors()) {
+            paths.add(error.getPath());
+        }
+        return paths;
+    }
 }

@@ -53,20 +53,8 @@ public class ReportViewDefaults {
     }
 
     private void normalizeBase(ReportViewSnapshot.Base base) {
-        if (base.getLayoutColumns() == null) {
-            base.setLayoutColumns(Integer.valueOf(2));
-        }
-        if (base.getInitQuery() == null) {
-            base.setInitQuery(Boolean.TRUE);
-        }
         if (base.getPagination() == null) {
             base.setPagination(new ReportViewSnapshot.Pagination());
-        }
-        if (base.getPagination().getEnabled() == null) {
-            base.getPagination().setEnabled(Boolean.TRUE);
-        }
-        if (base.getPagination().getPageLimit() == null) {
-            base.getPagination().setPageLimit(Integer.valueOf(20));
         }
         if (base.getSummaryEnabled() == null) {
             base.setSummaryEnabled(Boolean.FALSE);
