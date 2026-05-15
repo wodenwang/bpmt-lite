@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class OrmReportViewRepositoryTest {
     @Test
@@ -40,7 +41,7 @@ public class OrmReportViewRepositoryTest {
         RecordingTransactionManager tx = new RecordingTransactionManager();
         TransactionalOrmReportRepository repository = new TransactionalOrmReportRepository(tx);
         ReportViewResponse.WritePlan plan = new ReportViewResponse.WritePlan();
-        plan.getPermissionDeletes().add("report.SALES_REPORT.old.view");
+        plan.getPermissionDeletes().add("report.SALES_REPORT.column.OLD.view");
 
         repository.createViewConfig(url("SALES_REPORT", "rep_list"), new LinkedHashMap<String, Object>(), plan);
 
@@ -48,7 +49,21 @@ public class OrmReportViewRepositoryTest {
         assertEquals(1, tx.commits);
         assertEquals("saveUrl:SALES_REPORT", repository.operations.get(0));
         assertEquals("save:SALES_REPORT", repository.operations.get(1));
-        assertEquals("removePermission:report.SALES_REPORT.old.view", repository.operations.get(2));
+        assertEquals("removePermission:report.SALES_REPORT.column.OLD.view", repository.operations.get(2));
+    }
+
+    @Test
+    public void createViewConfigDoesNotDeleteCustomPermissionKeys() {
+        RecordingTransactionManager tx = new RecordingTransactionManager();
+        TransactionalOrmReportRepository repository = new TransactionalOrmReportRepository(tx);
+        ReportViewResponse.WritePlan plan = new ReportViewResponse.WritePlan();
+        plan.getPermissionDeletes().add("custom.shared.permission");
+
+        repository.createViewConfig(url("SALES_REPORT", "rep_list"), new LinkedHashMap<String, Object>(), plan);
+
+        assertEquals(1, tx.begins);
+        assertEquals(1, tx.commits);
+        assertTrue(!repository.operations.contains("removePermission:custom.shared.permission"));
     }
 
     @Test
@@ -80,6 +95,23 @@ public class OrmReportViewRepositoryTest {
 
         repository.attachExistingPermissions(values);
 
+        assertEquals(existing, values.get("pri"));
+    }
+
+    @Test
+    public void attachExistingPermissionsOnlyConvertsPriStringField() {
+        RecordingTransactionManager tx = new RecordingTransactionManager();
+        TransactionalOrmReportRepository repository = new TransactionalOrmReportRepository(tx);
+        CmPri existing = new CmPri();
+        existing.setPriKey("some.permission.key");
+        repository.existingPermission = existing;
+        Map<String, Object> values = new LinkedHashMap<String, Object>();
+        values.put("busiName", "some.permission.key");
+        values.put("pri", "some.permission.key");
+
+        repository.attachExistingPermissions(values);
+
+        assertEquals("some.permission.key", values.get("busiName"));
         assertEquals(existing, values.get("pri"));
     }
 

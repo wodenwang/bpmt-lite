@@ -127,6 +127,32 @@ public class ReportViewPermissionServiceTest {
         assertTrue(plan.getPermissionDeletes().contains("report.SALES_REPORT.weixin.view"));
     }
 
+    @Test
+    public void removedCustomPermissionIsNotPlannedForDelete() {
+        ReportViewSnapshot oldSnapshot = snapshotWithManagedPermissions("SALES_REPORT");
+        oldSnapshot.getLimits().get(0).setPermissions(permission("custom.shared.permission"));
+        ReportViewSnapshot target = snapshotWithManagedPermissions("SALES_REPORT");
+        target.getLimits().clear();
+
+        ReportViewResponse.WritePlan plan = new ReportViewPermissionService()
+                .apply("SALES_REPORT", oldSnapshot, target);
+
+        assertTrue(!plan.getPermissionDeletes().contains("custom.shared.permission"));
+    }
+
+    @Test
+    public void removedGeneratedPermissionIsStillPlannedForDelete() {
+        ReportViewSnapshot oldSnapshot = snapshotWithManagedPermissions("SALES_REPORT");
+        new ReportViewPermissionService().apply("SALES_REPORT", null, oldSnapshot);
+        ReportViewSnapshot target = snapshotWithManagedPermissions("SALES_REPORT");
+        target.getLimits().clear();
+
+        ReportViewResponse.WritePlan plan = new ReportViewPermissionService()
+                .apply("SALES_REPORT", oldSnapshot, target);
+
+        assertTrue(plan.getPermissionDeletes().contains("report.SALES_REPORT.limit.SELF_DEPT.view"));
+    }
+
     private static ReportViewSnapshot snapshotWithManagedPermissions(String viewKey) {
         ReportViewSnapshot snapshot = Fixtures.reportSnapshot(viewKey);
 

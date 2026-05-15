@@ -101,15 +101,21 @@ class ReportViewPermissionService {
                                            ReportViewResponse.WritePlan plan) {
         Set<String> oldKeys = collectKeys(oldSnapshot);
         Set<String> targetKeys = collectKeys(target);
+        String viewKey = target == null ? null : target.getViewKey();
         for (String key : oldKeys) {
-            if (!targetKeys.contains(key)) {
+            if (!targetKeys.contains(key) && isGeneratedPermissionKey(viewKey, key)) {
                 plan.getPermissionDeletes().add(key);
             }
         }
     }
 
     private void collectDeletes(ReportViewSnapshot oldSnapshot, ReportViewResponse.WritePlan plan) {
-        plan.getPermissionDeletes().addAll(collectKeys(oldSnapshot));
+        String viewKey = oldSnapshot == null ? null : oldSnapshot.getViewKey();
+        for (String key : collectKeys(oldSnapshot)) {
+            if (isGeneratedPermissionKey(viewKey, key)) {
+                plan.getPermissionDeletes().add(key);
+            }
+        }
     }
 
     private Set<String> collectKeys(ReportViewSnapshot snapshot) {
@@ -479,5 +485,24 @@ class ReportViewPermissionService {
                 keys.add(key);
             }
         }
+    }
+
+    static boolean isGeneratedPermissionKey(String viewKey, String key) {
+        if (StringUtils.isBlank(viewKey) || StringUtils.isBlank(key)) {
+            return false;
+        }
+        String prefix = "report." + viewKey + ".";
+        if (!StringUtils.startsWith(key, prefix) || !StringUtils.endsWith(key, ".view")) {
+            return false;
+        }
+        String suffix = key.substring(prefix.length());
+        return "weixin.view".equals(suffix)
+                || StringUtils.startsWith(suffix, "column.")
+                || StringUtils.startsWith(suffix, "line.")
+                || StringUtils.startsWith(suffix, "limit.")
+                || StringUtils.startsWith(suffix, "subview.")
+                || StringUtils.startsWith(suffix, "button.system.")
+                || StringUtils.startsWith(suffix, "button.item.")
+                || StringUtils.startsWith(suffix, "button.summary.");
     }
 }

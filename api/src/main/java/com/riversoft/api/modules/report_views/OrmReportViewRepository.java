@@ -64,7 +64,7 @@ class OrmReportViewRepository implements ReportViewRepository {
             protected void doInTransactionWithoutResult(TransactionStatus status) {
                 saveUrl(url);
                 saveViewConfig(url.getViewKey(), reportMap);
-                removePermissions(plan);
+                removePermissions(url.getViewKey(), plan);
             }
         });
     }
@@ -84,7 +84,7 @@ class OrmReportViewRepository implements ReportViewRepository {
                 updateDynamicEntity("VwReport", reportValues(reportMap));
                 removeAllChildConfig(url.getViewKey());
                 saveChildConfig(reportMap);
-                removePermissions(plan);
+                removePermissions(url.getViewKey(), plan);
             }
         });
     }
@@ -98,7 +98,7 @@ class OrmReportViewRepository implements ReportViewRepository {
             protected void doInTransactionWithoutResult(TransactionStatus status) {
                 updateUrl(url);
                 patchReportConfig(url.getViewKey(), section, reportMap);
-                removePermissions(plan);
+                removePermissions(url.getViewKey(), plan);
             }
         });
     }
@@ -184,6 +184,9 @@ class OrmReportViewRepository implements ReportViewRepository {
 
     protected void attachExistingPermissions(Map<String, Object> values) {
         for (Map.Entry<String, Object> entry : values.entrySet()) {
+            if (!"pri".equals(entry.getKey())) {
+                continue;
+            }
             Object value = entry.getValue();
             if (value instanceof CmPri) {
                 CmPri pri = (CmPri) value;
@@ -306,11 +309,11 @@ class OrmReportViewRepository implements ReportViewRepository {
         return keys;
     }
 
-    private void removePermissions(ReportViewResponse.WritePlan plan) {
+    private void removePermissions(String viewKey, ReportViewResponse.WritePlan plan) {
         if (plan == null || plan.getPermissionDeletes() == null || plan.getPermissionDeletes().isEmpty()) {
             return;
         }
-        removePermissionKeys(plan.getPermissionDeletes());
+        removePermissionKeys(viewKey, plan.getPermissionDeletes());
     }
 
     private void removeViewPermissions(String viewKey, ReportViewResponse.WritePlan plan) {
@@ -325,15 +328,15 @@ class OrmReportViewRepository implements ReportViewRepository {
         if (viewPriKeys != null) {
             priKeys.addAll(viewPriKeys);
         }
-        removePermissionKeys(priKeys);
+        removePermissionKeys(viewKey, priKeys);
     }
 
-    private void removePermissionKeys(Collection<String> priKeys) {
+    private void removePermissionKeys(String viewKey, Collection<String> priKeys) {
         if (priKeys == null || priKeys.isEmpty()) {
             return;
         }
         for (String priKey : priKeys) {
-            if (priKey != null && priKey.trim().length() > 0) {
+            if (ReportViewPermissionService.isGeneratedPermissionKey(viewKey, priKey)) {
                 removePermissionKey(priKey);
             }
         }
