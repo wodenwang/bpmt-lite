@@ -165,6 +165,34 @@ public class ReportViewValidatorTest {
         assertTrue(Fixtures.errorPaths(result).contains("weixin.date"));
     }
 
+    @Test
+    public void rejectsMissingQueryNameAfterDefaultsNormalize() {
+        ReportViewSnapshot snapshot = Fixtures.reportSnapshot("SALES_REPORT");
+        ReportViewSnapshot.Query query = new ReportViewSnapshot.Query();
+        query.setSql(Fixtures.script("and CUSTOMER_NAME = :customerName"));
+        snapshot.getQueries().add(query);
+
+        ReportViewValidationResult result = new ReportViewValidator().validate(snapshot);
+
+        assertFalse(result.isValid());
+        assertTrue(Fixtures.errorPaths(result).contains("queries[0].name"));
+        assertEquals(null, result.getNormalizedSnapshot().getQueries().get(0).getName());
+    }
+
+    @Test
+    public void rejectsMissingPreparedVariableVarAfterDefaultsNormalize() {
+        ReportViewSnapshot snapshot = Fixtures.reportSnapshot("SALES_REPORT");
+        ReportViewSnapshot.PreparedVariable variable = new ReportViewSnapshot.PreparedVariable();
+        variable.setExec(Fixtures.script("return vo.ID;"));
+        snapshot.getVariables().getPrepared().add(variable);
+
+        ReportViewValidationResult result = new ReportViewValidator().validate(snapshot);
+
+        assertFalse(result.isValid());
+        assertTrue(Fixtures.errorPaths(result).contains("variables.prepared[0].var"));
+        assertEquals(null, result.getNormalizedSnapshot().getVariables().getPrepared().get(0).getVar());
+    }
+
     private void assertInvalidScriptPath(ReportViewSnapshot snapshot, String path) {
         ReportViewValidationResult result = new ReportViewValidator().validate(snapshot);
 

@@ -35,7 +35,6 @@ public class ReportViewDefaults {
         }
         normalizeBase(normalized.getBase());
         normalizeColumns(normalized.getColumns());
-        normalizeQueries(normalized);
         normalizeLimits(normalized);
         normalizeVariables(normalized.getVariables());
         normalizeSubviews(normalized.getSubviews());
@@ -95,15 +94,6 @@ public class ReportViewDefaults {
         }
     }
 
-    private void normalizeQueries(ReportViewSnapshot snapshot) {
-        for (int i = 0; i < snapshot.getQueries().size(); i++) {
-            ReportViewSnapshot.Query query = snapshot.getQueries().get(i);
-            if (query != null && StringUtils.isBlank(query.getName())) {
-                query.setName("query-" + (i + 1));
-            }
-        }
-    }
-
     private void normalizeLimits(ReportViewSnapshot snapshot) {
         for (int i = 0; i < snapshot.getLimits().size(); i++) {
             ReportViewSnapshot.Limit limit = snapshot.getLimits().get(i);
@@ -116,12 +106,6 @@ public class ReportViewDefaults {
     private void normalizeVariables(ReportViewSnapshot.Variables variables) {
         if (variables.getPrepared() == null) {
             variables.setPrepared(new ArrayList<ReportViewSnapshot.PreparedVariable>());
-        }
-        for (int i = 0; i < variables.getPrepared().size(); i++) {
-            ReportViewSnapshot.PreparedVariable variable = variables.getPrepared().get(i);
-            if (variable != null && StringUtils.isBlank(variable.getVar())) {
-                variable.setVar("preparedVariable" + (i + 1));
-            }
         }
     }
 
