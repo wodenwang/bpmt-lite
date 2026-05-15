@@ -114,6 +114,10 @@ public class ApiDocsContractTest {
         assertTrue(root.path("components").path("schemas").has("ReportViewSnapshot"));
         assertTrue(root.path("components").path("schemas").has("ReportViewWritePlan"));
         assertTrue(root.path("components").path("schemas").has("ReportViewValidationResult"));
+        assertArrayDoesNotContain(root.path("components").path("schemas").path("ReportViewSnapshot").path("required"),
+                "viewKey");
+        assertTrue(root.path("components").path("schemas").path("ReportViewSnapshot")
+                .path("properties").path("viewKey").path("description").asText().contains("可选"));
     }
 
     @Test
@@ -240,6 +244,15 @@ public class ApiDocsContractTest {
             }
         }
         fail("Missing array value " + value);
+    }
+
+    private void assertArrayDoesNotContain(JsonNode array, String value) {
+        assertTrue("Expected array for " + value, array.isArray());
+        for (JsonNode item : array) {
+            if (value.equals(item.asText())) {
+                fail("Unexpected array value " + value);
+            }
+        }
     }
 
     private void assertArrayContains(String[] array, String value) {

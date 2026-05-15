@@ -2463,15 +2463,15 @@
       "ReportViewSnapshot": {
         "type": "object",
         "required": [
-          "viewKey",
           "base"
         ],
-        "description": "完整 rep_list 报表视图快照。管理 VW_URL 与 VW_REPORT* 配置，不执行 SQL、按钮动作或客户端脚本。导出的 GET 快照可作为 PUT baseline。",
+        "description": "完整 rep_list 报表视图快照。管理 VW_URL 与 VW_REPORT* 配置，不执行 SQL、按钮动作或客户端脚本。viewKey 是可选稳定 key；创建时可省略，由服务端生成，validate 按上下文做条件校验。导出的 GET 快照可作为 PUT baseline。",
         "properties": {
           "viewKey": {
             "type": "string",
             "pattern": "^[A-Za-z][A-Za-z0-9_-]*$",
-            "example": "SALES_REPORT"
+            "example": "SALES_REPORT",
+            "description": "可选稳定 key，对应 /{viewKey}.view。创建时可省略，由服务端生成；替换、局部替换、删除仍以 path 中的 viewKey 为准。"
           },
           "description": {
             "type": "string",
