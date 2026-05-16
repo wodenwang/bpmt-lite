@@ -762,7 +762,7 @@ v1.7.1 文档见：
 
 ## v1.7.2 GitHub issue bugfix 状态
 
-截至 2026-05-16，v1.7.2 已进入本地修复和验证阶段，目标是先处理 GitHub issue 上的已知 bug。
+截至 2026-05-16，v1.7.2 已完成发布收口，目标是先处理 GitHub issue 上的已知 bug。
 
 修复范围：
 
@@ -774,6 +774,12 @@ v1.7.1 文档见：
 版本边界：
 
 - Maven 项目版本、默认 Web/API 镜像 tag、安装脚本默认 release tag 和 README 当前版本已切到 `1.7.2`。
+- Git tag：`v1.7.2`。
+- GitHub Release：`https://github.com/wodenwang/bpmt-lite/releases/tag/v1.7.2`。
+- `ghcr.io/wodenwang/bpmt-lite:1.7.2` 已推送，manifest digest 为 `sha256:2568da6d7531dab48b96ce81c06195be7f90a8dac5e3af4b2da7b15bd21c2976`，包含 `linux/amd64` 和 `linux/arm64`。
+- `ghcr.io/wodenwang/bpmt-lite-api:1.7.2` 已推送，manifest digest 为 `sha256:831812d553f66799559d993ab3c301e37e14e8657d10d9be1a8b7172fca8b51a`，包含 `linux/amd64` 和 `linux/arm64`。
+- 两个 `latest` tag 已同步到 `1.7.2` manifest digest。
+- 用户本地 Docker 环境已使用 `1.7.2` Web/API 镜像验收通过。
 - API 不新增路径，不改变认证模型，不改变 OAuth、HTTPS、H5 或 Docker 第三方容器策略。
 - 发布说明和 API 快照归档到 `docs/release-v1.7.2.md`、`docs/v1.7.2/api-reference.md` 和 `docs/v1.7.2/openapi.json`。
 

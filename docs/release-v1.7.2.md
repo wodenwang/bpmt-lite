@@ -32,6 +32,19 @@
 - [x] `mvn -s settings.local.xml -pl platform -am -DskipTests package`
 - [x] `unzip -p platform/target/platform-1.7.2.war META-INF/MANIFEST.MF`
 - [x] `scripts/verify-repo.sh`
+- [x] 用户本地 Docker 环境验收通过。
+- [x] `scripts/build-multiarch-images.sh`
+- [x] `docker buildx imagetools inspect ghcr.io/wodenwang/bpmt-lite:1.7.2`
+- [x] `docker buildx imagetools inspect ghcr.io/wodenwang/bpmt-lite-api:1.7.2`
+
+## 发布结果
+
+- Maven 项目版本已切到 `1.7.2`。
+- 默认 Web/API 镜像 tag、安装脚本默认 release tag 和 README 当前版本已切到 `1.7.2`。
+- `ghcr.io/wodenwang/bpmt-lite:1.7.2` 已推送，manifest digest 为 `sha256:2568da6d7531dab48b96ce81c06195be7f90a8dac5e3af4b2da7b15bd21c2976`，包含 `linux/amd64` 和 `linux/arm64`。
+- `ghcr.io/wodenwang/bpmt-lite-api:1.7.2` 已推送，manifest digest 为 `sha256:831812d553f66799559d993ab3c301e37e14e8657d10d9be1a8b7172fca8b51a`，包含 `linux/amd64` 和 `linux/arm64`。
+- 两个 `latest` tag 已同步到 `1.7.2` manifest digest。
+- 用户本地 Docker 环境已使用 `1.7.2` Web/API 镜像验收通过。
 
 ## 发布边界
 
