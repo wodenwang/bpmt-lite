@@ -1,6 +1,7 @@
 package com.riversoft.api.modules.dynamic_table_views;
 
 import com.riversoft.api.http.ApiException;
+import com.riversoft.core.db.ORMService;
 import com.riversoft.platform.po.CmPri;
 import com.riversoft.platform.po.VwUrl;
 import org.junit.Test;
@@ -306,6 +307,17 @@ public class DynamicTableViewServiceTest {
         assertTrue(repository.savedValues.get("pri") == existing);
     }
 
+    @Test
+    public void flushAndClearViewCacheEvictsDynamicViewRegions() {
+        TransactionalOrmRepository repository = new TransactionalOrmRepository(new RecordingTransactionManager());
+
+        repository.flushAndClearViewCache("CRM_CUSTOMER_VIEW");
+
+        assertTrue(repository.operations.contains("flush"));
+        assertTrue(repository.operations.contains("clear"));
+        assertTrue(repository.operations.contains("evictViewCacheRegions"));
+    }
+
     private DynamicTableViewSnapshot snapshot(String viewKey) {
         DynamicTableViewSnapshot snapshot = new DynamicTableViewSnapshot();
         snapshot.setViewKey(viewKey);
@@ -519,6 +531,7 @@ public class DynamicTableViewServiceTest {
         private final PlatformTransactionManager transactionManager;
         private final List<String> operations = new ArrayList<String>();
         private final Map<String, Object> savedValues = new LinkedHashMap<String, Object>();
+        private final ORMService ormService = new RecordingOrmService(operations);
         private CmPri existingPermission;
         private boolean failSave;
 
@@ -529,6 +542,16 @@ public class DynamicTableViewServiceTest {
         @Override
         protected PlatformTransactionManager transactionManager() {
             return transactionManager;
+        }
+
+        @Override
+        protected ORMService ormService() {
+            return ormService;
+        }
+
+        @Override
+        protected void evictViewCacheRegions(ORMService service) {
+            operations.add("evictViewCacheRegions");
         }
 
         @Override
@@ -598,6 +621,24 @@ public class DynamicTableViewServiceTest {
                 return existingPermission;
             }
             return null;
+        }
+    }
+
+    private static class RecordingOrmService extends ORMService {
+        private final List<String> operations;
+
+        private RecordingOrmService(List<String> operations) {
+            this.operations = operations;
+        }
+
+        @Override
+        public void flush() {
+            operations.add("flush");
+        }
+
+        @Override
+        public void clear() {
+            operations.add("clear");
         }
     }
 

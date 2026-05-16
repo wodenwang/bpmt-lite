@@ -1,5 +1,6 @@
 package com.riversoft.api.modules.report_views;
 
+import com.riversoft.core.db.ORMService;
 import com.riversoft.platform.po.CmPri;
 import com.riversoft.platform.po.VwUrl;
 import org.junit.Test;
@@ -115,6 +116,17 @@ public class OrmReportViewRepositoryTest {
         assertEquals(existing, values.get("pri"));
     }
 
+    @Test
+    public void flushAndClearViewCacheEvictsReportViewRegions() {
+        TransactionalOrmReportRepository repository = new TransactionalOrmReportRepository(new RecordingTransactionManager());
+
+        repository.flushAndClearViewCache("SALES_REPORT");
+
+        assertTrue(repository.operations.contains("flush"));
+        assertTrue(repository.operations.contains("clear"));
+        assertTrue(repository.operations.contains("evictReportViewCacheRegions"));
+    }
+
     private static VwUrl url(String viewKey, String viewClass) {
         VwUrl url = new VwUrl();
         url.setViewKey(viewKey);
@@ -127,6 +139,7 @@ public class OrmReportViewRepositoryTest {
     private static class TransactionalOrmReportRepository extends OrmReportViewRepository {
         private final PlatformTransactionManager transactionManager;
         private final List<String> operations = new ArrayList<String>();
+        private final ORMService ormService = new RecordingOrmService(operations);
         private CmPri existingPermission;
 
         private TransactionalOrmReportRepository(PlatformTransactionManager transactionManager) {
@@ -136,6 +149,16 @@ public class OrmReportViewRepositoryTest {
         @Override
         protected PlatformTransactionManager transactionManager() {
             return transactionManager;
+        }
+
+        @Override
+        protected ORMService ormService() {
+            return ormService;
+        }
+
+        @Override
+        protected void evictViewCacheRegions(ORMService service) {
+            operations.add("evictReportViewCacheRegions");
         }
 
         @Override
@@ -190,6 +213,24 @@ public class OrmReportViewRepositoryTest {
                 return existingPermission;
             }
             return null;
+        }
+    }
+
+    private static class RecordingOrmService extends ORMService {
+        private final List<String> operations;
+
+        private RecordingOrmService(List<String> operations) {
+            this.operations = operations;
+        }
+
+        @Override
+        public void flush() {
+            operations.add("flush");
+        }
+
+        @Override
+        public void clear() {
+            operations.add("clear");
         }
     }
 

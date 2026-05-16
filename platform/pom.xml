@@ -3,7 +3,7 @@
   <parent>
     <artifactId>parent</artifactId>
     <groupId>com.riversoft</groupId>
-    <version>1.7.1</version>
+    <version>1.7.2</version>
     <relativePath>../parent/</relativePath>
   </parent>
   <artifactId>platform</artifactId>
@@ -552,6 +552,10 @@
               <archiveClasses>true</archiveClasses>
               <attachClasses>true</attachClasses>
               <archive>
+                <manifest>
+                  <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                  <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                </manifest>
                 <manifestEntries>
                   <X-River-Artifact>${project.artifactId}</X-River-Artifact>
                   <X-River-Build-Order>${BuildOrder}</X-River-Build-Order>
@@ -571,6 +575,10 @@
               <classifier>lightly</classifier>
               <archiveClasses>true</archiveClasses>
               <archive>
+                <manifest>
+                  <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                  <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                </manifest>
                 <manifestEntries>
                   <X-River-Artifact>${project.artifactId}</X-River-Artifact>
                   <X-River-Build-Order>${BuildOrder}</X-River-Build-Order>

@@ -187,8 +187,39 @@ class OrmDynamicTableViewRepository implements DynamicTableViewRepository {
     }
 
     public void flushAndClearViewCache(String viewKey) {
-        ORMService.getInstance().flush();
-        ORMService.getInstance().clear();
+        ORMService service = ormService();
+        service.flush();
+        service.clear();
+        evictViewCacheRegions(service);
+    }
+
+    protected ORMService ormService() {
+        return ORMService.getInstance();
+    }
+
+    protected void evictViewCacheRegions(ORMService service) {
+        service.evictEntityRegions(
+                VwUrl.class.getName(),
+                "VwDynTable",
+                "VwDynColumn",
+                "VwDynColumnForm",
+                "VwDynColumnShow",
+                "VwDynColumnLine",
+                "VwDynQuery",
+                "VwDynQueryExt",
+                "VwDynLimit",
+                "VwDynExecBefore",
+                "VwDynExecAfter",
+                "VwDynExecPrepare",
+                "VwDynParent",
+                "VwDynParentForeign",
+                "VwDynSubSys",
+                "VwDynSubView",
+                "VwDynBtnSys",
+                "VwDynBtnItem",
+                "VwDynBtnSummary",
+                "VwDynWeixin");
+        service.evictQueryRegions();
     }
 
     private List<Map<String, Object>> toColumnDefinitions(Set<TbColumn> columns) {

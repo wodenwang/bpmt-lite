@@ -29,9 +29,10 @@
 - `v1.6.1` 是基于 `v1.6.0` 增强微信生态第三方 OAuth 登录态传导的补丁版本。
 - `v1.6.2` 是修复第三方系统管理界面和 OAuth 无权限提示，并新增安装/升级脚本的补丁版本。
 - `v1.7.0` 是动态表视图配置 API 发布版本，开放 `/{viewKey}.view` 对应的 dyn 视图完整配置管理能力。
-- `v1.7.1` 是当前版本，基于 `v1.7.0` 新增报表视图配置 API，开放 `rep_list` 对应的 `/{viewKey}.view` 配置管理能力。
-- 默认 Web 镜像：`ghcr.io/wodenwang/bpmt-lite:1.7.1`
-- 默认 API 镜像：`ghcr.io/wodenwang/bpmt-lite-api:1.7.1`
+- `v1.7.1` 是基于 `v1.7.0` 新增报表视图配置 API，开放 `rep_list` 对应的 `/{viewKey}.view` 配置管理能力。
+- `v1.7.2` 是当前版本，基于 GitHub issue 修复报表视图创建、视图缓存、版本显示和数据库操作 save 显式主键写入问题。
+- 默认 Web 镜像：`ghcr.io/wodenwang/bpmt-lite:1.7.2`
+- 默认 API 镜像：`ghcr.io/wodenwang/bpmt-lite-api:1.7.2`
 - 同步镜像 tag：发布后同步到 `ghcr.io/wodenwang/bpmt-lite:latest` 和 `ghcr.io/wodenwang/bpmt-lite-api:latest`
 - 默认访问地址：`http://127.0.0.1/`
 - HTTPS 访问地址：`https://127.0.0.1/`，需要 `BPMT_HTTPS_ENABLED=1`
@@ -61,6 +62,7 @@
 - v1.6.2 开发和验收期间的 source-of-truth 顺序是：`AGENTS.md` -> `docs/superpowers/specs/2026-05-06-bpmt-lite-v1.6.2-install-upgrade-readme-issues-design.md` -> `docs/superpowers/plans/2026-05-06-bpmt-lite-v1.6.2-install-upgrade-readme-issues.md` -> `docs/release-v1.6.2.md` -> `README.md` -> implementation。
 - v1.7.0 动态表视图 API 开发和验收期间的 source-of-truth 顺序是：`AGENTS.md` -> `docs/superpowers/specs/2026-05-10-bpmt-lite-v1.7.0-dynamic-table-view-api-design.md` -> `docs/superpowers/plans/2026-05-10-bpmt-lite-v1.7.0-dynamic-table-view-api.md` -> `docs/v1.7.0/*` -> `docs/release-v1.7.0.md` -> `README.md` -> implementation。
 - v1.7.1 报表视图 API 开发和验收期间的 source-of-truth 顺序是：`AGENTS.md` -> `docs/superpowers/specs/2026-05-15-bpmt-lite-v1.7.1-report-view-api-design.md` -> `docs/superpowers/plans/2026-05-15-bpmt-lite-v1.7.1-report-view-api.md` -> `docs/v1.7.1/*` -> `docs/release-v1.7.1.md` -> `README.md` -> implementation。
+- v1.7.2 GitHub issue bugfix 开发和验收期间的 source-of-truth 顺序是：`AGENTS.md` -> `docs/superpowers/plans/2026-05-16-bpmt-lite-v1.7.2-github-issue-bugfixes.md` -> `docs/release-v1.7.2.md` -> `README.md` -> implementation。
 
 ## 已验证的本地编译基线
 
@@ -242,7 +244,7 @@ docker compose up -d
 - 报表视图 API 不执行 `mainSql`、查询 SQL、约束 SQL、PK SQL、按钮动作或客户端脚本；文档和响应必须保留风险提示。
 - 报表视图 API 的风险提示至少覆盖 `SQL_SCRIPT_PRESENT`、`CLIENT_SCRIPT_PRESENT`、`BUTTON_ACTION_PRESENT`、`EXTERNAL_DB_KEY_PRESENT` 和 `UNEXECUTED_SQL_SEMANTICS`。
 - v1.7.1 报表视图 API 只支持 `base`、`columns`、`queries`、`limits`、`variables`、`subviews`、`buttons`、`weixin`、`scripts` 这几类 section patch，不新增 `/sections/{section}` 或单项级 patch 路径。
-- 每次调整报表视图 API 都必须同步更新 `api/src/main/webapp/openapi.json`、`api/src/main/webapp/docs/index.html`、`docs/v1.7.1/api-reference.md` 和 `docs/v1.7.1/openapi.json`。
+- 每次调整报表视图 API 都必须同步更新 `api/src/main/webapp/openapi.json`、`api/src/main/webapp/docs/index.html`、当前版本 `docs/v*/api-reference.md` 和 `docs/v*/openapi.json`。
 
 ## v1.5.0 OAuth 开发规则
 
@@ -757,6 +759,30 @@ v1.7.1 文档见：
 - `docs/v1.7.1/api-reference.md`
 - `docs/v1.7.1/openapi.json`
 - `docs/release-v1.7.1.md`
+
+## v1.7.2 GitHub issue bugfix 状态
+
+截至 2026-05-16，v1.7.2 已进入本地修复和验证阶段，目标是先处理 GitHub issue 上的已知 bug。
+
+修复范围：
+
+- issue #17：报表视图 API 创建时 `validate`、`dryRun` 通过但实际写入 500。
+- issue #15：动态表视图和报表视图配置写入后未清理运行时视图缓存。
+- issue #14：控制面板注册信息没有显示实际 bpmt-lite 版本。
+- 同步修复数据库操作 `save` 显式主键 insert 无自增 key 时的 500 回归。
+
+版本边界：
+
+- Maven 项目版本、默认 Web/API 镜像 tag、安装脚本默认 release tag 和 README 当前版本已切到 `1.7.2`。
+- API 不新增路径，不改变认证模型，不改变 OAuth、HTTPS、H5 或 Docker 第三方容器策略。
+- 发布说明和 API 快照归档到 `docs/release-v1.7.2.md`、`docs/v1.7.2/api-reference.md` 和 `docs/v1.7.2/openapi.json`。
+
+v1.7.2 文档见：
+
+- `docs/superpowers/plans/2026-05-16-bpmt-lite-v1.7.2-github-issue-bugfixes.md`
+- `docs/v1.7.2/api-reference.md`
+- `docs/v1.7.2/openapi.json`
+- `docs/release-v1.7.2.md`
 
 ## 线上测试环境交接
 

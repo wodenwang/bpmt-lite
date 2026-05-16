@@ -23,6 +23,7 @@ public class ReportViewMapperTest {
 
         assertEquals("SALES_REPORT", map.get("viewKey"));
         assertEquals("销售报表", map.get("busiName"));
+        assertEquals(Integer.valueOf(0), map.get("sort"));
         assertEquals(Integer.valueOf(1), map.get("mainSqlType"));
         assertEquals("select * from SALE_ORDER where 1=1", map.get("mainSqlScript"));
         assertEquals(Integer.valueOf(1), map.get("pkType"));

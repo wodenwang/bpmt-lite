@@ -195,6 +195,24 @@ public final class Platform {
 		return instance.version;
 	}
 
+	static String resolvePlatformVersion(Attributes mainAttribs) {
+		if (mainAttribs != null) {
+			String version = mainAttribs.getValue("Implementation-Version");
+			if (StringUtils.isNotBlank(version)) {
+				return version;
+			}
+		}
+		String version = System.getProperty("bpmt.version");
+		if (StringUtils.isNotBlank(version)) {
+			return version;
+		}
+		version = System.getenv("BPMT_VERSION");
+		if (StringUtils.isNotBlank(version)) {
+			return version;
+		}
+		return "snapshot";
+	}
+
 	/**
 	 * 初始化
 	 * 
@@ -359,6 +377,7 @@ public final class Platform {
 								name = mainAttribs.getValue("X-River-Artifact");
 								// 平台的版本
 								if ("platform".equalsIgnoreCase(name)) {
+									version = resolvePlatformVersion(mainAttribs);
 									logger.info("平台版本:" + version);
 									this.version = version;
 								}

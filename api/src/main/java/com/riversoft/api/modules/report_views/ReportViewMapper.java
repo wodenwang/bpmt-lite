@@ -42,6 +42,7 @@ class ReportViewMapper {
         Map<String, Object> map = new LinkedHashMap<String, Object>();
         map.put("viewKey", snapshot.getViewKey());
         map.put("busiName", base == null ? null : base.getDisplayName());
+        map.put("sort", Integer.valueOf(0));
         map.put("dbKey", base == null ? null : base.getDbKey());
         putScript(map, "mainSqlType", "mainSqlScript", base == null ? null : base.getMainSql());
         putPrimaryKey(map, base == null ? null : base.getPrimaryKey());

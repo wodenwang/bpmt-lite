@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.Cache;
 import org.hibernate.Hibernate;
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Query;
@@ -1062,5 +1064,24 @@ public class ORMService {
 	 */
 	public void clear() {
 		sessionFactory.getCurrentSession().clear();
+	}
+
+	public void evictEntityRegions(String... entityNames) {
+		Cache cache = sessionFactory.getCache();
+		if (cache == null || entityNames == null) {
+			return;
+		}
+		for (String entityName : entityNames) {
+			if (StringUtils.isNotBlank(entityName)) {
+				cache.evictEntityRegion(entityName);
+			}
+		}
+	}
+
+	public void evictQueryRegions() {
+		Cache cache = sessionFactory.getCache();
+		if (cache != null) {
+			cache.evictQueryRegions();
+		}
 	}
 }

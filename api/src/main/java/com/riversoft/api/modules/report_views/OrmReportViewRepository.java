@@ -146,8 +146,31 @@ class OrmReportViewRepository implements ReportViewRepository {
     }
 
     public void flushAndClearViewCache(String viewKey) {
-        ORMService.getInstance().flush();
-        ORMService.getInstance().clear();
+        ORMService service = ormService();
+        service.flush();
+        service.clear();
+        evictViewCacheRegions(service);
+    }
+
+    protected ORMService ormService() {
+        return ORMService.getInstance();
+    }
+
+    protected void evictViewCacheRegions(ORMService service) {
+        service.evictEntityRegions(
+                VwUrl.class.getName(),
+                "VwReport",
+                "VwReportColumnShow",
+                "VwReportColumnLine",
+                "VwReportQuery",
+                "VwReportLimit",
+                "VwReportExecPrepare",
+                "VwReportSubView",
+                "VwReportBtnSys",
+                "VwReportBtnItem",
+                "VwReportBtnSummary",
+                "VwReportWeixin");
+        service.evictQueryRegions();
     }
 
     @SuppressWarnings("unchecked")

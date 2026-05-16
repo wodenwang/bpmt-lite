@@ -269,8 +269,13 @@ public class JdbcService {
 				return ps;
 			}
 		}, keyHolder);
-		logger.debug("自动流水号:" + keyHolder.getKey().intValue());
-		return keyHolder.getKey().longValue();
+		Number key = keyHolder.getKey();
+		if (key == null) {
+			logger.debug("新增SQL未返回自动流水号.");
+			return null;
+		}
+		logger.debug("自动流水号:" + key.longValue());
+		return key.longValue();
 	}
 
 	/**
