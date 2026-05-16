@@ -135,6 +135,26 @@ public class OAuthActionTest {
     }
 
     @Test
+    public void authorizeWechatBpmtLoginErrorShowsBpmtErrorPageTitle() {
+        TestOAuthAction action = new TestOAuthAction();
+        action.loggedIn = false;
+        action.wechatResult = OAuthWechatLoginResult.error("bpmt_login_paused",
+                "微信授权已成功，但 BPMT 当前处于维护/暂停模式，用户[woden]无法建立登录态。请管理员检查 safe.role 或 safe.admin 配置。");
+        MockHttpServletRequest request = authorizeRequest();
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        action.authorize(request, response);
+
+        assertEquals("/xhtml/oauth/error.jsp", action.forwardedPage);
+        assertEquals("OAuth BPMT 登录失败", request.getAttribute("oauthErrorTitle"));
+        assertEquals("微信授权已成功，但 BPMT 当前处于维护/暂停模式，用户[woden]无法建立登录态。请管理员检查 safe.role 或 safe.admin 配置。",
+                request.getAttribute("oauthErrorMessage"));
+        assertEquals("request-a", request.getAttribute("requestId"));
+        assertNull(action.loginTarget);
+        assertNull(response.getRedirectedUrl());
+    }
+
+    @Test
     public void authorizeWechatSkipFallsBackToNormalLogin() {
         TestOAuthAction action = new TestOAuthAction();
         action.loggedIn = false;

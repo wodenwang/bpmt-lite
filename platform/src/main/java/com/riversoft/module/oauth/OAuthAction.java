@@ -60,7 +60,7 @@ public class OAuthAction {
             if (wechat != null && OAuthWechatLoginStatus.ERROR.equals(wechat.getStatus())) {
                 logger.info("OAuth authorize WeChat login failed. requestId={} clientId={} result={} reason={}",
                         requestId, clientId, "deny", wechat.getReason());
-                showBrowserError(request, response, "OAuth 微信登录失败", wechat.getMessage(), requestId);
+                showBrowserError(request, response, wechatErrorTitle(wechat), wechat.getMessage(), requestId);
                 return;
             }
             if (wechat != null && OAuthWechatLoginStatus.LOGGED_IN.equals(wechat.getStatus())) {
@@ -341,6 +341,14 @@ public class OAuthAction {
         request.setAttribute("oauthErrorMessage", message);
         request.setAttribute("requestId", requestId);
         forwardErrorPage(request, response);
+    }
+
+    private String wechatErrorTitle(OAuthWechatLoginResult wechat) {
+        String reason = wechat == null ? null : wechat.getReason();
+        if (StringUtils.startsWith(reason, "bpmt_")) {
+            return "OAuth BPMT 登录失败";
+        }
+        return "OAuth 微信登录失败";
     }
 
     @SuppressWarnings("unchecked")

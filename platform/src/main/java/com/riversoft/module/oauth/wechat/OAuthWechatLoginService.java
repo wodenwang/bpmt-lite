@@ -78,6 +78,8 @@ public class OAuthWechatLoginService {
             return OAuthWechatLoginResult.loggedIn(userId);
         } catch (OAuthWechatConfigException e) {
             return error(thirdpart, wechatType, wechatKey, null, "wechat_config_invalid", e.getMessage());
+        } catch (OAuthWechatLoginException e) {
+            return error(thirdpart, wechatType, wechatKey, e.getUserId(), e.getReason(), e.getSafeMessage());
         } catch (RuntimeException e) {
             return error(thirdpart, wechatType, wechatKey, null, "wechat_login_failed", "微信登录失败.");
         }

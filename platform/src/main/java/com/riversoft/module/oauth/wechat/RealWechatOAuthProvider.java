@@ -44,8 +44,13 @@ public class RealWechatOAuthProvider implements WechatOAuthProvider {
         if (ThirdpartService.WECHAT_TYPE_AGENT.equals(wechatType)) {
             AgentOAuthConfig agentConfig = loadAgentConfig(wechatKey);
             QyUser qyUser = QyOAuth2s.with(agentConfig.toCorpSetting()).userInfo(code);
-            SessionManager.doUserLogin(request, qyUser.getUserId());
-            return qyUser.getUserId();
+            String userId = qyUser.getUserId();
+            try {
+                SessionManager.doUserLogin(request, userId);
+            } catch (RuntimeException e) {
+                throw OAuthWechatLoginFailureClassifier.classify(userId, e);
+            }
+            return userId;
         }
         if (ThirdpartService.WECHAT_TYPE_MP.equals(wechatType)) {
             loadMpConfig(wechatKey);

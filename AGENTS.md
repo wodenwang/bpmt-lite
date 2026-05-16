@@ -30,9 +30,10 @@
 - `v1.6.2` 是修复第三方系统管理界面和 OAuth 无权限提示，并新增安装/升级脚本的补丁版本。
 - `v1.7.0` 是动态表视图配置 API 发布版本，开放 `/{viewKey}.view` 对应的 dyn 视图完整配置管理能力。
 - `v1.7.1` 是基于 `v1.7.0` 新增报表视图配置 API，开放 `rep_list` 对应的 `/{viewKey}.view` 配置管理能力。
-- `v1.7.2` 是当前版本，基于 GitHub issue 修复报表视图创建、视图缓存、版本显示和数据库操作 save 显式主键写入问题。
-- 默认 Web 镜像：`ghcr.io/wodenwang/bpmt-lite:1.7.2`
-- 默认 API 镜像：`ghcr.io/wodenwang/bpmt-lite-api:1.7.2`
+- `v1.7.2` 是基于 `v1.7.1` 修复报表视图创建、视图缓存、版本显示和数据库操作 save 显式主键写入问题的补丁版本。
+- `v1.7.3` 是当前版本，基于 `v1.7.2` 修复 OAuth 微信登录失败页提示和 `/api/openapi.json` 文档风格问题。
+- 默认 Web 镜像：`ghcr.io/wodenwang/bpmt-lite:1.7.3`
+- 默认 API 镜像：`ghcr.io/wodenwang/bpmt-lite-api:1.7.3`
 - 同步镜像 tag：发布后同步到 `ghcr.io/wodenwang/bpmt-lite:latest` 和 `ghcr.io/wodenwang/bpmt-lite-api:latest`
 - 默认访问地址：`http://127.0.0.1/`
 - HTTPS 访问地址：`https://127.0.0.1/`，需要 `BPMT_HTTPS_ENABLED=1`
@@ -63,6 +64,7 @@
 - v1.7.0 动态表视图 API 开发和验收期间的 source-of-truth 顺序是：`AGENTS.md` -> `docs/superpowers/specs/2026-05-10-bpmt-lite-v1.7.0-dynamic-table-view-api-design.md` -> `docs/superpowers/plans/2026-05-10-bpmt-lite-v1.7.0-dynamic-table-view-api.md` -> `docs/v1.7.0/*` -> `docs/release-v1.7.0.md` -> `README.md` -> implementation。
 - v1.7.1 报表视图 API 开发和验收期间的 source-of-truth 顺序是：`AGENTS.md` -> `docs/superpowers/specs/2026-05-15-bpmt-lite-v1.7.1-report-view-api-design.md` -> `docs/superpowers/plans/2026-05-15-bpmt-lite-v1.7.1-report-view-api.md` -> `docs/v1.7.1/*` -> `docs/release-v1.7.1.md` -> `README.md` -> implementation。
 - v1.7.2 GitHub issue bugfix 开发和验收期间的 source-of-truth 顺序是：`AGENTS.md` -> `docs/superpowers/plans/2026-05-16-bpmt-lite-v1.7.2-github-issue-bugfixes.md` -> `docs/release-v1.7.2.md` -> `README.md` -> implementation。
+- v1.7.3 GitHub issue bugfix 开发和验收期间的 source-of-truth 顺序是：`AGENTS.md` -> `docs/superpowers/plans/2026-05-16-bpmt-lite-v1.7.3-github-issue-bugfixes.md` -> `docs/release-v1.7.3.md` -> `README.md` -> implementation。
 
 ## 已验证的本地编译基线
 
@@ -789,6 +791,35 @@ v1.7.2 文档见：
 - `docs/v1.7.2/api-reference.md`
 - `docs/v1.7.2/openapi.json`
 - `docs/release-v1.7.2.md`
+
+## v1.7.3 GitHub issue bugfix 状态
+
+截至 2026-05-16，v1.7.3 已完成发布收口，目标是修复 OAuth 微信登录失败页提示和 OpenAPI 文档风格问题。
+
+修复范围：
+
+- issue #18：企业微信授权成功但 BPMT 本地登录态建立失败时，错误页需要展示更清晰的 BPMT 侧失败原因。
+- issue #19：`/api/openapi.json` 的 `info.description` 和报表视图接口 summary 前后风格不一致，需要统一中文文档风格。
+
+版本边界：
+
+- 不新增 API 路径，不改变 HMAC 签名规则。
+- 不改变 OAuth 主流程，只增强微信授权后 BPMT 登录态建立失败的错误分类和页面标题。
+- 不改变数据库初始化结构、Docker Compose 拓扑或第三方容器版本策略。
+- Maven 项目版本、默认 Web/API 镜像 tag、安装脚本默认 release tag 和 README 当前版本已切到 `1.7.3`。
+- Git tag：`v1.7.3`。
+- GitHub Release：`https://github.com/wodenwang/bpmt-lite/releases/tag/v1.7.3`。
+- `ghcr.io/wodenwang/bpmt-lite:1.7.3` 已推送，manifest digest 为 `sha256:b3dd5635108a892a963d9cfddcb6b310cd20db31e7d0a34e9365f142101877e5`，包含 `linux/amd64` 和 `linux/arm64`。
+- `ghcr.io/wodenwang/bpmt-lite-api:1.7.3` 已推送，manifest digest 为 `sha256:001ecf794f1d819ea44a984df5d12bdec910ce3d72ebf6fb0b40dad4518c0845`，包含 `linux/amd64` 和 `linux/arm64`。
+- 两个 `latest` tag 已同步到 `1.7.3` manifest digest。
+- 发布说明、计划和 API 快照归档到 `docs/release-v1.7.3.md`、`docs/superpowers/plans/2026-05-16-bpmt-lite-v1.7.3-github-issue-bugfixes.md`、`docs/v1.7.3/api-reference.md` 和 `docs/v1.7.3/openapi.json`。
+
+v1.7.3 文档见：
+
+- `docs/superpowers/plans/2026-05-16-bpmt-lite-v1.7.3-github-issue-bugfixes.md`
+- `docs/v1.7.3/api-reference.md`
+- `docs/v1.7.3/openapi.json`
+- `docs/release-v1.7.3.md`
 
 ## 线上测试环境交接
 

@@ -299,6 +299,84 @@ public class OAuthWechatLoginServiceTest {
     }
 
     @Test
+    public void classifiesBpmtPauseDuringWechatLogin() {
+        OAuthWechatLoginException failure = OAuthWechatLoginFailureClassifier.classify("woden",
+                new RuntimeException("系统维护中,暂停用户登陆."));
+
+        assertEquals("bpmt_login_paused", failure.getReason());
+        assertEquals("woden", failure.getUserId());
+        assertEquals("微信授权已成功，但 BPMT 当前处于维护/暂停模式，用户[woden]无法建立登录态。请管理员检查 safe.role 或 safe.admin 配置。",
+                failure.getSafeMessage());
+    }
+
+    @Test
+    public void classifiesBpmtUserNotFoundDuringWechatLogin() {
+        OAuthWechatLoginException failure = OAuthWechatLoginFailureClassifier.classify("woden",
+                new RuntimeException("找不到用户[woden]."));
+
+        assertEquals("bpmt_user_not_found", failure.getReason());
+        assertEquals("微信授权已成功，但 BPMT 中找不到用户[woden]。请管理员检查企业微信 UserId 与 BPMT 用户账号映射。",
+                failure.getSafeMessage());
+    }
+
+    @Test
+    public void classifiesBpmtUserDisabledDuringWechatLogin() {
+        OAuthWechatLoginException failure = OAuthWechatLoginFailureClassifier.classify("woden",
+                new RuntimeException("用户[woden]账号已失效."));
+
+        assertEquals("bpmt_user_disabled", failure.getReason());
+        assertEquals("微信授权已成功，但 BPMT 用户[woden]账号已失效。请管理员启用用户或更换绑定账号。",
+                failure.getSafeMessage());
+    }
+
+    @Test
+    public void classifiesBpmtIpDeniedDuringWechatLogin() {
+        OAuthWechatLoginException failure = OAuthWechatLoginFailureClassifier.classify("woden",
+                new RuntimeException("用户[woden]当前网络环境不安全,请更换网络环境登陆."));
+
+        assertEquals("bpmt_user_ip_denied", failure.getReason());
+        assertEquals("微信授权已成功，但 BPMT 拒绝了用户[woden]当前网络环境。请管理员检查用户 IP 白名单或上游代理地址。",
+                failure.getSafeMessage());
+    }
+
+    @Test
+    public void classifiesBpmtRelationshipInvalidDuringWechatLogin() {
+        OAuthWechatLoginException failure = OAuthWechatLoginFailureClassifier.classify("woden",
+                new RuntimeException("无法找到用户[woden]归属的组织与角色,无法登陆系统."));
+
+        assertEquals("bpmt_user_relationship_invalid", failure.getReason());
+        assertEquals("微信授权已成功，但 BPMT 用户[woden]的组织或角色关系不可用。请管理员检查用户所属组织、角色和权限组。",
+                failure.getSafeMessage());
+    }
+
+    @Test
+    public void classifiesUnknownBpmtLoginFailureDuringWechatLogin() {
+        OAuthWechatLoginException failure = OAuthWechatLoginFailureClassifier.classify("woden",
+                new RuntimeException("unexpected local login failure"));
+
+        assertEquals("bpmt_login_failed", failure.getReason());
+        assertEquals("微信授权已成功，但 BPMT 本地登录态建立失败。请联系管理员并提供 Request ID。", failure.getSafeMessage());
+    }
+
+    @Test
+    public void returnsClassifiedBpmtLoginFailureWhenProviderReportsLocalLoginFailure() {
+        TestWechatOAuthProvider provider = new TestWechatOAuthProvider();
+        provider.loginFailure = OAuthWechatLoginFailureClassifier.classify("woden",
+                new RuntimeException("系统维护中,暂停用户登陆."));
+        OAuthWechatLoginService service = new OAuthWechatLoginService(provider);
+        MockHttpServletRequest request = wechatRequest();
+        request.setParameter("code", "secret-code");
+
+        OAuthWechatLoginResult result = service.handle(request, new MockHttpServletResponse(), agentThirdpart());
+
+        assertEquals(OAuthWechatLoginStatus.ERROR, result.getStatus());
+        assertEquals("bpmt_login_paused", result.getReason());
+        assertEquals("微信授权已成功，但 BPMT 当前处于维护/暂停模式，用户[woden]无法建立登录态。请管理员检查 safe.role 或 safe.admin 配置。",
+                result.getMessage());
+        assertEquals(1, provider.loginCalls);
+    }
+
+    @Test
     public void fakeProviderSwitchAcceptsOnlyExplicitTrueValues() {
         assertEquals(false, OAuthWechatLoginService.isFakeProviderEnabled("false", null));
         assertEquals(false, OAuthWechatLoginService.isFakeProviderEnabled(null, "0"));
