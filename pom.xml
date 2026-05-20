@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.riversoft</groupId>
   <artifactId>riversoft-product</artifactId>
-  <version>1.7.3</version>
+  <version>1.7.4</version>
   <packaging>pom</packaging>
   <name>RiverSoft Product</name>
 

@@ -1,6 +1,6 @@
 /**
  * 核心js类
- * 
+ *
  * @author wodenwang
  */
 var Core = {
@@ -70,8 +70,33 @@ var Core = {
 	},
 
 	/**
+	 * 清理整页加载和浏览器恢复时遗留的遮罩。
+	 */
+	clearPageMask : function() {
+		if (typeof ($) == "undefined") {
+			return;
+		}
+
+		$('#loading').hide();
+
+		var $openDialogs = $('.ui-dialog:visible').filter(function() {
+			return $('.ui-dialog-content:visible', this).size() > 0;
+		});
+		if ($openDialogs.size() < 1) {
+			$('.ui-widget-overlay').remove();
+			$('body').removeClass('ui-dialog-open');
+		}
+
+		var $openAmModals = $('.am-modal:visible').not('#_body_loading');
+		if ($openAmModals.size() < 1) {
+			$('#_body_loading').hide().removeClass('am-modal-active am-active');
+			$('.am-dimmer').removeClass('am-active').hide();
+		}
+	},
+
+	/**
 	 * 界面（区域）初始化
-	 * 
+	 *
 	 * @param zone
 	 *            区域id
 	 */
@@ -80,11 +105,15 @@ var Core = {
 
 		if (!zone || zone == '' || zone == '_body') {
 			// 硬塞一个div
+			Core.clearPageMask();
 			var $div = $('<div id="_body"></div>');
 			$div.append($('body').children());
 			$('body').append($div);
 			zone = '#_body ';
 			zoneId = '_body';
+			setTimeout(function() {
+				Core.clearPageMask();
+			}, 0);
 		} else {
 			zoneId = zone;
 			zone = '#' + zone + ' ';
@@ -920,3 +949,11 @@ var Core = {
 		return Core.seq++;
 	}
 };
+
+if (typeof ($) != "undefined") {
+	$(window).bind('load pageshow', function() {
+		setTimeout(function() {
+			Core.clearPageMask();
+		}, 0);
+	});
+}

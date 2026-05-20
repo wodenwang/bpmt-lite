@@ -78,7 +78,7 @@ public class ApiDocsContractTest {
     public void openApiJsonPublishesReportViewRouteMatrix() throws Exception {
         JsonNode root = new ObjectMapper().readTree(apiFile("src/main/webapp/openapi.json"));
 
-        assertTrue(root.path("info").path("title").asText().contains("v1.7.3"));
+        assertTrue(root.path("info").path("title").asText().contains("v1.7.4"));
         assertTrue(root.path("info").path("description").asText().contains("报表视图")
                 || root.path("info").path("description").asText().contains("report view"));
 
@@ -142,7 +142,7 @@ public class ApiDocsContractTest {
         JsonNode root = new ObjectMapper().readTree(apiFile("src/main/webapp/openapi.json"));
         String description = root.path("info").path("description").asText();
 
-        assertTrue(description.contains("BPMT Lite v1.7.3 API，提供动态表结构、dyn 动态表视图、数据库操作和报表视图配置接口。"));
+        assertTrue(description.contains("BPMT Lite v1.7.4 API，提供动态表结构、dyn 动态表视图、数据库操作和报表视图配置接口。"));
         assertTrue(description.contains("报表视图接口挂载在 /api/v1/report-views"));
         assertTrue(description.contains("只管理 rep_list 报表视图对应的 VW_URL / VW_REPORT* 配置"));
         assertTrue(description.contains("HMAC 签名的 PATH 必须使用公开请求 URI"));
@@ -155,9 +155,9 @@ public class ApiDocsContractTest {
     public void docsIndexDescribesReportViewApi() throws Exception {
         String html = read(apiFile("src/main/webapp/docs/index.html"));
 
-        assertTrue(html.contains("v1.7.3"));
+        assertTrue(html.contains("v1.7.4"));
         assertTrue(html.contains("报表视图 API"));
-        assertTrue(html.indexOf("v1.7.3") < html.indexOf("报表视图 API"));
+        assertTrue(html.indexOf("v1.7.4") < html.indexOf("报表视图 API"));
         assertTrue(html.contains("/api/v1/report-views"));
         assertTrue(html.contains("/api/v1/report-views:validate"));
         assertTrue(html.contains("/api/v1/report-views/SALES_REPORT/columns?dryRun=true"));

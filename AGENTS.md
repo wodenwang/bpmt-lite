@@ -31,9 +31,10 @@
 - `v1.7.0` 是动态表视图配置 API 发布版本，开放 `/{viewKey}.view` 对应的 dyn 视图完整配置管理能力。
 - `v1.7.1` 是基于 `v1.7.0` 新增报表视图配置 API，开放 `rep_list` 对应的 `/{viewKey}.view` 配置管理能力。
 - `v1.7.2` 是基于 `v1.7.1` 修复报表视图创建、视图缓存、版本显示和数据库操作 save 显式主键写入问题的补丁版本。
-- `v1.7.3` 是当前版本，基于 `v1.7.2` 修复 OAuth 微信登录失败页提示和 `/api/openapi.json` 文档风格问题。
-- 默认 Web 镜像：`ghcr.io/wodenwang/bpmt-lite:1.7.3`
-- 默认 API 镜像：`ghcr.io/wodenwang/bpmt-lite-api:1.7.3`
+- `v1.7.3` 是基于 `v1.7.2` 修复 OAuth 微信登录失败页提示和 `/api/openapi.json` 文档风格问题的补丁版本。
+- `v1.7.4` 是当前版本，基于 `v1.7.3` 修复登录后偶发灰色底蒙版问题。
+- 默认 Web 镜像：`ghcr.io/wodenwang/bpmt-lite:1.7.4`
+- 默认 API 镜像：`ghcr.io/wodenwang/bpmt-lite-api:1.7.4`
 - 同步镜像 tag：发布后同步到 `ghcr.io/wodenwang/bpmt-lite:latest` 和 `ghcr.io/wodenwang/bpmt-lite-api:latest`
 - 默认访问地址：`http://127.0.0.1/`
 - HTTPS 访问地址：`https://127.0.0.1/`，需要 `BPMT_HTTPS_ENABLED=1`
@@ -65,6 +66,7 @@
 - v1.7.1 报表视图 API 开发和验收期间的 source-of-truth 顺序是：`AGENTS.md` -> `docs/superpowers/specs/2026-05-15-bpmt-lite-v1.7.1-report-view-api-design.md` -> `docs/superpowers/plans/2026-05-15-bpmt-lite-v1.7.1-report-view-api.md` -> `docs/v1.7.1/*` -> `docs/release-v1.7.1.md` -> `README.md` -> implementation。
 - v1.7.2 GitHub issue bugfix 开发和验收期间的 source-of-truth 顺序是：`AGENTS.md` -> `docs/superpowers/plans/2026-05-16-bpmt-lite-v1.7.2-github-issue-bugfixes.md` -> `docs/release-v1.7.2.md` -> `README.md` -> implementation。
 - v1.7.3 GitHub issue bugfix 开发和验收期间的 source-of-truth 顺序是：`AGENTS.md` -> `docs/superpowers/plans/2026-05-16-bpmt-lite-v1.7.3-github-issue-bugfixes.md` -> `docs/release-v1.7.3.md` -> `README.md` -> implementation。
+- v1.7.4 登录后灰色蒙版 bugfix 开发和验收期间的 source-of-truth 顺序是：`AGENTS.md` -> `docs/superpowers/plans/2026-05-20-bpmt-lite-v1.7.4-login-mask.md` -> `docs/release-v1.7.4.md` -> `README.md` -> implementation。
 
 ## 已验证的本地编译基线
 
@@ -820,6 +822,35 @@ v1.7.3 文档见：
 - `docs/v1.7.3/api-reference.md`
 - `docs/v1.7.3/openapi.json`
 - `docs/release-v1.7.3.md`
+
+## v1.7.4 登录后灰色蒙版 bugfix 状态
+
+截至 2026-05-20，v1.7.4 正在推进发布收口，目标是修复登录后偶发出现灰色底蒙版的问题。
+
+修复范围：
+
+- 整页加载结束、根页面初始化和浏览器 `pageshow` 恢复时，统一清理孤儿 `#loading`、`.ui-widget-overlay`、`.am-dimmer` 和加载 modal。
+- 正常已打开弹窗的遮罩不清理，避免破坏现有 jQuery UI / AmazeUI 弹窗行为。
+- `include/html_bottom.jsp` 不再只写入 `#loading{display:none}`，优先调用 `Core.clearPageMask()`。
+- 新增 `LoginMaskCleanupTest` 覆盖遮罩清理入口和整页模板调用。
+
+版本边界：
+
+- 不新增 API 路径，不改变 HMAC 签名规则。
+- 不改变 OAuth 主流程、数据库初始化结构、Docker Compose 拓扑或第三方容器版本策略。
+- Maven 项目版本、默认 Web/API 镜像 tag、安装脚本默认 release tag 和 README 当前版本已切到 `1.7.4`。
+- Git tag：`v1.7.4`。
+- GitHub Release：`https://github.com/wodenwang/bpmt-lite/releases/tag/v1.7.4`。
+- `ghcr.io/wodenwang/bpmt-lite:1.7.4` 已推送，manifest digest 为 `sha256:11fc93e989b3dce4698f63b2fff082097600f4c6f6c8cf9b815cb343f2d4c77b`，包含 `linux/amd64` 和 `linux/arm64`。
+- `ghcr.io/wodenwang/bpmt-lite-api:1.7.4` 已推送，manifest digest 为 `sha256:2567aaa64f02a440e5a40016356ef0b15bf57accba33c7501ab5c0821b1ded06`，包含 `linux/amd64` 和 `linux/arm64`。
+- 两个 `latest` tag 已同步到 `1.7.4` manifest digest。
+
+v1.7.4 文档见：
+
+- `docs/superpowers/plans/2026-05-20-bpmt-lite-v1.7.4-login-mask.md`
+- `docs/v1.7.4/api-reference.md`
+- `docs/v1.7.4/openapi.json`
+- `docs/release-v1.7.4.md`
 
 ## 线上测试环境交接
 
