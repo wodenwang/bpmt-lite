@@ -3,7 +3,7 @@
 	<parent>
 		<artifactId>parent</artifactId>
 		<groupId>com.riversoft</groupId>
-		<version>1.7.4</version>
+		<version>1.7.5</version>
 		<relativePath>../parent/</relativePath>
 	</parent>
 	<artifactId>dbtools</artifactId>

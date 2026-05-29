@@ -54,6 +54,16 @@ OAuth 外部系统主数据和运行态都落库保存，数据库是 source of 
 - `PRI_KEY` 对应外部系统权限，OAuth `authorize` 时必须校验当前 BPMT 用户是否拥有该权限。
 - 菜单权限只控制菜单是否可见；OAuth 登录是否允许进入第三方系统，以 `权限组管理 -> 第三方系统权限` 中配置的 `CM_THIRDPART.PRI_KEY` 为准。
 
+## AI 接入提示词
+
+`v1.7.5` 起，`系统开发 -> 第三方系统` 列表页在每条外部系统记录的操作列提供“AI 接入提示词”按钮。
+
+该弹框用于把当前外部系统的 `thirdpartKey`、`thirdpartName`、`clientId`、`redirectUris` 和 `homeUrl` 组织成一段提示词，复制到 Codex 或 Claude Code 空白第三方项目中，用于初始化或更新项目根目录的 `AGENTS.md` / `CLAUDE.md`。提示词会要求第三方项目统一使用 BPMT OAuth Authorization Code 登录、严格校验 `state`、通过 `/oauth/userinfo` 建立本系统登录态，并按既有 BPMT API HMAC 规则调用业务 API。
+
+弹框允许维护者临时填写明文 `clientSecret`、API App Key 和 API App Secret，用于生成更完整的本地提示词。这些明文只存在浏览器当前页面中，不提交后端、不落库、不写日志，也不会写入列表页 HTML 初始渲染。
+
+`clientSecret` 的生命周期仍遵守原有安全规则：新增外部系统时只展示一次；编辑重置后不回显；数据库只保存 hash。列表页不会从数据库反查或输出明文 `clientSecret`，也不会输出 `CLIENT_SECRET_HASH`。
+
 ## 端点示例
 
 ```text
