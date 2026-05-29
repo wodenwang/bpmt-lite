@@ -865,6 +865,10 @@ v1.7.4 文档见：
 - 列表页不会从数据库反查或输出明文 `clientSecret`，也不输出 `clientSecretHash`。
 - 弹框中临时填写的 `clientSecret`、API App Key 和 API App Secret 只用于浏览器本地生成提示词，不提交、不落库、不写日志。
 - 提示词必须覆盖 `AGENTS.md` / `CLAUDE.md` 初始化、BPMT OAuth Authorization Code、`/oauth/authorize`、`/oauth/token`、`/oauth/userinfo`、`state` 校验、`userinfo` 建立第三方系统登录态、BPMT API HMAC 请求头和 canonical path 规则。
+- Maven 项目版本、默认 Web/API 镜像 tag、安装脚本默认 release tag、README 当前版本和 OpenAPI 版本已切到 `1.7.5`。
+- `ghcr.io/wodenwang/bpmt-lite:1.7.5` 已推送，manifest digest 为 `sha256:1cfe7d9efd790933689da70a8a94defd3fd358326384e71165157bda2995d19f`，包含 `linux/amd64` 和 `linux/arm64`。
+- `ghcr.io/wodenwang/bpmt-lite-api:1.7.5` 已推送，manifest digest 为 `sha256:36e66616d3670bdf4d330304ef15c5a2e3a8160be0624578212c6a024dae29a0`，包含 `linux/amd64` 和 `linux/arm64`。
+- 两个 `latest` tag 已同步到 `1.7.5` manifest digest。
 
 v1.7.5 文档见：
 
