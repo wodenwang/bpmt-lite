@@ -14,7 +14,7 @@ services:
       - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
 
   bpmt-web:
-    image: ghcr.io/wodenwang/bpmt-lite:${BPMT_IMAGE_TAG:-1.7.4}
+    image: ghcr.io/wodenwang/bpmt-lite:${BPMT_IMAGE_TAG:-1.7.5}
     container_name: bpmt-web
     depends_on:
       bpmt-mariadb:
@@ -41,7 +41,7 @@ services:
       - ./runtime/tomcat-logs:/usr/local/tomcat/logs
 
   bpmt-api:
-    image: ghcr.io/wodenwang/bpmt-lite-api:${BPMT_API_IMAGE_TAG:-1.7.4}
+    image: ghcr.io/wodenwang/bpmt-lite-api:${BPMT_API_IMAGE_TAG:-1.7.5}
     container_name: bpmt-api
     depends_on:
       bpmt-mariadb:

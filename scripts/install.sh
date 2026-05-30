@@ -2,7 +2,7 @@
 set -eu
 
 MODE="${1:-full}"
-REF="${BPMT_REF:-v1.7.4}"
+REF="${BPMT_REF:-v1.7.5}"
 INSTALL_DIR="${BPMT_HOME:-bpmt-lite}"
 RAW_BASE_URL="${BPMT_RAW_BASE_URL:-https://raw.githubusercontent.com/wodenwang/bpmt-lite/$REF}"
 SQL_BASE_URL="${BPMT_SQL_BASE_URL:-$RAW_BASE_URL/database}"

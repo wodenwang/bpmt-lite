@@ -69,7 +69,22 @@ public class ThirdpartJspTest {
         assertTrue(jsp.contains("企业号: ${vo.wechatKey}"));
         assertTrue(jsp.contains("服务号: ${vo.wechatKey}"));
         assertTrue(jsp.contains("关闭"));
-        assertFalse(jsp.contains("clientSecret"));
+        assertFalse(jsp.contains("clientSecretHash"));
+    }
+
+    @Test
+    public void thirdpartListContainsAiOnboardingPromptDialog() throws Exception {
+        String jsp = readWebapp("xhtml/thirdpart/ThirdpartAction/list.jsp");
+
+        assertTrue(jsp.contains("name=\"aiPrompt\""));
+        assertTrue(jsp.contains("AI 接入提示词"));
+        assertTrue(jsp.contains("bpmt-ai-prompt-dialog"));
+        assertTrue(jsp.contains("BPMT OAuth Authorization Code"));
+        assertTrue(jsp.contains("CLIENT_SECRET_PLACEHOLDER"));
+        assertTrue(jsp.contains("BPMT_API_APP_KEY"));
+        assertTrue(jsp.contains("BPMT_API_APP_SECRET"));
+        assertTrue(jsp.contains("AGENTS.md"));
+        assertTrue(jsp.contains("CLAUDE.md"));
         assertFalse(jsp.contains("clientSecretHash"));
     }
 

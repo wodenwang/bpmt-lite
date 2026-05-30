@@ -32,9 +32,10 @@
 - `v1.7.1` 是基于 `v1.7.0` 新增报表视图配置 API，开放 `rep_list` 对应的 `/{viewKey}.view` 配置管理能力。
 - `v1.7.2` 是基于 `v1.7.1` 修复报表视图创建、视图缓存、版本显示和数据库操作 save 显式主键写入问题的补丁版本。
 - `v1.7.3` 是基于 `v1.7.2` 修复 OAuth 微信登录失败页提示和 `/api/openapi.json` 文档风格问题的补丁版本。
-- `v1.7.4` 是当前版本，基于 `v1.7.3` 修复登录后偶发灰色底蒙版问题。
-- 默认 Web 镜像：`ghcr.io/wodenwang/bpmt-lite:1.7.4`
-- 默认 API 镜像：`ghcr.io/wodenwang/bpmt-lite-api:1.7.4`
+- `v1.7.4` 是基于 `v1.7.3` 修复登录后偶发灰色底蒙版问题的补丁版本。
+- `v1.7.5` 是当前版本，基于 `v1.7.4` 增强第三方系统 AI 接入提示词生成的补丁版本。
+- 默认 Web 镜像：`ghcr.io/wodenwang/bpmt-lite:1.7.5`
+- 默认 API 镜像：`ghcr.io/wodenwang/bpmt-lite-api:1.7.5`
 - 同步镜像 tag：发布后同步到 `ghcr.io/wodenwang/bpmt-lite:latest` 和 `ghcr.io/wodenwang/bpmt-lite-api:latest`
 - 默认访问地址：`http://127.0.0.1/`
 - HTTPS 访问地址：`https://127.0.0.1/`，需要 `BPMT_HTTPS_ENABLED=1`
@@ -67,6 +68,7 @@
 - v1.7.2 GitHub issue bugfix 开发和验收期间的 source-of-truth 顺序是：`AGENTS.md` -> `docs/superpowers/plans/2026-05-16-bpmt-lite-v1.7.2-github-issue-bugfixes.md` -> `docs/release-v1.7.2.md` -> `README.md` -> implementation。
 - v1.7.3 GitHub issue bugfix 开发和验收期间的 source-of-truth 顺序是：`AGENTS.md` -> `docs/superpowers/plans/2026-05-16-bpmt-lite-v1.7.3-github-issue-bugfixes.md` -> `docs/release-v1.7.3.md` -> `README.md` -> implementation。
 - v1.7.4 登录后灰色蒙版 bugfix 开发和验收期间的 source-of-truth 顺序是：`AGENTS.md` -> `docs/superpowers/plans/2026-05-20-bpmt-lite-v1.7.4-login-mask.md` -> `docs/release-v1.7.4.md` -> `README.md` -> implementation。
+- v1.7.5 第三方系统 AI 接入提示词开发和验收期间的 source-of-truth 顺序是：`AGENTS.md` -> `docs/superpowers/plans/2026-05-30-bpmt-lite-v1.7.5-thirdpart-ai-onboarding-prompt.md` -> `docs/release-v1.7.5.md` -> `docs/v1.5.0/oauth-login-reference.md` -> `README.md` -> implementation。
 
 ## 已验证的本地编译基线
 
@@ -851,6 +853,30 @@ v1.7.4 文档见：
 - `docs/v1.7.4/api-reference.md`
 - `docs/v1.7.4/openapi.json`
 - `docs/release-v1.7.4.md`
+
+## v1.7.5 第三方系统 AI 接入提示词状态
+
+截至 2026-05-30，v1.7.5 正在推进发布收口，目标是在“第三方系统”管理列表页生成可复制到 Codex 或 Claude Code 第三方项目的 AI 接入提示词。
+
+版本边界：
+
+- 只增强 `bpmt-web/platform` 第三方系统管理体验，不新增 OAuth endpoint。
+- 不改变 BPMT API HMAC 鉴权规则，不新增数据库结构。
+- 列表页不会从数据库反查或输出明文 `clientSecret`，也不输出 `clientSecretHash`。
+- 弹框中临时填写的 `clientSecret`、API App Key 和 API App Secret 只用于浏览器本地生成提示词，不提交、不落库、不写日志。
+- 提示词必须覆盖 `AGENTS.md` / `CLAUDE.md` 初始化、BPMT OAuth Authorization Code、`/oauth/authorize`、`/oauth/token`、`/oauth/userinfo`、`state` 校验、`userinfo` 建立第三方系统登录态、BPMT API HMAC 请求头和 canonical path 规则。
+- Maven 项目版本、默认 Web/API 镜像 tag、安装脚本默认 release tag、README 当前版本和 OpenAPI 版本已切到 `1.7.5`。
+- `ghcr.io/wodenwang/bpmt-lite:1.7.5` 已推送，manifest digest 为 `sha256:1cfe7d9efd790933689da70a8a94defd3fd358326384e71165157bda2995d19f`，包含 `linux/amd64` 和 `linux/arm64`。
+- `ghcr.io/wodenwang/bpmt-lite-api:1.7.5` 已推送，manifest digest 为 `sha256:36e66616d3670bdf4d330304ef15c5a2e3a8160be0624578212c6a024dae29a0`，包含 `linux/amd64` 和 `linux/arm64`。
+- 两个 `latest` tag 已同步到 `1.7.5` manifest digest。
+
+v1.7.5 文档见：
+
+- `docs/superpowers/plans/2026-05-30-bpmt-lite-v1.7.5-thirdpart-ai-onboarding-prompt.md`
+- `docs/v1.7.5/api-reference.md`
+- `docs/v1.7.5/openapi.json`
+- `docs/release-v1.7.5.md`
+- `docs/v1.5.0/oauth-login-reference.md`
 
 ## 线上测试环境交接
 
