@@ -2,6 +2,7 @@
 .svn/
 .vscode/
 .superpowers/
+.codegraph/
 
 target/
 **/target/

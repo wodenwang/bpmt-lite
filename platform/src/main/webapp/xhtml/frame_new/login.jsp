@@ -63,12 +63,18 @@
 		});
 
 		//点击登录操作
-		$login.on('click',function(){
-			console.log()
+		$login.on('click',function(event){
+			event.preventDefault();
 			if(sw){
 				reload($(this));
 			}else{
 				return;
+			}
+		})
+		$login.on('keydown',function(e){
+			if(e.which == 13 || e.which == 32){
+				e.preventDefault();
+				$(this).trigger('click');
 			}
 		})
 
@@ -202,25 +208,25 @@
    			<h1>${_title}</h1>
    			<form  action="${_cp}/frame/LoginAction/login.shtml" method="post" sync="true">
     			<div class="group">
-    				<label for=""><i class="icon icon-user"></i></label>
-    				<input type="text" name="username" placeholder="请输入用户名" id="user">
+					<label for="user" aria-label="用户名"><i class="icon icon-user"></i></label>
+					<input type="text" name="username" placeholder="请输入用户名" id="user" autocomplete="username">
     				<i class="tips"></i>
     			</div>
     			<div class="group">
-    				<label for=""><i class="icon icon-lock"></i></label>
-    				<input type="password" name="password" placeholder="请输入密码" id="password">
+					<label for="password" aria-label="密码"><i class="icon icon-lock"></i></label>
+					<input type="password" name="password" placeholder="请输入密码" id="password" autocomplete="current-password">
     				<i class="tips"></i>
     			</div>  
 				<div class="group tc-hide" id="verification-group">
-					<label for=""><i class="icon icon-ver"></i></label>
-					<input type="text" name="randomcode" placeholder="请输入验证码" id="verification">
+					<label for="verification" aria-label="验证码"><i class="icon icon-ver"></i></label>
+					<input type="text" name="randomcode" placeholder="请输入验证码" id="verification" autocomplete="off">
 					<div class="ver-pic-wrap" style="position:absolute;width:96px;height:auto;top:50%;margin-top: -13px;right: 10px;z-index: 10;line-height:0;">
-						<img src="${cp}/frame/LoginAction/randomImg.shtml?_tmp=abd" alt="" id="verification-img">
+						<img src="${cp}/frame/LoginAction/randomImg.shtml?_tmp=abd" alt="验证码，点击刷新" id="verification-img">
 					</div>
 					<i class="tips"></i>
 				</div>       			 
    			</form>
-   			<a href="javascript:;" class="login-btn" id="login">登录<div id="${_zone}_msg"></div></a>
+				<a href="javascript:;" class="login-btn" id="login" role="button" tabindex="0" aria-label="登录">登录<div id="${_zone}_msg"></div></a>
    			<div>
    				<p>${tips}</p>
    			</div>

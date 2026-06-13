@@ -33,9 +33,11 @@
 - `v1.7.2` 是基于 `v1.7.1` 修复报表视图创建、视图缓存、版本显示和数据库操作 save 显式主键写入问题的补丁版本。
 - `v1.7.3` 是基于 `v1.7.2` 修复 OAuth 微信登录失败页提示和 `/api/openapi.json` 文档风格问题的补丁版本。
 - `v1.7.4` 是基于 `v1.7.3` 修复登录后偶发灰色底蒙版问题的补丁版本。
-- `v1.7.5` 是当前版本，基于 `v1.7.4` 增强第三方系统 AI 接入提示词生成的补丁版本。
-- 默认 Web 镜像：`ghcr.io/wodenwang/bpmt-lite:1.7.5`
-- 默认 API 镜像：`ghcr.io/wodenwang/bpmt-lite-api:1.7.5`
+- `v1.7.5` 是基于 `v1.7.4` 增强第三方系统 AI 接入提示词生成的补丁版本。
+- `v1.8.0` 是桌面后台清晰度基线版本；原 `modern-theme foundation` / CSS-only 主题方向已被判定失败，仅保留为历史记录。
+- `v1.8.1` 是基于 `v1.8.0` 的桌面后台前端缺陷加固补丁版本，修复人工浏览器校验中标注的 footer、按钮、表格、zTree、顶部栏、logo 和通用空状态等问题。
+- 默认 Web 镜像：`ghcr.io/wodenwang/bpmt-lite:1.8.1`
+- 默认 API 镜像：`ghcr.io/wodenwang/bpmt-lite-api:1.8.1`
 - 同步镜像 tag：发布后同步到 `ghcr.io/wodenwang/bpmt-lite:latest` 和 `ghcr.io/wodenwang/bpmt-lite-api:latest`
 - 默认访问地址：`http://127.0.0.1/`
 - HTTPS 访问地址：`https://127.0.0.1/`，需要 `BPMT_HTTPS_ENABLED=1`
@@ -69,6 +71,10 @@
 - v1.7.3 GitHub issue bugfix 开发和验收期间的 source-of-truth 顺序是：`AGENTS.md` -> `docs/superpowers/plans/2026-05-16-bpmt-lite-v1.7.3-github-issue-bugfixes.md` -> `docs/release-v1.7.3.md` -> `README.md` -> implementation。
 - v1.7.4 登录后灰色蒙版 bugfix 开发和验收期间的 source-of-truth 顺序是：`AGENTS.md` -> `docs/superpowers/plans/2026-05-20-bpmt-lite-v1.7.4-login-mask.md` -> `docs/release-v1.7.4.md` -> `README.md` -> implementation。
 - v1.7.5 第三方系统 AI 接入提示词开发和验收期间的 source-of-truth 顺序是：`AGENTS.md` -> `docs/superpowers/plans/2026-05-30-bpmt-lite-v1.7.5-thirdpart-ai-onboarding-prompt.md` -> `docs/release-v1.7.5.md` -> `docs/v1.5.0/oauth-login-reference.md` -> `README.md` -> implementation。
+- v1.8.0 `modern-theme foundation` 分支已被 Product Design 判定为方向失败，不再作为后续实现依据。旧文档仅保留为失败方向证据。
+- v1.8.0 已重新规划并收口为 `desktop admin clarity baseline`，source-of-truth 顺序是：`AGENTS.md` -> `docs/release-v1.8.0.md` -> `docs/v2.0.0/desktop-admin-clarity-replan.md` -> `docs/superpowers/specs/2026-06-11-bpmt-lite-v1.8.0-desktop-admin-clarity-design.md` -> `docs/superpowers/plans/2026-06-11-bpmt-lite-v1.8.0-desktop-admin-clarity.md` -> `README.md` -> implementation。
+- v1.8.0 不以全局 CSS-only 现代主题作为发布目标，而是围绕登录后首页、第三方系统列表、AI 接入提示词弹窗三条代表路径改善当前位置、页面任务、主操作、空/加载状态和复制反馈。
+- v1.8.1 前端缺陷加固开发和验收期间的 source-of-truth 顺序是：`AGENTS.md` -> `docs/release-v1.8.1.md` -> `docs/superpowers/plans/2026-06-13-bpmt-lite-v1.8.1-frontend-defect-hardening.md` -> `docs/v2.0.0/configuration-workbench-lite-qa-2026-06-13.md` -> `docs/v2.0.0/configuration-workbench-lite-verification-2026-06-13/README.md` -> `README.md` -> implementation。
 
 ## 已验证的本地编译基线
 
@@ -876,6 +882,36 @@ v1.7.5 文档见：
 - `docs/v1.7.5/api-reference.md`
 - `docs/v1.7.5/openapi.json`
 - `docs/release-v1.7.5.md`
+
+## v1.8.0 桌面后台清晰度基线状态
+
+截至 2026-06-12，`v1.8.0 modern-theme foundation` 分支已被判定为方向失败。失败原因是 CSS-only 主题覆盖只能让页面变浅、变白、变圆角，不能解决后台更关键的当前位置、页面任务、空/加载/错误状态、主操作和导航层级问题。
+
+新的 `v1.8.0` 已按 `desktop admin clarity baseline` 收口，目标是先围绕三条代表路径建立清晰度样板：
+
+- 登录后首页。
+- 第三方系统列表。
+- AI 接入提示词弹窗。
+
+本版本要求：
+
+- 不再以全局 CSS-only 现代主题作为发布目标。
+- 不改移动端 H5、前端技术栈、菜单权限、OAuth、API 鉴权、动态表、报表或流程业务逻辑。
+- 保留 `bpmt-modern.css` 文件名作为可回滚覆盖层，但内容定位为代表路径清晰度增强。
+- 实现态截图保存到 `docs/v2.0.0/screenshots/v1.8.0-clarity-implemented/`。
+- 验证记录保存到 `docs/release-v1.8.0.md` 和 `docs/v2.0.0/desktop-ui-qa-checklist.md`。
+
+v1.8.0 新规划文档见：
+
+- `docs/v2.0.0/desktop-admin-clarity-replan.md`
+- `docs/superpowers/specs/2026-06-11-bpmt-lite-v1.8.0-desktop-admin-clarity-design.md`
+- `docs/superpowers/plans/2026-06-11-bpmt-lite-v1.8.0-desktop-admin-clarity.md`
+
+旧方向文档仅作为失败方向记录，不再作为实现依据：
+
+- `docs/superpowers/specs/2026-06-11-bpmt-lite-v1.8.0-modern-theme-foundation-design.md`
+- `docs/superpowers/plans/2026-06-11-bpmt-lite-v1.8.0-modern-theme-foundation.md`
+- `docs/v2.0.0/v1.8.0-modern-theme-foundation-design.md`
 - `docs/v1.5.0/oauth-login-reference.md`
 
 ## 线上测试环境交接

@@ -299,10 +299,20 @@
 
 <%-- 顶部bar  --%>
 <div class="frame topbar ui-widget-header">
-	<div class="left">
-		${wpf:lan("#:zh[用户]:en[User]#")}<span class="ui-state-default" style="font-weight: bold;">[${sessionScope.USER.busiName}]</span>${wpf:lan("#:zh[所在组织]:en[Organization]#")}<span
-			class="ui-state-default" style="font-weight: bold;">[${sessionScope.GROUP.busiName}]</span>,${wpf:lan("#:zh[角色]:en[Role]#")}<span class="ui-state-default" style="font-weight: bold;">[${sessionScope.ROLE.busiName}]</span>,${wpf:lan("#:zh[于]:en[At]#")}<span
-			class="ui-state-default" style="font-weight: bold;">[${wcm:widget('date[datetime]',sessionScope.DATE)}]</span>${wpf:lan("#:zh[登录]:en[Sign in]#")}.
+	<div class="left bpmt-session-summary" aria-label="${wpf:lan('#:zh[当前登录信息]:en[Current session]#')}">
+		<span class="bpmt-session-item">
+			<span class="bpmt-session-label">${wpf:lan("#:zh[用户]:en[User]#")}</span>
+			<span class="bpmt-session-value">${sessionScope.USER.busiName}</span>
+		</span>
+		<span class="bpmt-session-item">
+			<span class="bpmt-session-label">${wpf:lan("#:zh[组织]:en[Organization]#")}</span>
+			<span class="bpmt-session-value">${sessionScope.GROUP.busiName}</span>
+		</span>
+		<span class="bpmt-session-item">
+			<span class="bpmt-session-label">${wpf:lan("#:zh[角色]:en[Role]#")}</span>
+			<span class="bpmt-session-value">${sessionScope.ROLE.busiName}</span>
+		</span>
+		<span class="bpmt-session-time">${wpf:lan("#:zh[登录时间]:en[Signed in]#")} ${wcm:widget('date[datetime]',sessionScope.DATE)}</span>
 	</div>
 	<div class="right">
 		<ul class="top-menu">

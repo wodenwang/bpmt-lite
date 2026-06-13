@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="206" height="50" viewBox="0 0 206 50" role="img" aria-labelledby="title desc">
+  <title id="title">BPMT logo horizontal</title>
+  <desc id="desc">A compact BPMT wordmark with a three-line workflow mark.</desc>
+  <defs>
+    <linearGradient id="markGradient" x1="8" y1="8" x2="48" y2="42" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2563eb"/>
+      <stop offset="1" stop-color="#0f766e"/>
+    </linearGradient>
+  </defs>
+  <g fill="none" fill-rule="evenodd">
+    <g transform="translate(10 10)">
+      <rect x="0" y="0" width="40" height="7" rx="3.5" fill="url(#markGradient)"/>
+      <rect x="0" y="13" width="31" height="7" rx="3.5" fill="#155e75"/>
+      <rect x="0" y="26" width="40" height="7" rx="3.5" fill="#0f766e"/>
+      <circle cx="44" cy="3.5" r="3.5" fill="#93c5fd"/>
+      <circle cx="35" cy="16.5" r="3.5" fill="#67e8f9"/>
+      <circle cx="44" cy="29.5" r="3.5" fill="#99f6e4"/>
+    </g>
+    <text x="66" y="34" fill="#102033" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="800" letter-spacing="1.2">BPMT</text>
+  </g>
+</svg>

@@ -140,6 +140,16 @@
 			<td class="center">${wpf:formatDuring(wpf:compareDate(_now,vo.task.createTime,'s'))}</td>
 		</tr>
 	</c:forEach>
+	<c:if test="${fn:length(list) < 1}">
+		<tr class="bpmt-empty-table-row">
+			<td colspan="7">
+				<div class="bpmt-state bpmt-state-empty">
+					<strong>${wpf:lan("#:zh[没有流程任务]:en[No workflow tasks]#")}</strong>
+					<span>${wpf:lan("#:zh[当前查询条件下没有流程任务。请调整筛选条件，或点击“重置查询”后重新查询。]:en[There are no workflow tasks for the current query. Adjust filters, or reset the query and search again.]#")}</span>
+				</div>
+			</td>
+		</tr>
+	</c:if>
 </table>
 
 <wcm:page dp="${dp}" form="${_form}" params="${_zone}_params" />

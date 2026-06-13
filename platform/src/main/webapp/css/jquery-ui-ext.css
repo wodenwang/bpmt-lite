@@ -53,15 +53,15 @@ table.ui-styled-table td.right {text-align: right;}
 table.ui-styled-table td.center {text-align: center;}
 
 
-/* hovered-row cells should show bottom border (will be highlighted) */
+/* hovered-row cells should only change color/background, not dimensions. */
 table.ui-styled-table tbody tr:hover th,
 table.ui-styled-table tbody tr:hover td
-{ border-bottom-width: 1px !important; }
+{ border-bottom-width: 0px !important; }
 
-/* remove top border if the above row is being hovered to prevent double horizontal borders */
+/* keep adjacent rows stable when the above row is hovered */
 table.ui-styled-table tbody tr:hover + tr th,
 table.ui-styled-table tbody tr:hover + tr td
-{ border-top-width: 1px !important; }
+{ border-top-width: 0px !important; }
 
 /* last-row cells should always show bottom border (not necessarily highlighted if not hovered) */
 /* IE7, IE8: selector dependent on CSS classes because of no support for :last-child */
