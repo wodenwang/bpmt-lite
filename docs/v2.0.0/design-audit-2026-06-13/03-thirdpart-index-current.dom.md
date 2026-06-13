@@ -1,0 +1,69 @@
+- tablist:
+  - tab "第三方系统" [expanded] [selected]:
+    - link "第三方系统":
+      - /url: "#_body_1"
+- tabpanel "第三方系统":
+  - heading "第三方系统" [level=2]
+  - paragraph: 配置外部系统 OAuth 登录、微信登录和 AI 接入提示词。新增外部系统后，可在列表中管理启停状态并复制接入说明。
+  - button "新增外部系统":
+    - generic: 新增外部系统
+  - table:
+    - rowgroup:
+      - row "系统标识 模糊 系统名称 模糊":
+        - rowheader "系统标识 模糊"
+        - cell:
+          - textbox
+        - rowheader "系统名称 模糊"
+        - cell:
+          - textbox
+      - row "Client ID 模糊 是否启用 全部 全部 是 否":
+        - rowheader "Client ID 模糊"
+        - cell:
+          - textbox
+        - rowheader "是否启用"
+        - cell "全部 全部 是 否":
+          - link "全部":
+            - /url: javascript:void(0)
+            - generic: 全部
+          - textbox
+          - list:
+            - listitem: 全部
+            - listitem: 是
+            - listitem: 否
+      - row "重置查询 查询":
+        - columnheader "重置查询 查询":
+          - button "重置查询":
+            - generic: 重置查询
+          - button "查询":
+            - generic: 查询
+  - strong: 第三方系统列表
+  - generic: 管理外部系统 OAuth、微信登录和 AI 接入说明。
+  - table:
+    - rowgroup:
+      - row "操作 系统标识 系统名称 Client ID 状态 首页地址 微信登录 创建时间 更新时间 说明":
+        - columnheader "操作"
+        - columnheader "系统标识": 系统标识
+        - columnheader "系统名称"
+        - columnheader "Client ID"
+        - columnheader "状态"
+        - columnheader "首页地址"
+        - columnheader "微信登录"
+        - columnheader "创建时间"
+        - columnheader "更新时间"
+        - columnheader "说明"
+    - rowgroup:
+      - row "还没有外部系统 新增外部系统后，可配置 OAuth 登录、微信登录，并复制 AI 接入提示词给集成开发者。":
+        - cell "还没有外部系统 新增外部系统后，可配置 OAuth 登录、微信登录，并复制 AI 接入提示词给集成开发者。":
+          - strong: 还没有外部系统
+          - generic: 新增外部系统后，可配置 OAuth 登录、微信登录，并复制 AI 接入提示词给集成开发者。
+  - generic: "[每页记录数：20] 总页数/总记录数：1/0"
+  - button "第一页":
+    - generic: 第一页
+  - button "前一页":
+    - generic: 前一页
+  - button "1" [disabled]:
+    - generic: "1"
+  - button "下一页":
+    - generic: 下一页
+  - button "最后页":
+    - generic: 最后页

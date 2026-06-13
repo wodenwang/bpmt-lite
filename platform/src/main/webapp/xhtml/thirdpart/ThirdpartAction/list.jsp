@@ -34,8 +34,10 @@
 			$('input[name=promptClientSecret]', $dialog).val('CLIENT_SECRET_PLACEHOLDER');
 			$('input[name=promptApiAppKey]', $dialog).val('BPMT_API_APP_KEY');
 			$('input[name=promptApiAppSecret]', $dialog).val('BPMT_API_APP_SECRET');
+			renderAiPromptMeta($dialog);
 			renderAiPrompt($dialog);
-			$dialog.dialog({ title: 'AI 接入提示词', width: 760, modal: true });
+			showCopyStatus($dialog, 'idle', '提示词已根据当前配置生成。');
+			$dialog.dialog({ title: 'AI 接入提示词', width: 840, modal: true, dialogClass: 'bpmt-ai-prompt-modal' });
 		});
 
 		$('input[name=promptClientSecret], input[name=promptApiAppKey], input[name=promptApiAppSecret]', $('#${_zone}_bpmt_ai_prompt_dialog')).keyup(function() {
@@ -45,20 +47,57 @@
 		});
 
 		$('button[name=copyAiPrompt]', $('#${_zone}_bpmt_ai_prompt_dialog')).click(function() {
+			var $dialog = $('#${_zone}_bpmt_ai_prompt_dialog');
 			var $prompt = $('textarea[name=promptText]', $('#${_zone}_bpmt_ai_prompt_dialog'));
 			var prompt = $prompt.val();
+			var fallbackCopy = function(message) {
+				showCopyStatus($dialog, 'warning', message);
+				$prompt.focus().select();
+			};
 			if (navigator.clipboard && navigator.clipboard.writeText) {
-				var copyResult = navigator.clipboard.writeText(prompt);
-				if (copyResult && copyResult.then) {
-					copyResult.then(null, function() {
-						$prompt.focus().select();
-					});
+				try {
+					var copyResult = navigator.clipboard.writeText(prompt);
+					if (copyResult && copyResult.then) {
+						copyResult.then(function() {
+							showCopyStatus($dialog, 'success', '已复制提示词。');
+						}, function() {
+							fallbackCopy('浏览器阻止自动复制，已选中文本，请手动复制。');
+						});
+					} else {
+						fallbackCopy('浏览器没有返回复制结果，已选中文本，请手动复制。');
+					}
+				} catch (e) {
+					fallbackCopy('浏览器阻止自动复制，已选中文本，请手动复制。');
 				}
 			} else {
 				$prompt.focus().select();
-				document.execCommand('copy');
+				try {
+					if (document.execCommand('copy')) {
+						showCopyStatus($dialog, 'success', '已复制提示词。');
+					} else {
+						fallbackCopy('已选中文本，请手动复制。');
+					}
+				} catch (e) {
+					fallbackCopy('已选中文本，请手动复制。');
+				}
 			}
 		});
+
+		$('button[name=closeAiPrompt]', $('#${_zone}_bpmt_ai_prompt_dialog')).click(function() {
+			$('#${_zone}_bpmt_ai_prompt_dialog').dialog('close');
+		});
+
+		function renderAiPromptMeta($dialog) {
+			var data = $dialog.data('bpmtAiPromptData') || {};
+			setPromptMetaText($('.bpmt-ai-meta-thirdpart-key', $dialog), data.thirdpartKey || '未配置');
+			setPromptMetaText($('.bpmt-ai-meta-client-id', $dialog), data.clientId || '未配置');
+			setPromptMetaText($('.bpmt-ai-meta-redirect-uris', $dialog), data.redirectUris || '未配置 OAuth 回调地址');
+		}
+
+		function setPromptMetaText($node, text) {
+			$node.text(text);
+			$node.attr('title', text);
+		}
 
 		function renderAiPrompt($dialog) {
 			var data = $dialog.data('bpmtAiPromptData') || {};
@@ -66,6 +105,17 @@
 			data.apiAppKey = $('input[name=promptApiAppKey]', $dialog).val() || 'BPMT_API_APP_KEY';
 			data.apiAppSecret = $('input[name=promptApiAppSecret]', $dialog).val() || 'BPMT_API_APP_SECRET';
 			$('textarea[name=promptText]', $dialog).val(buildAiPrompt(data));
+		}
+
+		function showCopyStatus($dialog, type, text) {
+			var $status = $('.bpmt-copy-status', $dialog);
+			$status.removeClass('bpmt-copy-success bpmt-copy-warning');
+			if (type == 'success') {
+				$status.addClass('bpmt-copy-success');
+			} else if (type == 'warning') {
+				$status.addClass('bpmt-copy-warning');
+			}
+			$status.text(text);
 		}
 
 		function buildAiPrompt(data) {
@@ -106,7 +156,14 @@
 	});
 </script>
 
-<table class="ws-table" form="${_zone}_form">
+<div class="bpmt-list-toolbar">
+	<div>
+		<strong>第三方系统列表</strong>
+		<span>管理外部系统 OAuth、微信登录和 AI 接入说明。</span>
+	</div>
+</div>
+
+<table class="ws-table bpmt-data-table bpmt-thirdpart-table" form="${_zone}_form">
 	<thead>
 		<tr>
 			<th style="width: 125px;">操作</th>
@@ -125,65 +182,99 @@
 		<c:forEach items="${dp.list}" var="vo">
 			<tr>
 				<td class="center ws-group">
-					<button icon="wrench" text="false" type="button" name="edit" value="${vo.thirdpartKey}">编辑</button>
+					<button icon="wrench" text="false" type="button" name="edit" value="${vo.thirdpartKey}" title="编辑外部系统" aria-label="编辑外部系统">编辑</button>
 					<c:choose>
 						<c:when test="${vo.activeFlag == 1}">
-							<button icon="closethick" text="false" type="button" name="toggleActive" value="${vo.thirdpartKey}" activeFlag="0">停用</button>
+							<button icon="closethick" text="false" type="button" name="toggleActive" value="${vo.thirdpartKey}" activeFlag="0" title="停用外部系统" aria-label="停用外部系统">停用</button>
 						</c:when>
 						<c:otherwise>
-							<button icon="check" text="false" type="button" name="toggleActive" value="${vo.thirdpartKey}" activeFlag="1">启用</button>
+							<button icon="check" text="false" type="button" name="toggleActive" value="${vo.thirdpartKey}" activeFlag="1" title="启用外部系统" aria-label="启用外部系统">启用</button>
 						</c:otherwise>
 					</c:choose>
-					<button icon="clipboard" text="false" type="button" name="aiPrompt">AI 接入提示词</button>
+					<button icon="clipboard" text="false" type="button" name="aiPrompt" title="复制 AI 接入提示词" aria-label="复制 AI 接入提示词">AI 接入提示词</button>
 					<textarea class="bpmt-ai-prompt-thirdpart-key" style="display:none;"><c:out value="${vo.thirdpartKey}" /></textarea>
 					<textarea class="bpmt-ai-prompt-thirdpart-name" style="display:none;"><c:out value="${vo.thirdpartName}" /></textarea>
 					<textarea class="bpmt-ai-prompt-client-id" style="display:none;"><c:out value="${vo.clientId}" /></textarea>
 					<textarea class="bpmt-ai-prompt-redirect-uris" style="display:none;"><c:out value="${vo.redirectUris}" /></textarea>
 					<textarea class="bpmt-ai-prompt-home-url" style="display:none;"><c:out value="${vo.homeUrl}" /></textarea>
 				</td>
-				<td class="center">${vo.thirdpartKey}</td>
-				<td class="left">${vo.thirdpartName}</td>
-				<td class="left">${vo.clientId}</td>
+				<td class="center"><span class="bpmt-text-clip bpmt-text-key" title="${fn:escapeXml(vo.thirdpartKey)}"><c:out value="${vo.thirdpartKey}" /></span></td>
+				<td class="left"><span class="bpmt-text-clip bpmt-text-name" title="${fn:escapeXml(vo.thirdpartName)}"><c:out value="${vo.thirdpartName}" /></span></td>
+				<td class="left"><span class="bpmt-text-clip bpmt-text-client" title="${fn:escapeXml(vo.clientId)}"><c:out value="${vo.clientId}" /></span></td>
 				<td class="center"><c:choose><c:when test="${vo.activeFlag == 1}">启用</c:when><c:otherwise>停用</c:otherwise></c:choose></td>
-				<td class="left">${vo.homeUrl}</td>
+				<td class="left"><span class="bpmt-text-clip bpmt-text-url" title="${fn:escapeXml(vo.homeUrl)}"><c:out value="${vo.homeUrl}" /></span></td>
 				<td class="left"><c:choose><c:when test="${vo.wechatLoginEnabled == 1 && vo.wechatType == 'agent'}">企业号: ${vo.wechatKey}</c:when><c:when test="${vo.wechatLoginEnabled == 1 && vo.wechatType == 'mp'}">服务号: ${vo.wechatKey}</c:when><c:otherwise>关闭</c:otherwise></c:choose></td>
 				<td class="right">${wcm:widget('date[datetime]',vo.createTime)}</td>
 				<td class="right">${wcm:widget('date[datetime]',vo.updateTime)}</td>
-				<td class="left">${vo.description}</td>
+				<td class="left"><span class="bpmt-text-clip bpmt-text-desc" title="${fn:escapeXml(vo.description)}"><c:out value="${vo.description}" /></span></td>
 			</tr>
 		</c:forEach>
+		<c:if test="${fn:length(dp.list) < 1}">
+			<tr class="bpmt-empty-table-row">
+				<td colspan="10">
+					<c:set var="hasThirdpartQuery" value="${not empty param._sl_thirdpartKey || not empty param._sl_thirdpartName || not empty param._sl_clientId || not empty param._ne_activeFlag}" />
+					<c:choose>
+						<c:when test="${hasThirdpartQuery}">
+							<div class="bpmt-state bpmt-state-empty">
+								<strong>没有匹配的外部系统</strong>
+								<span>当前筛选条件没有结果。请调整关键词或点击“重置查询”后重新搜索。</span>
+							</div>
+						</c:when>
+						<c:otherwise>
+							<div class="bpmt-state bpmt-state-empty">
+								<strong>还没有外部系统</strong>
+								<span>新增外部系统后，可配置 OAuth 登录、微信登录，并复制 AI 接入提示词给集成开发者。</span>
+							</div>
+						</c:otherwise>
+					</c:choose>
+				</td>
+			</tr>
+		</c:if>
 	</tbody>
-	<tr>
-		<th class="ws-bar">
-			<div class="ws-group right">
-				<button type="button" icon="plus" text="true" name="create">新增外部系统</button>
-			</div>
-		</th>
-	</tr>
 </table>
 
 <div id="${_zone}_bpmt_ai_prompt_dialog" class="bpmt-ai-prompt-dialog" style="display:none;">
-	<table class="ws-table">
-		<tr>
-			<th>Client Secret</th>
-			<td><input type="text" name="promptClientSecret" placeholder="新增时一次性展示或重置后自行保存的明文 clientSecret" style="width: 98%;" /></td>
-		</tr>
-		<tr>
-			<th>API App Key</th>
-			<td><input type="text" name="promptApiAppKey" placeholder="例如 BPMT_API_APP_KEY，默认开发值 bpmt-api" style="width: 98%;" /></td>
-		</tr>
-		<tr>
-			<th>API App Secret</th>
-			<td><input type="text" name="promptApiAppSecret" placeholder="正式部署必须填写实际 BPMT_API_APP_SECRET" style="width: 98%;" /></td>
-		</tr>
-		<tr>
-			<th>提示词</th>
-			<td><textarea name="promptText" style="width: 100%; height: 360px;"></textarea></td>
-		</tr>
-	</table>
-	<div class="ws-bar">
+	<div class="bpmt-dialog-intro">
+		<strong>复制给第三方 AI agent 或集成开发者</strong>
+		<span>根据当前外部系统配置生成 OAuth、API 签名和治理文件要求。请在复制前替换真实密钥。</span>
+	</div>
+	<div class="bpmt-prompt-meta" aria-label="第三方系统接入元信息">
+		<div>
+			<span>系统标识</span>
+			<strong class="bpmt-ai-meta-thirdpart-key">未配置</strong>
+		</div>
+		<div>
+			<span>Client ID</span>
+			<strong class="bpmt-ai-meta-client-id">未配置</strong>
+		</div>
+		<div>
+			<span>OAuth 回调地址</span>
+			<strong class="bpmt-ai-meta-redirect-uris">未配置 OAuth 回调地址</strong>
+		</div>
+	</div>
+	<div class="bpmt-prompt-grid">
+		<label>
+			<span>Client Secret</span>
+			<input type="text" name="promptClientSecret" placeholder="新增时一次性展示或重置后自行保存的明文 clientSecret" />
+		</label>
+		<label>
+			<span>API App Key</span>
+			<input type="text" name="promptApiAppKey" placeholder="例如 BPMT_API_APP_KEY，默认开发值 bpmt-api" />
+		</label>
+		<label>
+			<span>API App Secret</span>
+			<input type="text" name="promptApiAppSecret" placeholder="正式部署必须填写实际 BPMT_API_APP_SECRET" />
+		</label>
+	</div>
+	<label class="bpmt-prompt-text">
+		<span>提示词</span>
+		<textarea name="promptText" readonly="readonly" aria-label="AI 接入提示词"></textarea>
+	</label>
+	<div class="bpmt-dialog-actions">
+		<div class="bpmt-copy-status" role="status" aria-live="polite"></div>
 		<div class="ws-group">
 			<button type="button" icon="copy" text="true" name="copyAiPrompt">复制提示词</button>
+			<button type="button" icon="closethick" text="true" name="closeAiPrompt">关闭</button>
 		</div>
 	</div>
 </div>

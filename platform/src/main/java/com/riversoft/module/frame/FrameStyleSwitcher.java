@@ -19,6 +19,8 @@ import com.riversoft.core.web.Actions;
  */
 class FrameStyleSwitcher {
 
+	private static final String LOGO_VERSION = "?v=20260613-logo";
+
 	/**
 	 * 判断是否使用新模板
 	 * 
@@ -90,9 +92,9 @@ class FrameStyleSwitcher {
 	 */
 	protected static String getLogoUrl() {
 		if (isNewFrame()) {
-			return "/xhtml/frame_new/images/logo.png";
+			return "/xhtml/frame_new/images/logo.png" + LOGO_VERSION;
 		}
-		return "/css/images/logo.png";
+		return "/css/images/logo.png" + LOGO_VERSION;
 	}
 
 }

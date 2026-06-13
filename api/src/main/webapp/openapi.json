@@ -1,9 +1,9 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "BPMT Lite v1.7.5 API",
-    "version": "1.7.5",
-    "description": "BPMT Lite v1.7.5 API，提供动态表结构、dyn 动态表视图、数据库操作和报表视图配置接口。报表视图接口挂载在 /api/v1/report-views，只管理 rep_list 报表视图对应的 VW_URL / VW_REPORT* 配置，不执行 SQL、按钮动作或客户端脚本。HMAC 签名的 PATH 必须使用公开请求 URI，例如 /api/v1/report-views。"
+    "title": "BPMT Lite v1.8.1 API",
+    "version": "1.8.1",
+    "description": "BPMT Lite v1.8.1 API，提供动态表结构、dyn 动态表视图、数据库操作和报表视图配置接口。报表视图接口挂载在 /api/v1/report-views，只管理 rep_list 报表视图对应的 VW_URL / VW_REPORT* 配置，不执行 SQL、按钮动作或客户端脚本。HMAC 签名的 PATH 必须使用公开请求 URI，例如 /api/v1/report-views。"
   },
   "servers": [
     {

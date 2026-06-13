@@ -111,6 +111,16 @@
 				<td class="center">${wcm:widget('date',vo.updateDate)}</td>
 			</tr>
 		</c:forEach>
+		<c:if test="${fn:length(dp.list)<1}">
+			<tr class="bpmt-empty-table-row">
+				<td colspan="99">
+					<div class="bpmt-state bpmt-state-empty">
+						<strong>没有匹配的定时任务</strong>
+						<span>当前查询条件下没有定时任务。请调整筛选条件，或点击“重置查询”后重新查询。</span>
+					</div>
+				</td>
+			</tr>
+		</c:if>
 	</tbody>
 	<tr>
 		<th class="ws-bar">

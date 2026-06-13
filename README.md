@@ -6,10 +6,10 @@
 
 本仓只处理遗留 BPMT 的发行工程：代码结构、打包方式、配置方式、Docker 运行方式、初始化数据和升级脚本。不升级 Java/Tomcat/MariaDB 技术栈，不重写业务功能。
 
-当前版本：`v1.7.5`
+当前版本：`v1.8.1`
 
-- Web 镜像：`ghcr.io/wodenwang/bpmt-lite:1.7.5`
-- API 镜像：`ghcr.io/wodenwang/bpmt-lite-api:1.7.5`
+- Web 镜像：`ghcr.io/wodenwang/bpmt-lite:1.8.1`
+- API 镜像：`ghcr.io/wodenwang/bpmt-lite-api:1.8.1`
 - 同步镜像：`ghcr.io/wodenwang/bpmt-lite:latest`、`ghcr.io/wodenwang/bpmt-lite-api:latest`
 - 默认访问地址：`http://127.0.0.1/`
 - API 文档：`http://127.0.0.1/api/docs/`
@@ -21,7 +21,7 @@
 不需要 clone 项目，直接执行一条命令完成安装、初始化数据库并启动服务：
 
 ```bash
-curl -fsSL https://github.com/wodenwang/bpmt-lite/raw/refs/tags/v1.7.5/scripts/install.sh | bash
+curl -fsSL https://github.com/wodenwang/bpmt-lite/raw/refs/tags/v1.8.1/scripts/install.sh | bash
 ```
 
 脚本会创建 `bpmt-lite/` 运行目录，下载 `docker-compose.yml`、初始化脚本、升级脚本、nginx 配置模板和默认数据库，并执行 `docker compose up -d`。
@@ -42,7 +42,7 @@ http://127.0.0.1/
 启用本地 HTTPS：
 
 ```bash
-curl -fsSL https://github.com/wodenwang/bpmt-lite/raw/refs/tags/v1.7.5/scripts/install.sh | BPMT_HTTPS_ENABLED=1 bash
+curl -fsSL https://github.com/wodenwang/bpmt-lite/raw/refs/tags/v1.8.1/scripts/install.sh | BPMT_HTTPS_ENABLED=1 bash
 ```
 
 升级到最新版本：
@@ -52,7 +52,7 @@ cd bpmt-lite
 sh ./upgrade.sh
 ```
 
-`upgrade.sh` 会根据 GitHub 最新 release/tag 下载参考 compose 文件，例如 `docker-compose-v1.7.5.yml`；不会覆盖当前 `docker-compose.yml`。升级时只拉取 BPMT Web/API 的 `latest` 镜像并重启这两个服务，不自动升级 `mariadb`、`nginx` 等第三方容器。升级状态记录在 `.bpmt-lite/` 下，不写入业务数据库。
+`upgrade.sh` 会根据 GitHub 最新 release/tag 下载参考 compose 文件，例如 `docker-compose-v1.8.1.yml`；不会覆盖当前 `docker-compose.yml`。升级时只拉取 BPMT Web/API 的 `latest` 镜像并重启这两个服务，不自动升级 `mariadb`、`nginx` 等第三方容器。升级状态记录在 `.bpmt-lite/` 下，不写入业务数据库。
 
 常用检查：
 
@@ -83,7 +83,7 @@ curl -fsSI http://127.0.0.1/api/openapi.json
 - 安全边界：只管理 `VW_URL` 与 `VW_REPORT*` 元数据，不管理菜单、首页卡片、外部入口或报表业务数据；删除视图不会删除业务数据。
 - 风险提示：API 不执行 SQL、按钮动作或客户端脚本，调用方需要通过实际业务页面或验收脚本确认 SQL 语义、结果列、权限过滤和运行性能。
 - 变更预检：写接口支持 `dryRun=true`，也可使用 `POST /api/v1/report-views:validate` 做纯校验。
-- 文档归档：[v1.7.5 API 归档](docs/v1.7.5/api-reference.md)，[v1.7.5 OpenAPI](docs/v1.7.5/openapi.json)。
+- 文档归档：[v1.8.0 API 归档](docs/v1.8.0/api-reference.md)，[v1.8.0 OpenAPI](docs/v1.8.0/openapi.json)。
 
 ## 文件结构
 
@@ -124,6 +124,8 @@ docker compose up -d
 
 | 版本 | 发布日期 | 说明 | 文档 |
 | --- | --- | --- | --- |
+| `v1.8.1` | 2026-06-13 | 基于人工浏览器标注修复桌面后台 footer、按钮、表格、zTree、顶部栏、logo 和通用空状态等前端可用性问题。 | [release](docs/release-v1.8.1.md)、[计划](docs/superpowers/plans/2026-06-13-bpmt-lite-v1.8.1-frontend-defect-hardening.md)、[QA](docs/v2.0.0/configuration-workbench-lite-qa-2026-06-13.md) |
+| `v1.8.0` | 2026-06-12 | 新增桌面后台清晰度基线，围绕登录后首页、第三方系统列表和 AI 接入提示词弹窗改善任务说明、主操作、空状态和复制反馈。 | [release](docs/release-v1.8.0.md)、[设计](docs/superpowers/specs/2026-06-11-bpmt-lite-v1.8.0-desktop-admin-clarity-design.md)、[QA](docs/v2.0.0/desktop-ui-qa-checklist.md) |
 | `v1.7.5` | 2026-05-30 | 增强第三方系统 AI 接入提示词生成，便于初始化 Codex/Claude Code 第三方项目治理文件。 | [release](docs/release-v1.7.5.md)、[API](docs/v1.7.5/api-reference.md)、[OpenAPI](docs/v1.7.5/openapi.json) |
 | `v1.7.4` | 2026-05-20 | 基于 `v1.7.3` 修复登录后偶发灰色底蒙版问题，不新增接口能力。 | [release](docs/release-v1.7.4.md)、[API](docs/v1.7.4/api-reference.md)、[OpenAPI](docs/v1.7.4/openapi.json) |
 | `v1.7.3` | 2026-05-16 | 基于 `v1.7.2` 修复 OAuth 微信登录失败页提示和 `/api/openapi.json` 文档风格问题，不新增接口能力。 | [release](docs/release-v1.7.3.md)、[API](docs/v1.7.3/api-reference.md)、[OpenAPI](docs/v1.7.3/openapi.json) |
@@ -149,9 +151,13 @@ docker compose up -d
 
 - [bpmt-doc](https://github.com/wodenwang/bpmt-doc)：面向低代码用户的 SOP 文档项目。
 - [维护说明](docs/maintenance.md)：维护者构建、验证、镜像发布和升级策略。
+- [v1.8.1 发布说明](docs/release-v1.8.1.md)：桌面后台前端缺陷加固补丁版本的范围、验证和回滚说明。
+- [v1.8.0 发布说明](docs/release-v1.8.0.md)：桌面后台清晰度基线版本的范围、验证和回滚说明。
+- [v1.8.0 桌面后台清晰度设计](docs/superpowers/specs/2026-06-11-bpmt-lite-v1.8.0-desktop-admin-clarity-design.md)：Product Design 重新规划后的设计依据。
+- [v1.8.0 重新规划记录](docs/v2.0.0/desktop-admin-clarity-replan.md)：旧 CSS-only 方向失败原因和新方向选择。
+- [v1.8.0 API 归档](docs/v1.8.0/api-reference.md)：当前 API 的 Markdown 归档，完整接口以 OpenAPI 快照为准。
+- [v1.8.0 OpenAPI](docs/v1.8.0/openapi.json)：给 AI agent、N8N、飞书集成平台使用的接口契约。
 - [v1.7.5 发布说明](docs/release-v1.7.5.md)：第三方系统 AI 接入提示词补丁版本的范围和安全边界。
-- [v1.7.5 API 归档](docs/v1.7.5/api-reference.md)：当前 API 的 Markdown 归档，完整接口以 OpenAPI 快照为准。
-- [v1.7.5 OpenAPI](docs/v1.7.5/openapi.json)：给 AI agent、N8N、飞书集成平台使用的接口契约。
 - [v1.7.4 发布说明](docs/release-v1.7.4.md)：登录后偶发灰色底蒙版补丁版本的修复范围和验证清单。
 - [v1.7.0 API 文档](docs/v1.7.0/api-reference.md)：动态表视图 API 的 Markdown 归档。
 - [v1.7.0 OpenAPI 快照](docs/v1.7.0/openapi.json)：v1.7.0 的接口契约归档。

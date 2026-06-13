@@ -483,9 +483,19 @@
 						</c:forEach>
 					</tr>
 				</c:forEach>
+				<c:if test="${fn:length(dp.list) < 1}">
+					<tr class="bpmt-empty-table-row">
+						<td colspan="99">
+							<div class="bpmt-state bpmt-state-empty">
+								<strong>${wpf:lan("#:zh[没有匹配的数据]:en[No matching records]#")}</strong>
+								<span>${wpf:lan("#:zh[当前查询条件没有返回记录。请调整筛选条件，或点击“重置条件”后重新查询。]:en[The current query returned no records. Adjust filters, or reset the query and search again.]#")}</span>
+							</div>
+						</td>
+					</tr>
+				</c:if>
 			</tbody>
-			<tr>
-				<th class="ws-bar"><c:forEach items="${fn:split('left,center,right',',')}" var="styleClass">
+			<tr class="bpmt-summary-button-row">
+				<th class="ws-bar" colspan="99"><c:forEach items="${fn:split('left,center,right',',')}" var="styleClass">
 						<div class="ws-group ${styleClass}">
 							<c:forEach items="${config.summaryBtns}" var="btn">
 								<c:if test="${btn.styleClass==styleClass}">

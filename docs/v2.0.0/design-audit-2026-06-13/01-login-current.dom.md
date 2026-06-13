@@ -1,0 +1,15 @@
+- generic: 请先登录.
+- heading "BPMT" [level=3]
+- table:
+  - rowgroup:
+    - row "用户名":
+      - rowheader "用户名"
+      - cell:
+        - textbox
+    - row "密码":
+      - rowheader "密码"
+      - cell:
+        - textbox
+- button "登录":
+  - generic: 登录
+- paragraph: Copyright (c) 2026 wodenwang and borballzhai

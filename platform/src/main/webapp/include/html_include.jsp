@@ -16,10 +16,12 @@
 		<link href="${_ext_style}" rel="stylesheet">
 	</c:otherwise>
 </c:choose>
-<link href="${_cp}/css/jquery-ui-ext.css" rel="stylesheet">
+<link href="${_cp}/css/jquery-ui-ext.css?v=20260613-table-hover" rel="stylesheet">
 <link href="${_cp}/css/styles.css" rel="stylesheet">
 <%-- 深浅样式 --%>
 <link href="${_cp}/css/styles_${_backgroud_style=='1'?'dark':'light'}.css" rel="stylesheet">
+<%-- v1.8.0 桌面后台清晰度基线覆盖层，最后加载以便可单文件回滚 --%>
+<link href="${_cp}/css/bpmt-modern.css?v=20260613-top-menu" rel="stylesheet">
 
 <%-- 公共js函数 --%>
 <script>

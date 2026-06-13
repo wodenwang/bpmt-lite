@@ -1,0 +1,122 @@
+- generic "当前登录信息":
+  - generic: 用户
+  - generic: 管理员
+  - generic: 组织
+  - generic: 系统管理组
+  - generic: 角色
+  - generic: 管理员
+  - generic: 登录时间 2026-06-13 15:45:31
+- list:
+  - link "Language":
+    - /url: javascript:;;
+    - text: Language
+  - link "待办":
+    - /url: javascript:;;
+    - text: 待办
+  - link "全屏":
+    - /url: javascript:;;
+    - text: 全屏
+  - link "切换":
+    - /url: javascript:;;
+    - text: 切换
+  - link "设置":
+    - /url: javascript:;;
+    - text: 设置
+  - link "退出":
+    - /url: javascript:;;
+    - text: 退出
+- link:
+  - /url: javascript:void(0);
+- button "我的事项":
+  - generic: 我的事项
+- button "综合人事":
+  - generic: 综合人事
+- button "财务模块":
+  - generic: 财务模块
+- button "进销存":
+  - generic: 进销存
+- button "项目管理":
+  - generic: 项目管理
+- button "基础数据":
+  - generic: 基础数据
+- button "功能设置":
+  - generic: 功能设置
+- heading "菜单" [level=3]: 菜单
+- list:
+  - generic "首页":
+    - text: 首页
+    - generic "新窗口打开"
+  - generic "我的任务": 我的任务
+  - list:
+    - generic "我的待办": 我的待办
+    - generic "我的发起": 我的发起
+    - generic "我的相关": 我的相关
+    - list:
+      - generic "进行中": 进行中
+      - generic "已完结": 已完结
+      - generic "已取消": 已取消
+  - generic "综合事项": 综合事项
+  - list:
+    - generic "通讯录": 通讯录
+    - generic "公司资料": 公司资料
+    - generic "报告管理": 报告管理
+    - generic "事项申请": 事项申请
+  - generic "人力薪资": 人力薪资
+  - list:
+    - generic "个人档案": 个人档案
+    - generic "请假申请": 请假申请
+    - generic "工资台账": 工资台账
+  - generic "财务信息": 财务信息
+  - list:
+    - generic "费用报销": 费用报销
+    - generic "付款申请": 付款申请
+    - generic "员工借款": 员工借款
+    - generic "员工还款": 员工还款
+    - generic "押金登记": 押金登记
+    - generic "押金退还": 押金退还
+- heading "通知公告" [level=3]: 通知公告
+- table:
+  - rowgroup:
+    - row "[2020-10-30] 测试公告":
+      - columnheader "[2020-10-30]"
+      - columnheader "测试公告":
+        - link "测试公告":
+          - /url: javascript:void(0);
+- heading "首页待办" [level=3]: 首页待办
+- tablist:
+  - tab "个人任务" [expanded] [selected]:
+    - link "个人任务":
+      - /url: "#auto_2_home_0_1_task"
+  - tab "群组任务":
+    - link "群组任务":
+      - /url: "#auto_2_home_0_1_share_task"
+- tabpanel "个人任务":
+  - table:
+    - rowgroup:
+      - row "操作 单号 所属流程 摘要 处理人 当前节点 开始时间 等待时长":
+        - columnheader "操作"
+        - columnheader "单号"
+        - columnheader "所属流程"
+        - columnheader "摘要"
+        - columnheader "处理人"
+        - columnheader "当前节点"
+        - columnheader "开始时间"
+        - columnheader "等待时长"
+      - row "没有待办任务 当前查询条件下没有待处理任务。请调整筛选条件，或点击“重置查询”后重新查询。":
+        - cell "没有待办任务 当前查询条件下没有待处理任务。请调整筛选条件，或点击“重置查询”后重新查询。":
+          - strong: 没有待办任务
+          - generic: 当前查询条件下没有待处理任务。请调整筛选条件，或点击“重置查询”后重新查询。
+  - generic: "[每页记录数：20] 总页数/总记录数：1/0"
+  - button "第一页":
+    - generic: 第一页
+  - button "前一页":
+    - generic: 前一页
+  - button "1" [disabled]:
+    - generic: "1"
+  - button "下一页":
+    - generic: 下一页
+  - button "最后页":
+    - generic: 最后页
+- heading "我的工作量" [level=3]: 我的工作量
+- paragraph: Copyright (c) 2026 wodenwang and borballzhai
+- log

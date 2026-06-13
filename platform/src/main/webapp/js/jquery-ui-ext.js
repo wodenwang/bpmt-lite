@@ -89,6 +89,15 @@ var _core = {
 				}
 
 				var $button = $(this);
+				var buttonText = $.trim($button.text());
+				if (buttonText != '') {
+					if (!$button.attr('title')) {
+						$button.attr('title', buttonText);
+					}
+					if (!$button.attr('aria-label')) {
+						$button.attr('aria-label', buttonText);
+					}
+				}
 				$button.button({
 					text : text,
 					icons : {

@@ -59,6 +59,16 @@
 			<td class="center"><f:formatDate value="${vo.SENT_DATE}" pattern="yyyy-MM-dd HH:mm:ss" /></td>
 		</tr>
 	</c:forEach>
+	<c:if test="${fn:length(dp.list)<1}">
+		<tr class="bpmt-empty-table-row">
+			<td colspan="99">
+				<div class="bpmt-state bpmt-state-empty">
+					<strong>没有匹配的发件邮件</strong>
+					<span>当前查询条件下没有发件邮件。请调整筛选条件，或点击“重置查询”后重新查询。</span>
+				</div>
+			</td>
+		</tr>
+	</c:if>
 	<tr>
 		<th class="ws-bar left"><button icon="trash" type="button" name="del">删除</button></th>
 	</tr>

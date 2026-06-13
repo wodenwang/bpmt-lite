@@ -1,0 +1,13 @@
+{
+  "model": "claude-opus-4-6",
+  "reason": "finished",
+  "usage": {
+    "inputTokens": 56129,
+    "outputTokens": 21582,
+    "cacheCreationInputTokens": 0,
+    "cacheReadInputTokens": 1240832,
+    "numTurns": 26,
+    "totalCostUsd": 1.440611,
+    "durationMs": 234600
+  }
+}

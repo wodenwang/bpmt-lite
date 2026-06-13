@@ -25,9 +25,15 @@ var Ui = {
 		if (style == undefined || style == null) {
 			style = 'info';
 		}
+		var closeText = '关闭';
+		if (typeof (_lan) != "undefined" && _lan == 'en') {
+			closeText = 'Close';
+		}
 
-		var $div = $('<div class="ws-msg" style="position: relative;">' + msg
-				+ '<a href="javascript:void(0);" class="ui-corner-all msgPage"><span class="ui-icon ui-icon-closethick">close</span></a></div>');
+		var role = style == 'error' || style == 'warning' ? 'alert' : 'status';
+		var live = role == 'alert' ? 'assertive' : 'polite';
+		var $div = $('<div class="ws-msg" style="position: relative;" role="' + role + '" aria-live="' + live + '">' + msg
+				+ '<a href="javascript:void(0);" class="ui-corner-all msgPage" title="' + closeText + '" aria-label="' + closeText + '"><span class="ui-icon ui-icon-closethick">close</span></a></div>');
 		$div.styleMsg({
 			type : style
 		});
@@ -59,7 +65,7 @@ var Ui = {
 			btnText = 'OK';
 		}
 
-		$('body').append('<div id="ws-dialog-alert-div" style="display:none;">' + msg + '</div>');
+		$('body').append('<div id="ws-dialog-alert-div" style="display:none;" role="alert" aria-live="assertive">' + msg + '</div>');
 		$("#ws-dialog-alert-div").styleMsg({
 			type : 'info'
 		});
@@ -102,7 +108,7 @@ var Ui = {
 			cancelText = "Cancel";
 		}
 
-		$('body').append('<div id="ws-dialog-confirm-div" style="display:none;">' + msg + '</div>');
+		$('body').append('<div id="ws-dialog-confirm-div" style="display:none;" role="alertdialog" aria-live="assertive">' + msg + '</div>');
 		$("#ws-dialog-confirm-div").styleMsg({
 			type : 'warning'
 		});
