@@ -46,6 +46,15 @@ jobs:
       - name: Prepare Maven settings
         run: cp settings.example.xml settings.local.xml
 
+      - name: Install vendored Maven artifacts
+        run: |
+          mvn -s settings.local.xml install:install-file \
+            -DgroupId=com.riversoft \
+            -DartifactId=ueditor \
+            -Dversion=1.4.3 \
+            -Dpackaging=war \
+            -Dfile=vendor/maven/com/riversoft/ueditor/1.4.3/ueditor-1.4.3.war
+
       - name: Build and publish multi-arch images
         env:
           BPMT_IMAGE_TAG: ${{ inputs.image_tag }}
