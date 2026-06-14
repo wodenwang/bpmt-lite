@@ -116,6 +116,7 @@ Playwright 验证证据：
 }
 ```
 
-待发布收口时补充：
+## 发布信息
 
-- Git tag 和 GitHub Release。
+- Git tag：`v1.9.0`
+- GitHub Release：`https://github.com/wodenwang/bpmt-lite/releases/tag/v1.9.0`
