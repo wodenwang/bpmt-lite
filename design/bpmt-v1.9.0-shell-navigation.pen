@@ -1,0 +1,1532 @@
+{
+  "version": "2.13",
+  "children": [
+    {
+      "type": "frame",
+      "id": "By36y",
+      "x": 0,
+      "y": 0,
+      "name": "01 Home shell",
+      "clip": true,
+      "width": 1440,
+      "height": 900,
+      "fill": "#EEF2F6",
+      "children": [
+        {
+          "type": "frame",
+          "id": "W10NGn",
+          "name": "Unified Sidebar",
+          "width": 264,
+          "height": "fill_container",
+          "fill": "#172033",
+          "layout": "vertical",
+          "gap": 14,
+          "padding": [
+            18,
+            16
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "uLZ5U",
+              "name": "Brand Row",
+              "width": "fill_container",
+              "height": 48,
+              "gap": 12,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "V2JXFe",
+                  "name": "Brand Mark",
+                  "width": 34,
+                  "height": 34,
+                  "fill": "#FFFFFF",
+                  "cornerRadius": 7
+                },
+                {
+                  "type": "text",
+                  "id": "JEflw",
+                  "name": "Brand Text",
+                  "fill": "#FFFFFF",
+                  "content": "BPMT",
+                  "fontFamily": "Inter",
+                  "fontSize": 20,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "Kz8RO",
+              "name": "Navigation",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 6,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "CeIa5",
+                  "name": "Nav 工作台",
+                  "width": "fill_container",
+                  "fill": "#243552",
+                  "cornerRadius": 6,
+                  "gap": 10,
+                  "padding": [
+                    10,
+                    12
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "e4JgsD",
+                      "name": "Nav 工作台 Icon",
+                      "width": 18,
+                      "height": 18,
+                      "icon": "layout-dashboard",
+                      "library": "lucide",
+                      "fill": "#FFFFFF"
+                    },
+                    {
+                      "type": "text",
+                      "id": "axuOY",
+                      "name": "Nav 工作台 Text",
+                      "fill": "#FFFFFF",
+                      "content": "工作台",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "YIDVp",
+                  "name": "Nav 系统开发",
+                  "width": "fill_container",
+                  "fill": "#172033",
+                  "cornerRadius": 6,
+                  "gap": 10,
+                  "padding": [
+                    10,
+                    12
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "NI6H3",
+                      "name": "Nav 系统开发 Icon",
+                      "width": 18,
+                      "height": 18,
+                      "icon": "circle",
+                      "library": "lucide",
+                      "fill": "#94A3B8"
+                    },
+                    {
+                      "type": "text",
+                      "id": "iOyOf",
+                      "name": "Nav 系统开发 Text",
+                      "fill": "#CBD5E1",
+                      "content": "系统开发",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "kjqo2",
+                  "name": "Nav 报表中心",
+                  "width": "fill_container",
+                  "fill": "#172033",
+                  "cornerRadius": 6,
+                  "gap": 10,
+                  "padding": [
+                    10,
+                    12
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "CzzfH",
+                      "name": "Nav 报表中心 Icon",
+                      "width": 18,
+                      "height": 18,
+                      "icon": "circle",
+                      "library": "lucide",
+                      "fill": "#94A3B8"
+                    },
+                    {
+                      "type": "text",
+                      "id": "zsKfk",
+                      "name": "Nav 报表中心 Text",
+                      "fill": "#CBD5E1",
+                      "content": "报表中心",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "Y852e",
+              "name": "Sidebar State",
+              "width": "fill_container",
+              "fill": "#223047",
+              "cornerRadius": 6,
+              "layout": "vertical",
+              "gap": 6,
+              "padding": 12,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "zQB7M",
+                  "name": "Sidebar State Title",
+                  "fill": "#E2E8F0",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "统一导航区域",
+                  "fontFamily": "Inter",
+                  "fontSize": 13,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "bx2lk",
+                  "name": "Sidebar State Body",
+                  "fill": "#94A3B8",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "logo 与菜单合并为同一列，宽度与主区顶部严格对齐。",
+                  "fontFamily": "Inter",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "vEdyl",
+          "name": "Work Area",
+          "width": "fill_container",
+          "height": "fill_container",
+          "fill": "#EEF2F6",
+          "layout": "vertical",
+          "children": [
+            {
+              "type": "frame",
+              "id": "nQTbC",
+              "name": "Top Command Bar",
+              "width": "fill_container",
+              "height": 64,
+              "fill": "#FFFFFF",
+              "stroke": "#D7DEE8",
+              "strokeWidth": {
+                "bottom": 1
+              },
+              "padding": [
+                0,
+                24
+              ],
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "wfhPR",
+                  "name": "Breadcrumb",
+                  "layout": "vertical",
+                  "gap": 3,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "y8KIeX",
+                      "name": "Page Title",
+                      "fill": "#111827",
+                      "content": "首页工作台",
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "BHy0H",
+                      "name": "Page Subtitle",
+                      "fill": "#64748B",
+                      "content": "统一后的 logo / 菜单 / 顶部功能按钮 / 主内容区域",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "cggdM",
+                  "name": "Header Actions",
+                  "gap": 8,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "atEAs",
+                      "name": "Search Command",
+                      "fill": "#F8FAFC",
+                      "cornerRadius": 6,
+                      "stroke": "#D7DEE8",
+                      "strokeWidth": 1,
+                      "padding": [
+                        8,
+                        12
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "ZaleA",
+                          "name": "Search Label",
+                          "fill": "#111827",
+                          "content": "查询",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "ZtwGr",
+                      "name": "Primary Command",
+                      "fill": "#2563EB",
+                      "cornerRadius": 6,
+                      "padding": [
+                        8,
+                        12
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "f0uif",
+                          "name": "Primary Label",
+                          "fill": "#FFFFFF",
+                          "content": "新增",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "ioKu8",
+              "name": "Main Content",
+              "width": "fill_container",
+              "height": "fill_container",
+              "layout": "vertical",
+              "gap": 16,
+              "padding": 24,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "K6zzTh",
+                  "name": "Home Metrics",
+                  "width": "fill_container",
+                  "height": 92,
+                  "gap": 12,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "o0wsZA",
+                      "name": "Metric 待办事项",
+                      "width": "fill_container",
+                      "height": "fill_container",
+                      "fill": "#FFFFFF",
+                      "cornerRadius": 6,
+                      "stroke": "#D7DEE8",
+                      "strokeWidth": 1,
+                      "layout": "vertical",
+                      "gap": 6,
+                      "padding": 16,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "qyDxY",
+                          "name": "Metric 待办 Label",
+                          "fill": "#64748B",
+                          "content": "待办事项",
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "RXhxU",
+                          "name": "Metric 待办 Value",
+                          "fill": "#111827",
+                          "content": "18",
+                          "fontFamily": "Inter",
+                          "fontSize": 28,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "Scrpb",
+                      "name": "Metric 异常提醒",
+                      "width": "fill_container",
+                      "height": "fill_container",
+                      "fill": "#FFFFFF",
+                      "cornerRadius": 6,
+                      "stroke": "#D7DEE8",
+                      "strokeWidth": 1,
+                      "layout": "vertical",
+                      "gap": 6,
+                      "padding": 16,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "n9FYvF",
+                          "name": "Metric 异常 Label",
+                          "fill": "#64748B",
+                          "content": "异常提醒",
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "cqp9r",
+                          "name": "Metric 异常 Value",
+                          "fill": "#111827",
+                          "content": "2",
+                          "fontFamily": "Inter",
+                          "fontSize": 28,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "TN3ir",
+                  "name": "Result Table With Correct Empty Lifecycle",
+                  "width": "fill_container",
+                  "height": 560,
+                  "fill": "#FFFFFF",
+                  "cornerRadius": 6,
+                  "stroke": "#D7DEE8",
+                  "strokeWidth": 1,
+                  "layout": "vertical",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "QyolE",
+                      "name": "Table Header",
+                      "width": "fill_container",
+                      "height": 42,
+                      "fill": "#F8FAFC",
+                      "stroke": "#D7DEE8",
+                      "strokeWidth": {
+                        "bottom": 1
+                      },
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "bZnzr",
+                          "name": "Header 名称",
+                          "fill": "#64748B",
+                          "content": "名称",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "MkYL1",
+                          "name": "Header 状态",
+                          "fill": "#64748B",
+                          "content": "状态",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "R8YEM4",
+                          "name": "Header 操作",
+                          "fill": "#64748B",
+                          "content": "操作",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "X6iWf",
+                      "name": "Data Row 审批流程配置",
+                      "width": "fill_container",
+                      "height": 48,
+                      "stroke": "#D7DEE8",
+                      "strokeWidth": {
+                        "bottom": 1
+                      },
+                      "padding": [
+                        0,
+                        14
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "ITp45",
+                          "name": "Cell Name",
+                          "fill": "#111827",
+                          "content": "审批流程配置",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "GKFLx",
+                          "name": "Cell Status",
+                          "fill": "#047857",
+                          "content": "可用",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "Uy490",
+                          "name": "Cell Action",
+                          "fill": "#2563EB",
+                          "content": "查看",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "vv2q2",
+                      "name": "Empty State Contract",
+                      "width": "fill_container",
+                      "fill": "#F8FAFC",
+                      "gap": 8,
+                      "padding": 14,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "g5Q13o",
+                          "name": "Empty Contract Icon",
+                          "width": 18,
+                          "height": 18,
+                          "icon": "info",
+                          "library": "lucide",
+                          "fill": "#2563EB"
+                        },
+                        {
+                          "type": "text",
+                          "id": "zjwm0",
+                          "name": "Empty Contract Text",
+                          "fill": "#64748B",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "有结果时不保留“没有匹配的数据”行；空状态只由当前查询结果驱动。",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "lGDEH",
+      "x": 1520,
+      "y": 0,
+      "name": "02 Settings shell",
+      "clip": true,
+      "width": 1440,
+      "height": 900,
+      "fill": "#EEF2F6",
+      "children": [
+        {
+          "type": "frame",
+          "id": "J6oFw",
+          "name": "Unified Sidebar",
+          "width": 264,
+          "height": "fill_container",
+          "fill": "#172033",
+          "layout": "vertical",
+          "gap": 14,
+          "padding": [
+            18,
+            16
+          ],
+          "children": [
+            {
+              "type": "text",
+              "id": "a09k6c",
+              "name": "Brand Text",
+              "fill": "#FFFFFF",
+              "content": "BPMT",
+              "fontFamily": "Inter",
+              "fontSize": 20,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "frame",
+              "id": "NajAI",
+              "name": "Nav Active 系统开发",
+              "width": "fill_container",
+              "fill": "#243552",
+              "cornerRadius": 6,
+              "gap": 10,
+              "padding": [
+                10,
+                12
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "YwnFN",
+                  "name": "Nav Active Icon",
+                  "width": 18,
+                  "height": 18,
+                  "icon": "settings",
+                  "library": "lucide",
+                  "fill": "#FFFFFF"
+                },
+                {
+                  "type": "text",
+                  "id": "AN3zx",
+                  "name": "Nav Active Text",
+                  "fill": "#FFFFFF",
+                  "content": "系统开发",
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "M28p4",
+          "name": "Work Area",
+          "width": "fill_container",
+          "height": "fill_container",
+          "layout": "vertical",
+          "children": [
+            {
+              "type": "frame",
+              "id": "JF8OE",
+              "name": "Top Command Bar",
+              "width": "fill_container",
+              "height": 64,
+              "fill": "#FFFFFF",
+              "stroke": "#D7DEE8",
+              "strokeWidth": {
+                "bottom": 1
+              },
+              "padding": [
+                0,
+                24
+              ],
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "CsqKI",
+                  "name": "Breadcrumb",
+                  "layout": "vertical",
+                  "gap": 3,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "HXDuB",
+                      "name": "Page Title",
+                      "fill": "#111827",
+                      "content": "系统开发 / 第三方系统",
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "YF0gC",
+                      "name": "Page Subtitle",
+                      "fill": "#64748B",
+                      "content": "侧栏与顶部栏合并后，配置列表、按钮和树控件按统一栅格对齐",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "sPimj",
+                  "name": "Top Action",
+                  "fill": "#2563EB",
+                  "cornerRadius": 6,
+                  "padding": [
+                    8,
+                    12
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "sPqu3",
+                      "name": "Top Action Text",
+                      "fill": "#FFFFFF",
+                      "content": "新增应用",
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "p7v3bD",
+              "name": "Main Content",
+              "width": "fill_container",
+              "height": "fill_container",
+              "gap": 16,
+              "padding": 24,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "ZHoTV",
+                  "name": "Stable Non Menu zTree",
+                  "width": 300,
+                  "height": "fill_container",
+                  "fill": "#FFFFFF",
+                  "cornerRadius": 6,
+                  "stroke": "#D7DEE8",
+                  "strokeWidth": 1,
+                  "layout": "vertical",
+                  "gap": 4,
+                  "padding": 12,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "B5WoUK",
+                      "name": "Tree Title",
+                      "fill": "#111827",
+                      "content": "组织与分类",
+                      "fontFamily": "Inter",
+                      "fontSize": 15,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "Mq0Wt",
+                      "name": "Tree Row 系统开发",
+                      "width": "fill_container",
+                      "height": 32,
+                      "fill": "#FFFFFF",
+                      "cornerRadius": 4,
+                      "gap": 8,
+                      "padding": [
+                        0,
+                        8
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "AecVY",
+                          "name": "Tree Icon 系统开发",
+                          "width": 18,
+                          "height": 18,
+                          "icon": "folder",
+                          "library": "lucide",
+                          "fill": "#64748B"
+                        },
+                        {
+                          "type": "text",
+                          "id": "v6fymT",
+                          "name": "Tree Text 系统开发",
+                          "fill": "#111827",
+                          "content": "系统开发",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "uewI5",
+                      "name": "Tree Row 第三方系统 Hover",
+                      "width": "fill_container",
+                      "height": 32,
+                      "fill": "#EAF2FF",
+                      "cornerRadius": 4,
+                      "gap": 8,
+                      "padding": [
+                        0,
+                        8
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "l8eLvl",
+                          "name": "Tree Icon 第三方系统",
+                          "width": 18,
+                          "height": 18,
+                          "icon": "folder-open",
+                          "library": "lucide",
+                          "fill": "#2563EB"
+                        },
+                        {
+                          "type": "text",
+                          "id": "c7qMm",
+                          "name": "Tree Text 第三方系统",
+                          "fill": "#2563EB",
+                          "content": "第三方系统",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "xOlXP",
+                      "name": "Tree Row AI 接入提示词",
+                      "width": "fill_container",
+                      "height": 32,
+                      "fill": "#FFFFFF",
+                      "cornerRadius": 4,
+                      "gap": 8,
+                      "padding": [
+                        0,
+                        8
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "S3Xk1x",
+                          "name": "Tree Icon AI",
+                          "width": 18,
+                          "height": 18,
+                          "icon": "folder",
+                          "library": "lucide",
+                          "fill": "#64748B"
+                        },
+                        {
+                          "type": "text",
+                          "id": "GB4Xe",
+                          "name": "Tree Text AI",
+                          "fill": "#111827",
+                          "content": "AI 接入提示词",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "xOhad",
+                  "name": "Settings List",
+                  "width": "fill_container",
+                  "height": "fill_container",
+                  "fill": "#FFFFFF",
+                  "cornerRadius": 6,
+                  "stroke": "#D7DEE8",
+                  "strokeWidth": 1,
+                  "layout": "vertical",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "q1yjG",
+                      "name": "List Toolbar",
+                      "width": "fill_container",
+                      "height": 56,
+                      "stroke": "#D7DEE8",
+                      "strokeWidth": {
+                        "bottom": 1
+                      },
+                      "padding": [
+                        0,
+                        16
+                      ],
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "lD0pk",
+                          "name": "List Toolbar Title",
+                          "fill": "#111827",
+                          "content": "第三方系统",
+                          "fontFamily": "Inter",
+                          "fontSize": 16,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "y1bM4",
+                          "name": "List Toolbar Note",
+                          "fill": "#64748B",
+                          "content": "按钮不浮出弹框层级模型",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "G3Ed3",
+                      "name": "Settings Row 飞书 IAM",
+                      "width": "fill_container",
+                      "height": 56,
+                      "stroke": "#D7DEE8",
+                      "strokeWidth": {
+                        "bottom": 1
+                      },
+                      "padding": [
+                        0,
+                        16
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "F9Zs0O",
+                          "name": "Settings Row Name 飞书 IAM",
+                          "fill": "#111827",
+                          "content": "飞书 IAM",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "K5iRSS",
+                          "name": "Settings Row Status 飞书 IAM",
+                          "fill": "#047857",
+                          "content": "已启用",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "AG5HB",
+                      "name": "Settings Row 企业微信",
+                      "width": "fill_container",
+                      "height": 56,
+                      "stroke": "#D7DEE8",
+                      "strokeWidth": {
+                        "bottom": 1
+                      },
+                      "padding": [
+                        0,
+                        16
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "P6d3J",
+                          "name": "Settings Row Name 企业微信",
+                          "fill": "#111827",
+                          "content": "企业微信",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "NeePS",
+                          "name": "Settings Row Status 企业微信",
+                          "fill": "#047857",
+                          "content": "已启用",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "N4pjvS",
+      "x": 0,
+      "y": 980,
+      "name": "03 Modal layering",
+      "clip": true,
+      "width": 1440,
+      "height": 900,
+      "fill": "#EEF2F6",
+      "layout": "none",
+      "children": [
+        {
+          "type": "frame",
+          "id": "fvNY2",
+          "x": 0,
+          "y": 0,
+          "name": "Page Shell Behind Mask",
+          "width": 1440,
+          "height": 900,
+          "fill": "#EEF2F6",
+          "children": [
+            {
+              "type": "frame",
+              "id": "tJNcv",
+              "name": "Sidebar Behind Mask",
+              "width": 264,
+              "height": 900,
+              "fill": "#172033"
+            },
+            {
+              "type": "frame",
+              "id": "qa28E",
+              "name": "Work Area Behind Mask",
+              "width": 1176,
+              "height": 900,
+              "layout": "vertical",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "Bicew",
+                  "name": "Top Bar Behind Mask",
+                  "width": "fill_container",
+                  "height": 64,
+                  "fill": "#FFFFFF",
+                  "stroke": "#D7DEE8",
+                  "strokeWidth": {
+                    "bottom": 1
+                  },
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "LIh5e",
+                      "name": "Top Bar Title Behind Mask",
+                      "fill": "#111827",
+                      "content": "弹框层级验证",
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "Uzh2x",
+                  "name": "High Z Button Behind Modal",
+                  "width": 260,
+                  "height": 40,
+                  "fill": "#F97316",
+                  "cornerRadius": 6,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "e99Kt",
+                      "name": "High Z Button Text",
+                      "fill": "#FFFFFF",
+                      "content": "历史高层级按钮：应被遮罩覆盖",
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "ngTr7",
+          "x": 0,
+          "y": 0,
+          "name": "Global Modal Mask",
+          "width": 1440,
+          "height": 900,
+          "fill": "#111827B8"
+        },
+        {
+          "type": "frame",
+          "id": "LLtC8",
+          "x": 430,
+          "y": 170,
+          "name": "Global Dialog",
+          "width": 580,
+          "height": 420,
+          "fill": "#FFFFFF",
+          "cornerRadius": 8,
+          "stroke": "#CBD5E1",
+          "strokeWidth": 1,
+          "layout": "vertical",
+          "children": [
+            {
+              "type": "frame",
+              "id": "BdqCn",
+              "name": "Dialog Titlebar",
+              "width": "fill_container",
+              "height": 56,
+              "stroke": "#D7DEE8",
+              "strokeWidth": {
+                "bottom": 1
+              },
+              "padding": [
+                0,
+                16
+              ],
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "QVIKz",
+                  "name": "Dialog Title",
+                  "fill": "#111827",
+                  "content": "AI 接入提示词",
+                  "fontFamily": "Inter",
+                  "fontSize": 18,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "frame",
+                  "id": "BawYb",
+                  "name": "Dialog Close Button 32",
+                  "width": 32,
+                  "height": 32,
+                  "fill": "#F8FAFC",
+                  "cornerRadius": 6,
+                  "stroke": "#D7DEE8",
+                  "strokeWidth": 1,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "khiUw",
+                      "name": "Dialog Close Icon",
+                      "width": 18,
+                      "height": 18,
+                      "icon": "x",
+                      "library": "lucide",
+                      "fill": "#111827"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "D4e7Ve",
+              "name": "Dialog Body",
+              "width": "fill_container",
+              "height": "fill_container",
+              "layout": "vertical",
+              "gap": 12,
+              "padding": 20,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "fZS2W",
+                  "name": "Dialog Body Text",
+                  "fill": "#111827",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "遮罩层覆盖整个 shell；窗体在遮罩之上；右上角关闭按钮固定 32 x 32，不随 jQuery UI 标题栏样式漂移。",
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "frame",
+                  "id": "Nwu2Z",
+                  "name": "Dialog Primary Button",
+                  "fill": "#2563EB",
+                  "cornerRadius": 6,
+                  "padding": [
+                    9,
+                    14
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "dZuID",
+                      "name": "Dialog Primary Button Text",
+                      "fill": "#FFFFFF",
+                      "content": "复制提示词",
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "Bcx3h",
+      "x": 1520,
+      "y": 980,
+      "name": "04 Non-menu zTree",
+      "clip": true,
+      "width": 1440,
+      "height": 900,
+      "fill": "#EEF2F6",
+      "children": [
+        {
+          "type": "frame",
+          "id": "NMoEI",
+          "name": "zTree Test Panel",
+          "width": 360,
+          "height": "fill_container",
+          "fill": "#FFFFFF",
+          "stroke": "#D7DEE8",
+          "strokeWidth": {
+            "right": 1
+          },
+          "layout": "vertical",
+          "gap": 10,
+          "padding": 24,
+          "children": [
+            {
+              "type": "text",
+              "id": "WeyPS",
+              "name": "zTree Test Title",
+              "fill": "#111827",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "非菜单 zTree hover 规范",
+              "fontFamily": "Inter",
+              "fontSize": 20,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "QaXSC",
+              "name": "zTree Test Body",
+              "fill": "#64748B",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "所有业务区域的 zTree 行高、图标尺寸、文字框尺寸保持稳定，hover 只改变背景和文字色。",
+              "fontFamily": "Inter",
+              "fontSize": 13,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "frame",
+              "id": "uhfO8",
+              "name": "Unified zTree Row 组织架构",
+              "width": "fill_container",
+              "height": 32,
+              "fill": "#FFFFFF",
+              "cornerRadius": 4,
+              "gap": 8,
+              "padding": [
+                0,
+                8
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "dKauH",
+                  "name": "Unified zTree Icon 组织架构",
+                  "width": 18,
+                  "height": 18,
+                  "icon": "chevron-right",
+                  "library": "lucide",
+                  "fill": "#64748B"
+                },
+                {
+                  "type": "text",
+                  "id": "pJ6Xg",
+                  "name": "Unified zTree Text 组织架构",
+                  "fill": "#111827",
+                  "content": "组织架构",
+                  "fontFamily": "Inter",
+                  "fontSize": 13,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "e9mUo",
+              "name": "Unified zTree Row 动态表分类 Hover",
+              "width": "fill_container",
+              "height": 32,
+              "fill": "#EAF2FF",
+              "cornerRadius": 4,
+              "gap": 8,
+              "padding": [
+                0,
+                8
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "H8lXo",
+                  "name": "Unified zTree Icon 动态表分类",
+                  "width": 18,
+                  "height": 18,
+                  "icon": "chevron-right",
+                  "library": "lucide",
+                  "fill": "#2563EB"
+                },
+                {
+                  "type": "text",
+                  "id": "PPcDi",
+                  "name": "Unified zTree Text 动态表分类",
+                  "fill": "#2563EB",
+                  "content": "动态表分类",
+                  "fontFamily": "Inter",
+                  "fontSize": 13,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "WZXhf",
+              "name": "Unified zTree Row 第三方系统权限",
+              "width": "fill_container",
+              "height": 32,
+              "fill": "#FFFFFF",
+              "cornerRadius": 4,
+              "gap": 8,
+              "padding": [
+                0,
+                8
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "MEzlt",
+                  "name": "Unified zTree Icon 第三方系统权限",
+                  "width": 18,
+                  "height": 18,
+                  "icon": "chevron-right",
+                  "library": "lucide",
+                  "fill": "#64748B"
+                },
+                {
+                  "type": "text",
+                  "id": "FusaS",
+                  "name": "Unified zTree Text 第三方系统权限",
+                  "fill": "#111827",
+                  "content": "第三方系统权限",
+                  "fontFamily": "Inter",
+                  "fontSize": 13,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "pqCds",
+          "name": "zTree Measurement",
+          "width": "fill_container",
+          "height": "fill_container",
+          "layout": "vertical",
+          "gap": 16,
+          "padding": 24,
+          "children": [
+            {
+              "type": "text",
+              "id": "c44MNb",
+              "name": "zTree Measurement Title",
+              "fill": "#111827",
+              "content": "验收量化",
+              "fontFamily": "Inter",
+              "fontSize": 20,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "frame",
+              "id": "Hk4sc",
+              "name": "Rule Row Height",
+              "width": "fill_container",
+              "gap": 10,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "uqAcE",
+                  "name": "Rule Row Height Icon",
+                  "width": 18,
+                  "height": 18,
+                  "icon": "check",
+                  "library": "lucide",
+                  "fill": "#2563EB"
+                },
+                {
+                  "type": "text",
+                  "id": "Hh152",
+                  "name": "Rule Row Height Text",
+                  "fill": "#111827",
+                  "content": "hover 前后 row height = 32px",
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "S6k4X",
+              "name": "Rule Box Model",
+              "width": "fill_container",
+              "gap": 10,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "kmQct",
+                  "name": "Rule Box Model Icon",
+                  "width": 18,
+                  "height": 18,
+                  "icon": "check",
+                  "library": "lucide",
+                  "fill": "#2563EB"
+                },
+                {
+                  "type": "text",
+                  "id": "xwZgp",
+                  "name": "Rule Box Model Text",
+                  "fill": "#111827",
+                  "content": "switch / ico / a 盒模型不改变",
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "d8WWkq",
+              "name": "Rule Menu Override",
+              "width": "fill_container",
+              "gap": 10,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "E8bS6",
+                  "name": "Rule Menu Override Icon",
+                  "width": 18,
+                  "height": 18,
+                  "icon": "check",
+                  "library": "lucide",
+                  "fill": "#2563EB"
+                },
+                {
+                  "type": "text",
+                  "id": "bpyGj",
+                  "name": "Rule Menu Override Text",
+                  "fill": "#111827",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "菜单 zTree 可保留深色侧栏视觉，但继承同一稳定尺寸",
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "GIAKq",
+              "name": "Rule Dialog Tree",
+              "width": "fill_container",
+              "gap": 10,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "Ed5QJ",
+                  "name": "Rule Dialog Tree Icon",
+                  "width": 18,
+                  "height": 18,
+                  "icon": "check",
+                  "library": "lucide",
+                  "fill": "#2563EB"
+                },
+                {
+                  "type": "text",
+                  "id": "gaEQ1",
+                  "name": "Rule Dialog Tree Text",
+                  "fill": "#111827",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "弹框内 zTree 不被标题栏或按钮样式污染",
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

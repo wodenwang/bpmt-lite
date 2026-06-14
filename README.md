@@ -6,10 +6,10 @@
 
 本仓只处理遗留 BPMT 的发行工程：代码结构、打包方式、配置方式、Docker 运行方式、初始化数据和升级脚本。不升级 Java/Tomcat/MariaDB 技术栈，不重写业务功能。
 
-当前版本：`v1.8.1`
+当前版本：`v1.9.0`
 
-- Web 镜像：`ghcr.io/wodenwang/bpmt-lite:1.8.1`
-- API 镜像：`ghcr.io/wodenwang/bpmt-lite-api:1.8.1`
+- Web 镜像：`ghcr.io/wodenwang/bpmt-lite:1.9.0`
+- API 镜像：`ghcr.io/wodenwang/bpmt-lite-api:1.9.0`
 - 同步镜像：`ghcr.io/wodenwang/bpmt-lite:latest`、`ghcr.io/wodenwang/bpmt-lite-api:latest`
 - 默认访问地址：`http://127.0.0.1/`
 - API 文档：`http://127.0.0.1/api/docs/`
@@ -21,7 +21,7 @@
 不需要 clone 项目，直接执行一条命令完成安装、初始化数据库并启动服务：
 
 ```bash
-curl -fsSL https://github.com/wodenwang/bpmt-lite/raw/refs/tags/v1.8.1/scripts/install.sh | bash
+curl -fsSL https://github.com/wodenwang/bpmt-lite/raw/refs/tags/v1.9.0/scripts/install.sh | bash
 ```
 
 脚本会创建 `bpmt-lite/` 运行目录，下载 `docker-compose.yml`、初始化脚本、升级脚本、nginx 配置模板和默认数据库，并执行 `docker compose up -d`。
@@ -42,7 +42,7 @@ http://127.0.0.1/
 启用本地 HTTPS：
 
 ```bash
-curl -fsSL https://github.com/wodenwang/bpmt-lite/raw/refs/tags/v1.8.1/scripts/install.sh | BPMT_HTTPS_ENABLED=1 bash
+curl -fsSL https://github.com/wodenwang/bpmt-lite/raw/refs/tags/v1.9.0/scripts/install.sh | BPMT_HTTPS_ENABLED=1 bash
 ```
 
 升级到最新版本：
@@ -52,7 +52,7 @@ cd bpmt-lite
 sh ./upgrade.sh
 ```
 
-`upgrade.sh` 会根据 GitHub 最新 release/tag 下载参考 compose 文件，例如 `docker-compose-v1.8.1.yml`；不会覆盖当前 `docker-compose.yml`。升级时只拉取 BPMT Web/API 的 `latest` 镜像并重启这两个服务，不自动升级 `mariadb`、`nginx` 等第三方容器。升级状态记录在 `.bpmt-lite/` 下，不写入业务数据库。
+`upgrade.sh` 会根据 GitHub 最新 release/tag 下载参考 compose 文件，例如 `docker-compose-v1.9.0.yml`；不会覆盖当前 `docker-compose.yml`。升级时只拉取 BPMT Web/API 的 `latest` 镜像并重启这两个服务，不自动升级 `mariadb`、`nginx` 等第三方容器。升级状态记录在 `.bpmt-lite/` 下，不写入业务数据库。
 
 常用检查：
 
@@ -124,6 +124,7 @@ docker compose up -d
 
 | 版本 | 发布日期 | 说明 | 文档 |
 | --- | --- | --- | --- |
+| `v1.9.0` | 2026-06-14 | 修复桌面后台弹框层级、关闭按钮、空状态生命周期、壳层对齐和非菜单 zTree hover 尺寸稳定问题。 | [release](docs/release-v1.9.0.md)、[设计](docs/v2.0.0/v1.9.0-desktop-shell-navigation-design.md)、[QA](docs/v2.0.0/screenshots/v1.9.0-shell-navigation/) |
 | `v1.8.1` | 2026-06-13 | 基于人工浏览器标注修复桌面后台 footer、按钮、表格、zTree、顶部栏、logo 和通用空状态等前端可用性问题。 | [release](docs/release-v1.8.1.md)、[计划](docs/superpowers/plans/2026-06-13-bpmt-lite-v1.8.1-frontend-defect-hardening.md)、[QA](docs/v2.0.0/configuration-workbench-lite-qa-2026-06-13.md) |
 | `v1.8.0` | 2026-06-12 | 新增桌面后台清晰度基线，围绕登录后首页、第三方系统列表和 AI 接入提示词弹窗改善任务说明、主操作、空状态和复制反馈。 | [release](docs/release-v1.8.0.md)、[设计](docs/superpowers/specs/2026-06-11-bpmt-lite-v1.8.0-desktop-admin-clarity-design.md)、[QA](docs/v2.0.0/desktop-ui-qa-checklist.md) |
 | `v1.7.5` | 2026-05-30 | 增强第三方系统 AI 接入提示词生成，便于初始化 Codex/Claude Code 第三方项目治理文件。 | [release](docs/release-v1.7.5.md)、[API](docs/v1.7.5/api-reference.md)、[OpenAPI](docs/v1.7.5/openapi.json) |
@@ -151,6 +152,7 @@ docker compose up -d
 
 - [bpmt-doc](https://github.com/wodenwang/bpmt-doc)：面向低代码用户的 SOP 文档项目。
 - [维护说明](docs/maintenance.md)：维护者构建、验证、镜像发布和升级策略。
+- [v1.9.0 发布说明](docs/release-v1.9.0.md)：桌面后台壳层、弹框、空状态和 zTree 全局缺陷修复版本的范围、验证和回滚说明。
 - [v1.8.1 发布说明](docs/release-v1.8.1.md)：桌面后台前端缺陷加固补丁版本的范围、验证和回滚说明。
 - [v1.8.0 发布说明](docs/release-v1.8.0.md)：桌面后台清晰度基线版本的范围、验证和回滚说明。
 - [v1.8.0 桌面后台清晰度设计](docs/superpowers/specs/2026-06-11-bpmt-lite-v1.8.0-desktop-admin-clarity-design.md)：Product Design 重新规划后的设计依据。

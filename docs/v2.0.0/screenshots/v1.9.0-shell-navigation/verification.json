@@ -1,0 +1,35 @@
+{
+  "url": "http://127.0.0.1:18080/J_DpS0eJL9X.xhtml",
+  "login": {
+    "hasShell": 2
+  },
+  "modal": {
+    "overlayZ": "5000",
+    "dialogZ": "5010",
+    "highButtonZ": "999",
+    "closeWidth": "32px",
+    "closeHeight": "32px"
+  },
+  "emptyState": {
+    "afterEmpty": 1,
+    "afterData": 0,
+    "dataRows": 1
+  },
+  "ztree": {
+    "base": {
+      "height": "32px",
+      "lineHeight": "30px",
+      "paddingLeft": "8px",
+      "paddingRight": "8px",
+      "borderTopWidth": "1px"
+    },
+    "hover": {
+      "height": "32px",
+      "lineHeight": "30px",
+      "paddingLeft": "8px",
+      "paddingRight": "8px",
+      "borderTopWidth": "1px"
+    }
+  },
+  "consoleErrors": []
+}

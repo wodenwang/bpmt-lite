@@ -7,7 +7,7 @@
   <parent>
     <groupId>com.riversoft</groupId>
     <artifactId>riversoft-product</artifactId>
-    <version>1.8.1</version>
+    <version>1.9.0</version>
   </parent>
 
   <properties>

@@ -20,8 +20,8 @@
 <link href="${_cp}/css/styles.css" rel="stylesheet">
 <%-- 深浅样式 --%>
 <link href="${_cp}/css/styles_${_backgroud_style=='1'?'dark':'light'}.css" rel="stylesheet">
-<%-- v1.8.0 桌面后台清晰度基线覆盖层，最后加载以便可单文件回滚 --%>
-<link href="${_cp}/css/bpmt-modern.css?v=20260613-top-menu" rel="stylesheet">
+<%-- v1.8.0+ 桌面后台清晰度覆盖层，最后加载以便可单文件回滚 --%>
+<link href="${_cp}/css/bpmt-modern.css?v=20260614-v190-shell" rel="stylesheet">
 
 <%-- 公共js函数 --%>
 <script>
@@ -117,7 +117,7 @@
 <script src="${_cp}/js/ws-ajax.js"></script>
 <script src="${_cp}/js/ws-ajax-ext.js"></script>
 <script src="${_cp}/js/ws-core.js"></script>
-<script src="${_cp}/js/ws-core-ext.js"></script>
+<script src="${_cp}/js/ws-core-ext.js?v=20260614-v190-empty-state"></script>
 <script src="${_cp}/js/ws-ui.js"></script>
 <script src="${_cp}/js/ws-ui-ext.js"></script>
 <script src="${_cp}/js/ws-widget.js"></script>

@@ -1,0 +1,54 @@
+{
+  "desktop": {
+    "logo": {
+      "x": 5,
+      "y": 44,
+      "width": 250,
+      "height": 71
+    },
+    "menu": {
+      "x": 5,
+      "y": 115,
+      "width": 250,
+      "height": 750
+    },
+    "topActions": {
+      "x": 265,
+      "y": 77,
+      "width": 744,
+      "height": 30
+    },
+    "main": {
+      "x": 265,
+      "y": 115,
+      "width": 1170,
+      "height": 1097
+    }
+  },
+  "narrow": {
+    "logo": {
+      "x": 5,
+      "y": 44,
+      "width": 250,
+      "height": 71
+    },
+    "menu": {
+      "x": 5,
+      "y": 115,
+      "width": 250,
+      "height": 618
+    },
+    "topActions": {
+      "x": 265,
+      "y": 77,
+      "width": 744,
+      "height": 30
+    },
+    "main": {
+      "x": 265,
+      "y": 115,
+      "width": 1096,
+      "height": 1097
+    }
+  }
+}

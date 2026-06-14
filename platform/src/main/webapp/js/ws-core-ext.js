@@ -147,9 +147,9 @@ Core.applyEmptyTableState = function(zone) {
 	zone = zone || '';
 	$.each($(zone + 'table.ws-table[form]'), function() {
 		var $table = $(this);
-		if ($('.bpmt-empty-table-row', $table).size() > 0) {
-			return;
-		}
+		var $emptyRows = $('.bpmt-empty-table-row', $table).filter(function() {
+			return $(this).parents('table:first')[0] == $table[0];
+		});
 		if ($('th[field], th[check]', $table).size() < 1) {
 			return;
 		}
@@ -169,6 +169,10 @@ Core.applyEmptyTableState = function(zone) {
 			}
 		});
 		if (hasDataRow) {
+			$emptyRows.remove();
+			return;
+		}
+		if ($emptyRows.size() > 0) {
 			return;
 		}
 

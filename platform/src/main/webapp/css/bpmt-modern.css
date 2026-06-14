@@ -15,6 +15,13 @@
  * Danger: #dc2626
  * Success: #16a34a
  * Radius: 4px / 6px
+ *
+ * Layer ladder:
+ * shell/fixed chrome <= 100
+ * floating widgets/chosen <= 900
+ * modal overlay = 5000
+ * modal dialog = 5010
+ * dialog titlebar buttons inherit dialog layer
  */
 
 html,
@@ -338,6 +345,7 @@ button[name="copyAiPrompt"].ui-button:hover {
 	box-shadow: 0 24px 60px rgba(15, 23, 42, 0.24);
 	overflow: hidden;
 	padding: 0;
+	z-index: 5010 !important;
 }
 
 .ui-dialog .ui-dialog-titlebar {
@@ -355,12 +363,39 @@ button[name="copyAiPrompt"].ui-button:hover {
 	line-height: 22px;
 }
 
-.ui-dialog .ui-dialog-titlebar-close {
-	border-radius: 4px;
-	height: 28px;
-	margin-top: -14px;
-	right: 10px;
-	width: 28px;
+.ui-dialog .ui-dialog-titlebar-buttonpane {
+	height: 32px !important;
+	margin-top: -16px !important;
+	right: 12px !important;
+}
+
+.ui-dialog .ui-dialog-titlebar-close,
+.ui-dialog .ui-dialog-titlebar-buttonpane > a {
+	align-items: center;
+	border-radius: 6px;
+	box-sizing: border-box;
+	display: inline-flex;
+	height: 32px !important;
+	justify-content: center;
+	margin: 0 !important;
+	padding: 0 !important;
+	right: 12px;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 32px !important;
+}
+
+.ui-dialog .ui-dialog-titlebar-close .ui-icon,
+.ui-dialog .ui-dialog-titlebar-buttonpane > a .ui-icon {
+	margin: 0;
+	position: static;
+}
+
+.ui-dialog .ui-dialog-titlebar-close:hover,
+.ui-dialog .ui-dialog-titlebar-close:focus,
+.ui-dialog .ui-dialog-titlebar-buttonpane > a:hover,
+.ui-dialog .ui-dialog-titlebar-buttonpane > a:focus {
+	padding: 0 !important;
 }
 
 .ui-dialog .ui-dialog-content {
@@ -376,7 +411,12 @@ button[name="copyAiPrompt"].ui-button:hover {
 
 .ui-widget-overlay {
 	background: #0f172a;
-	opacity: 0.42;
+	opacity: 0.48;
+	z-index: 5000 !important;
+}
+
+#dialog-extend-fixed-container {
+	z-index: 900 !important;
 }
 
 .ws-table,
@@ -784,16 +824,19 @@ th.left {
 
 .frame.header {
 	background: #f6f8fb;
+	margin-bottom: 0 !important;
 	margin-top: 44px !important;
 }
 
 .frame.header .left {
 	background: #ffffff;
 	border: 1px solid #d9e2ec;
-	border-radius: 6px;
+	border-bottom: 0;
+	border-radius: 6px 6px 0 0;
 	box-sizing: border-box;
 	min-height: 58px;
 	padding: 10px;
+	width: 250px;
 }
 
 .frame.header .right {
@@ -805,6 +848,7 @@ th.left {
 }
 
 .frame.center {
+	margin-top: 0 !important;
 	margin-bottom: 46px !important;
 	min-width: 0;
 }
@@ -812,10 +856,13 @@ th.left {
 .frame.menu {
 	background: #ffffff;
 	border: 1px solid #d9e2ec;
-	border-radius: 6px;
+	border-radius: 0 0 6px 6px;
+	border-top: 0;
 	box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
 	box-sizing: border-box;
+	margin-top: 0;
 	overflow: hidden;
+	width: 250px;
 }
 
 .frame.menu .ws-panel {
@@ -889,6 +936,97 @@ th.left {
 	white-space: nowrap;
 }
 
+/*
+ * frame_new shell target:
+ * left navigation column = 264px
+ * top user bar = 40px
+ * domain/header band = 78px
+ * main content starts at x = 264px
+ */
+.tc-top-wrap {
+	background: #ffffff;
+	border-bottom: 1px solid #d9e2ec;
+	box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+	box-sizing: border-box;
+	min-height: 40px;
+	padding: 0 24px;
+}
+
+.tc-logo-wrap,
+.tc-slider-bar {
+	box-sizing: border-box;
+	width: 264px !important;
+}
+
+.tc-logo-wrap {
+	background: #ffffff;
+	border: 1px solid #d9e2ec;
+	border-bottom: 0;
+	border-radius: 6px 6px 0 0;
+	height: 78px;
+	margin: 8px 0 0 5px;
+	padding: 14px 20px;
+}
+
+.tc-logo-wrap .tc-logo {
+	align-items: center;
+	display: flex;
+	gap: 12px;
+	justify-content: center;
+	margin: 0;
+	max-width: none;
+	min-height: 48px;
+}
+
+.tc-logo-wrap .tc-logo img {
+	max-height: 48px;
+	max-width: 220px;
+	object-fit: contain;
+}
+
+.tc-tab-bar {
+	background: #f6f8fb;
+	box-sizing: border-box;
+	height: 78px;
+	margin-left: 264px;
+	padding: 34px 16px 0;
+}
+
+.tc-tab-bar .tc-nav {
+	border-color: #cbd5e1;
+	border-radius: 4px;
+	box-sizing: border-box;
+	height: 30px;
+	line-height: 28px;
+	padding: 0 12px;
+}
+
+.tc-wrapper {
+	clear: both;
+}
+
+.tc-slider-bar {
+	background: #ffffff !important;
+	border: 1px solid #d9e2ec;
+	border-radius: 0 0 6px 6px;
+	border-top: 0;
+	margin-left: 5px;
+	padding-top: 12px;
+}
+
+.tc-container {
+	box-sizing: border-box;
+	margin-left: 264px !important;
+	min-width: 0;
+	padding: 0 16px 44px;
+}
+
+.tc-slider-bar .ws-panel,
+.tc-slider-bar .ui-widget-content {
+	border-left: 0;
+	border-right: 0;
+}
+
 .frame.login {
 	margin-bottom: 56px;
 	width: 460px;
@@ -946,33 +1084,38 @@ th.left {
 }
 
 .ztree li {
-	line-height: 26px;
+	line-height: 32px !important;
 }
 
 .ztree li a {
-	border: 1px solid transparent;
-	border-radius: 4px;
-	box-sizing: border-box;
+	align-items: center !important;
+	border: 1px solid transparent !important;
+	border-radius: 4px !important;
+	box-sizing: border-box !important;
 	color: #344054 !important;
-	height: 26px;
-	line-height: 24px;
-	padding: 0 4px;
+	display: inline-flex !important;
+	height: 32px !important;
+	line-height: 30px !important;
+	padding: 0 8px !important;
+	vertical-align: middle !important;
 }
 
 .ztree li a:hover,
-.ztree li a.curSelectedNode {
+.ztree li a.curSelectedNode,
+.ztree li a:focus {
 	background: #eff6ff;
-	border: 1px solid #bfdbfe;
+	border: 1px solid #bfdbfe !important;
 	color: #1d4ed8 !important;
-	height: 26px;
-	line-height: 24px;
+	height: 32px !important;
+	line-height: 30px !important;
 	opacity: 1;
-	padding: 0 4px;
+	padding: 0 8px !important;
 }
 
 .ztree li span.button {
+	flex: 0 0 auto;
 	opacity: 0.72;
-	vertical-align: middle;
+	vertical-align: middle !important;
 }
 
 .ztree li a:hover span.button,
@@ -992,7 +1135,7 @@ th.left {
 
 .ztree li span.node_name {
 	display: inline-block;
-	max-width: 168px;
+	max-width: 180px;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	vertical-align: middle;
@@ -1000,13 +1143,7 @@ th.left {
 }
 
 #frame-menu-panel .ztree li a {
-	border: 1px solid transparent;
-	border-radius: 4px;
-	box-sizing: border-box;
 	color: #344054 !important;
-	height: 26px;
-	line-height: 24px;
-	padding: 0 4px;
 }
 
 #frame-menu-panel .ztree li a:hover,
@@ -1014,10 +1151,7 @@ th.left {
 	background: #eff6ff;
 	border: 1px solid #bfdbfe;
 	color: #1d4ed8 !important;
-	height: 26px;
-	line-height: 24px;
 	opacity: 1;
-	padding: 0 4px;
 }
 
 #frame-menu-panel .ztree li span.button {

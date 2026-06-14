@@ -36,8 +36,9 @@
 - `v1.7.5` 是基于 `v1.7.4` 增强第三方系统 AI 接入提示词生成的补丁版本。
 - `v1.8.0` 是桌面后台清晰度基线版本；原 `modern-theme foundation` / CSS-only 主题方向已被判定失败，仅保留为历史记录。
 - `v1.8.1` 是基于 `v1.8.0` 的桌面后台前端缺陷加固补丁版本，修复人工浏览器校验中标注的 footer、按钮、表格、zTree、顶部栏、logo 和通用空状态等问题。
-- 默认 Web 镜像：`ghcr.io/wodenwang/bpmt-lite:1.8.1`
-- 默认 API 镜像：`ghcr.io/wodenwang/bpmt-lite-api:1.8.1`
+- `v1.9.0` 是基于 `v1.8.1` 的桌面后台壳层、全局弹框、空状态生命周期和非菜单 zTree 缺陷修复版本。
+- 默认 Web 镜像：`ghcr.io/wodenwang/bpmt-lite:1.9.0`
+- 默认 API 镜像：`ghcr.io/wodenwang/bpmt-lite-api:1.9.0`
 - 同步镜像 tag：发布后同步到 `ghcr.io/wodenwang/bpmt-lite:latest` 和 `ghcr.io/wodenwang/bpmt-lite-api:latest`
 - 默认访问地址：`http://127.0.0.1/`
 - HTTPS 访问地址：`https://127.0.0.1/`，需要 `BPMT_HTTPS_ENABLED=1`
@@ -75,6 +76,7 @@
 - v1.8.0 已重新规划并收口为 `desktop admin clarity baseline`，source-of-truth 顺序是：`AGENTS.md` -> `docs/release-v1.8.0.md` -> `docs/v2.0.0/desktop-admin-clarity-replan.md` -> `docs/superpowers/specs/2026-06-11-bpmt-lite-v1.8.0-desktop-admin-clarity-design.md` -> `docs/superpowers/plans/2026-06-11-bpmt-lite-v1.8.0-desktop-admin-clarity.md` -> `README.md` -> implementation。
 - v1.8.0 不以全局 CSS-only 现代主题作为发布目标，而是围绕登录后首页、第三方系统列表、AI 接入提示词弹窗三条代表路径改善当前位置、页面任务、主操作、空/加载状态和复制反馈。
 - v1.8.1 前端缺陷加固开发和验收期间的 source-of-truth 顺序是：`AGENTS.md` -> `docs/release-v1.8.1.md` -> `docs/superpowers/plans/2026-06-13-bpmt-lite-v1.8.1-frontend-defect-hardening.md` -> `docs/v2.0.0/configuration-workbench-lite-qa-2026-06-13.md` -> `docs/v2.0.0/configuration-workbench-lite-verification-2026-06-13/README.md` -> `README.md` -> implementation。
+- v1.9.0 桌面壳层与全局缺陷修复开发和验收期间的 source-of-truth 顺序是：`AGENTS.md` -> `docs/release-v1.9.0.md` -> `docs/superpowers/plans/2026-06-14-bpmt-lite-v1.9.0-shell-navigation-hardening.md` -> `docs/v2.0.0/v1.9.0-plan-eng-review-2026-06-14.md` -> `design/bpmt-v1.9.0-shell-navigation.pen` -> `README.md` -> implementation。
 
 ## 已验证的本地编译基线
 

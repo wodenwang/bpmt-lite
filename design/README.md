@@ -112,3 +112,32 @@ v2 修正说明：
 - Pencil CLI agent 路径因 `API Error: 402 Insufficient Balance` 不可用。
 - 最终通过 `pencil interactive --in design/configuration-workbench-lite-review.pen --out design/configuration-workbench-lite-v2.pen` 使用结构化 MCP 操作生成。
 - 通过 `export_nodes` 导出 `design/qHTYM.png`，并复制为稳定文件名 `design/configuration-workbench-lite-v2.png`。
+
+## v1.9.0 桌面壳层与全局缺陷原型
+
+`v1.9.0` 原型聚焦桌面后台壳层、全局弹框层级、空状态生命周期和非菜单 zTree hover 稳定性，不继续扩展 `v1.8.x` 的登录页、第三方系统表格细节或 AI 提示词内容 polish。
+
+| 文件 | 用途 |
+| --- | --- |
+| `bpmt-v1.9.0-shell-navigation.pen` | Pencil 源文件，包含 4 个 1440x900 目标态画面 |
+| `v1.9.0-shell-navigation-source-export/By36y.png` | `01 Home shell`，展示统一导航侧栏、顶部功能按钮、主内容区和空状态生命周期约束 |
+| `v1.9.0-shell-navigation-source-export/lGDEH.png` | `02 Settings shell`，展示系统开发配置页的侧栏、顶部栏、内容列表和非菜单 zTree 对齐 |
+| `v1.9.0-shell-navigation-source-export/N4pjvS.png` | `03 Modal layering`，展示遮罩覆盖高层级按钮、窗体位于遮罩之上、关闭按钮固定 32 x 32 |
+| `v1.9.0-shell-navigation-source-export/Bcx3h.png` | `04 Non-menu zTree`，展示全站 zTree hover 前后尺寸稳定的量化验收 |
+
+正式评审优先查看：
+
+```text
+design/bpmt-v1.9.0-shell-navigation.pen
+design/v1.9.0-shell-navigation-source-export/
+```
+
+Pencil 生成与验证记录：
+
+- `pencil 0.2.7`
+- `pencil interactive --out design/bpmt-v1.9.0-shell-navigation.pen`
+- `pencil interactive --in design/bpmt-v1.9.0-shell-navigation.pen --out /tmp/bpmt-v1.9.0-shell-navigation-export-read.pen`
+- `snapshot_layout({ problemsOnly: true })` 返回 `No layout problems.`
+- `export_nodes({ nodeIds: ["By36y","lGDEH","N4pjvS","Bcx3h"], outputDir: ".../design/v1.9.0-shell-navigation-source-export", format: "png", scale: 2 })`
+
+注意：`pencil --out ... --prompt ... --export ...` 的 agent 路径在当前环境仍受 `API Error: 402 Insufficient Balance` 限制；本原型通过 Pencil interactive 的结构化操作落盘。不要用早期内存导出的临时 PNG 目录作为评审依据。
